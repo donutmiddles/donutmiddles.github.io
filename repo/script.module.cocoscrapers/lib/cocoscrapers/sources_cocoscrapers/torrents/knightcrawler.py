@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 7-19-2022) ud (updated 05/22/24)
+# created by Venom for Fenomscrapers (2-10-2024) ud (updated 05/22/24)
 '''
 	Fenomscrapers Project
 '''
@@ -7,8 +7,10 @@
 from json import loads as jsloads
 import re
 from cocoscrapers.modules import client
-from cocoscrapers.modules import source_utils, cache
-from cocoscrapers.modules.control import setting as getSetting, homeWindow, sleep
+from cocoscrapers.modules import source_utils
+from cocoscrapers.modules import cache
+from cocoscrapers.modules import log_utils
+from cocoscrapers.modules import control
 
 class source:
 	priority = 1
@@ -17,16 +19,11 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = "https://torrentio.strem.fun"
-		#self.movieSearch_link = '/providers=yts,eztv,rarbg,1337x,thepiratebay,kickasstorrents,torrentgalaxy|language=english/stream/movie/%s.json' #found this to be broken 12-9-22 umbrelladev
-		#self.tvSearch_link = '/providers=yts,eztv,rarbg,1337x,thepiratebay,kickasstorrents,torrentgalaxy|language=english/stream/series/%s:%s:%s.json' #found this to be broken 12-9-22 umbrelladev
-		#self.movieSearch_link = '/providers=yts,eztv,rarbg,1337x,thepiratebay,kickasstorrents,torrentgalaxy/stream/movie/%s.json'
-		#self.tvSearch_link = '/providers=yts,eztv,rarbg,1337x,thepiratebay,kickasstorrents,torrentgalaxy/stream/series/%s:%s:%s.json'
+		self.base_link = "https://torrentio.elfhosted.com"
 		self.movieSearch_link = '/stream/movie/%s.json'
 		self.tvSearch_link = '/stream/series/%s:%s:%s.json'
+		self.bypass_filter = control.setting('knightcrawler.bypass_filter')
 		self.min_seeders = 0
-		self.bypass_filter = getSetting('torrentio.bypass_filter')
-# Currently supports YTS(+), EZTV(+), RARBG(+), 1337x(+), ThePirateBay(+), KickassTorrents(+), TorrentGalaxy(+), HorribleSubs(+), NyaaSi(+), NyaaPantsu(+), Rutor(+), Comando(+), ComoEuBaixo(+), Lapumia(+), OndeBaixa(+), Torrent9(+).
 
 	def _get_files(self, url):
 		if self.get_pack_files: return []
@@ -38,7 +35,7 @@ class source:
 		self.get_pack_files = False
 		sources = []
 		if not data:
-			homeWindow.clearProperty('cocoscrapers.torrentio.performing_single_scrape')
+			control.homeWindow.clearProperty('cocoscrapers.knightcrawler.performing_single_scrape')
 			return sources
 		sources_append = sources.append
 		try:
@@ -46,7 +43,7 @@ class source:
 			year = data['year']
 			imdb = data['imdb']
 			if 'tvshowtitle' in data:
-				homeWindow.setProperty('cocoscrapers.torrentio.performing_single_scrape', 'true')
+				control.homeWindow.setProperty('cocoscrapers.knightcrawler.performing_single_scrape', 'true')
 				title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ').replace('$', 's')
 				episode_title = data['title']
 				season = data['season']
@@ -62,13 +59,13 @@ class source:
 				years = [str(int(year)-1), str(year), str(int(year)+1)]
 				url = '%s%s' % (self.base_link, self.movieSearch_link % imdb)
 				files = self._get_files(url)
-			homeWindow.clearProperty('cocoscrapers.torrentio.performing_single_scrape')
-			_INFO = re.compile(r'👤.*')
+			control.homeWindow.clearProperty('cocoscrapers.knightcrawler.performing_single_scrape')
+			_INFO = re.compile(r'💾.*')
 			undesirables = source_utils.get_undesirables()
 			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
-			homeWindow.clearProperty('cocoscrapers.torrentio.performing_single_scrape')
-			source_utils.scraper_error('TORRENTIO')
+			control.homeWindow.clearProperty('cocoscrapers.knightcrawler.performing_single_scrape')
+			source_utils.scraper_error('KNIGHTCRAWLER')
 			return sources
 
 		for file in files:
@@ -76,7 +73,9 @@ class source:
 				hash = file['infoHash']
 				file_title = file['title'].split('\n')
 				file_info = [x for x in file_title if _INFO.match(x)][0]
-				name = source_utils.clean_name(file_title[0])
+				#updated by ud to fix elf hosted title format change.
+				name = source_utils.clean_name(file_title[1])
+
 				if self.bypass_filter == 'false':
 					if not source_utils.check_title(title, aliases, name.replace('.(Archie.Bunker', ''), hdlr, year, years): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
@@ -97,11 +96,11 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				sources_append({'provider': 'torrentio', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+				sources_append({'provider': 'knightcrawler', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
-				homeWindow.clearProperty('cocoscrapers.torrentio.performing_single_scrape')
-				source_utils.scraper_error('TORRENTIO')
+				control.homeWindow.clearProperty('cocoscrapers.knightcrawler.performing_single_scrape')
+				source_utils.scraper_error('KNIGHTCRAWLER')
 		return sources
 
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -109,10 +108,10 @@ class source:
 		sources = []
 		if not data: return sources
 		count, finished_single_scrape = 0, False
-		sleep(2000)
+		control.sleep(2000)
 		while count < 10000 and not finished_single_scrape:
-			finished_single_scrape = homeWindow.getProperty('cocoscrapers.torrentio.performing_single_scrape') != 'true'
-			sleep(100)
+			finished_single_scrape = control.homeWindow.getProperty('cocoscrapers.knightcrawler.performing_single_scrape') != 'true'
+			control.sleep(100)
 			count += 100
 		if not finished_single_scrape: return sources
 		sources_append = sources.append
@@ -124,11 +123,11 @@ class source:
 			season = data['season']
 			url = '%s%s' % (self.base_link, self.tvSearch_link % (imdb, season, data['episode']))
 			files = cache.get(self._get_files, 10, url)
-			_INFO = re.compile(r'👤.*')
+			_INFO = re.compile(r'💾.*')
 			undesirables = source_utils.get_undesirables()
 			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
-			source_utils.scraper_error('TORRENTIO')
+			source_utils.scraper_error('KNIGHTCRAWLER')
 			return sources
 
 		for file in files:
@@ -138,7 +137,7 @@ class source:
 				file_info = [x for x in file_title if _INFO.match(x)][0]
 				name = source_utils.clean_name(file_title[0])
 				if self.bypass_filter == 'true': bypass_filter = True
-
+    
 				episode_start, episode_end = 0, 0
 				if not search_series:
 					if not bypass_filter:
@@ -171,11 +170,11 @@ class source:
 				except: dsize = 0
 				info = ' | '.join(info)
 
-				item = {'provider': 'torrentio', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+				item = {'provider': 'knightcrawler', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 				if search_series: item.update({'last_season': last_season})
 				elif episode_start: item.update({'episode_start': episode_start, 'episode_end': episode_end}) # for partial season packs
 				sources_append(item)
 			except:
-				source_utils.scraper_error('TORRENTIO')
+				source_utils.scraper_error('KNIGHTCRAWLER')
 		return sources
