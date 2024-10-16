@@ -144,7 +144,7 @@
         <description lang="en_NZ">Nimbus Helper for the Nimbus Skin.</description>
         <description lang="en_US">Nimbus Helper for the Nimbus Skin.</description>
     </extension>
-</addon><addon id="service.subtitles.a4ksubtitles" name="a4kSubtitles" version="3.17.0" provider-name="Unknown">
+</addon><addon id="service.subtitles.a4ksubtitles" name="a4kSubtitles" version="3.18.1" provider-name="Unknown">
     <requires>
       <import addon="script.module.requests" />
       <import addon="vfs.libarchive" optional="true" />
@@ -168,7 +168,13 @@ Supports: OpenSubtitles, BSPlayer, Podnadpisi.NET, SubDL, Addic7ed
             <screenshot>screenshot-02.png</screenshot>
             <screenshot>screenshot-03.png</screenshot>
         </assets>
-        <news>
+    <news>
+[v3.18.1]:
+  * Fix IMDB ID not found
+
+[v3.18.0]:
+  * Use the newer InfoTagVideo KODI API (contributed by @kiamvdd)
+
 [v3.17.0]:
   * Fix: TV year being pulled incorrectly
   * Fix: File name issues in both temp and media directories
