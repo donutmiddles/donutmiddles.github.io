@@ -35,7 +35,7 @@ def tvshow_details(tmdb_id, api_key):
 def episode_groups_data(tmdb_id):
 	api_key = tmdb_api_key()
 	if api_key in empty_setting_check: return no_api_key()
-	string = 'episode_groups_details_%s' % tmdb_id
+	string = 'episode_groups_data_%s' % tmdb_id
 	url = '%s/tv/%s/episode_groups?api_key=%s' % (base_url, tmdb_id, api_key)
 	return cache_function(get_tmdb, string, url, expiration=EXPIRY_1_WEEK)
 
