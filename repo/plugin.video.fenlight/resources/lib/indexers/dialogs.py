@@ -181,7 +181,9 @@ def episode_groups_choice(params):
 	meta = params.get('meta')
 	poster = params.get('poster') or empty_poster
 	groups = metadata.episode_groups(meta['tmdb_id'])
-	if not groups: return None
+	if not groups:
+		notification('No Episode Groups to choose from.')
+		return None
 	list_items = [{'line1': '%s | %s Order | %d Groups | %02d Episodes' % (item['name'], episode_group_types[item['type']], item['group_count'], item['episode_count']),
 					'line2': item['description'], 'icon': poster} for item in groups]
 	kwargs = {'items': json.dumps(list_items), 'heading': 'Episode Groups', 'enable_context_menu': 'true', 'enumerate': 'true', 'multi_line': 'true'}
@@ -220,7 +222,7 @@ def playback_choice(params):
 			{'line': 'Scrape with DEFAULT External Scrapers', 'function': 'scrape_with_default'},
 			{'line': 'Scrape with ALL External Scrapers', 'function': 'scrape_with_disabled'},
 			{'line': 'Scrape With All Filters Ignored', 'function': 'scrape_with_filters_ignored'}]
-	if media_type == 'episode' and episode_id: items.append({'line': 'Scrape with Custom Episode Groups Value', 'function': 'scrape_with_episode_group'})
+	if media_type == 'episode': items.append({'line': 'Scrape with Custom Episode Groups Value', 'function': 'scrape_with_episode_group'})
 	if aliases: items.append({'line': 'Scrape with an Alias', 'function': 'scrape_with_aliases'})
 	items.append({'line': 'Scrape with Custom Values', 'function': 'scrape_with_custom_values'})
 	list_items = [{'line1': i['line'], 'icon': poster} for i in items]
@@ -258,9 +260,7 @@ def playback_choice(params):
 		set_property('fs_filterless_search', 'true')
 	elif choice == 'scrape_with_episode_group':
 		choice = episode_groups_choice({'meta': meta, 'poster': poster})
-		if choice == None:
-			notification('No Episode Groups to choose from. Try a different method.')
-			return playback_choice(params)
+		if choice == None: return playback_choice(params)
 		episode_details = metadata.group_episode_data(metadata.group_details(choice), episode_id, season, episode)
 		if not episode_details:
 			notification('No matching episode')
