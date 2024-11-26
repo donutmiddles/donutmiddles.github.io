@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import time
-from random import shuffle
 from caches.providers_cache import ExternalProvidersCache
 from modules import kodi_utils, source_utils
 from modules.debrid import RD_check, PM_check, AD_check, query_local_cache
@@ -10,14 +9,17 @@ from modules.utils import clean_file_name
 ls, sleep, monitor, get_property, set_property = kodi_utils.local_string, kodi_utils.sleep, kodi_utils.monitor, kodi_utils.get_property, kodi_utils.set_property
 json, Thread, notification, hide_busy_dialog = kodi_utils.json, kodi_utils.Thread, kodi_utils.notification, kodi_utils.hide_busy_dialog
 normalize, get_file_info, pack_enable_check, def_host_dict = source_utils.normalize, source_utils.get_file_info, source_utils.pack_enable_check, source_utils.def_host_dict
-int_window_prop, get_setting = kodi_utils.int_window_prop, kodi_utils.get_setting
+int_window_prop, get_setting, random = kodi_utils.int_window_prop, kodi_utils.get_setting, kodi_utils.random
 season_display, show_display, remain_str, pack_display = ls(32537), ls(32089), ls(32676), '%s (%s)'
 pack_check = (season_display, show_display)
 debrid_runners = {'Real-Debrid': ('Real-Debrid', RD_check), 'Premiumize.me': ('Premiumize.me', PM_check), 'AllDebrid': ('AllDebrid', AD_check)}
 sd_check = ('SD', 'CAM', 'TELE', 'SYNC')
+correct_pack_sizes = ('torrentio', 'knightcrawler', 'comet')
 
 class source:
-	def __init__(self, meta, source_dict, debrid_torrents, internal_scrapers, prescrape_sources, progress_dialog, disabled_ext_ignored=False):
+	def __init__(self, meta, source_dict, debrid_torrents, debrid_service, debrid_token, internal_scrapers, prescrape_sources, progress_dialog, disabled_ext_ignored=False):
+
+		self.debrid_service, self.debrid_token = debrid_service, debrid_token
 		self.scrape_provider = 'external'
 		self.progress_dialog = progress_dialog
 		self.meta = meta
@@ -49,13 +51,14 @@ class source:
 			self.single_expiry, self.season_expiry, self.show_expiry = info['expiry_times']
 			if self.media_type == 'movie':
 				self.season_divider, self.show_divider = 0, 0
-				self.data = {'imdb': info['imdb_id'], 'title': self.title, 'aliases': aliases, 'year': self.year}
+				self.data = {'imdb': info['imdb_id'], 'title': self.title, 'aliases': aliases, 'year': self.year,
+				'debrid_service': self.debrid_service, 'debrid_token': self.debrid_token}
 			else:
 				try: self.season_divider = [int(x['episode_count']) for x in self.meta['season_data'] if int(x['season_number']) == int(self.meta['season'])][0]
 				except: self.season_divider = 1
 				self.show_divider = int(self.meta['total_aired_eps'])
 				self.data = {'imdb': info['imdb_id'], 'tvdb': info['tvdb_id'], 'tvshowtitle': self.title, 'aliases': aliases,'year': self.year,
-							'title': ep_name, 'season': str(self.season), 'episode': str(self.episode)}
+							'title': ep_name, 'season': str(self.season), 'episode': str(self.episode), 'debrid_service': self.debrid_service, 'debrid_token': self.debrid_token}
 		except: return []
 		return self.get_sources()
 
@@ -104,7 +107,7 @@ class source:
 				if pack_capable:
 					self.source_dict.extend([(i[0], i[1], ls(32537)) for i in pack_capable])
 					if self.show_packs: self.source_dict.extend([(i[0], i[1], ls(32089)) for i in pack_capable])
-					shuffle(self.source_dict)
+					random.shuffle(self.source_dict)
 			Thread(target=self.process_episode_threads).start()
 		if self.background: _background()
 		else: _scraperDialog()
@@ -211,7 +214,7 @@ class source:
 					else: quality, extraInfo = get_file_info(url=i_get('url'))
 					try:
 						size = i_get('size')
-						if 'package' in i and provider != 'torrentio':
+						if 'package' in i and provider not in correct_pack_sizes:
 							if i_get('package') == 'season': divider = self.season_divider
 							else: divider = self.show_divider
 							size = float(size) / divider

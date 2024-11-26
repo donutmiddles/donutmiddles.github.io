@@ -385,7 +385,6 @@ def build_single_episode(list_type, params={}):
 			try:
 				airing_today = [i for i in item_list
 								if date_difference_function(current_date, jsondate_to_datetime_function(i.get('first_aired', '2100-12-31'), '%Y-%m-%d').date(), 0)]
-				airing_today = sorted(airing_today, key=lambda i: i.get('first_aired', '2100-12-31'))
 			except: pass
 			remainder = [i for i in item_list if not i in airing_today]
 			remainder = sorted(remainder, key=lambda i: func(i[sort_key]), reverse=sort_direction)
