@@ -129,10 +129,20 @@
 	</variable>
 
 
-	<!-- Released -->
 	<!-- <variable name="RI_Year">
 		<value condition="!String.IsEmpty(ListItem.Year)">[COLOR unfocused_text]$INFO[ListItem.Year][/COLOR]</value>
 	</variable> -->
+	<!-- Released -->
+	<variable name="RI_Digital">
+    <!-- Already digitally released (more than 3 days) - show digital release date in teal -->
+    <value condition="Skin.HasSetting(Enable.SmartStatus) + String.IsEqual(Window(home).Property(nimbus.digital_release_flag),true)">[COLOR FF40E0B0]$INFO[Window(home).Property(nimbus.digital_release_date)][/COLOR]</value>
+    <!-- Recently released (within 3 days) - show digital release date in yellow -->
+    <value condition="Skin.HasSetting(Enable.SmartStatus) + String.IsEqual(Window(home).Property(nimbus.digital_release_flag),recently)">[COLOR FFFFC30B]$INFO[Window(home).Property(nimbus.digital_release_date)][/COLOR]</value>
+    <!-- Future digital release - show date in coral -->
+    <value condition="Skin.HasSetting(Enable.SmartStatus) + String.IsEqual(Window(home).Property(nimbus.digital_release_flag),false) + !String.IsEmpty(Window(home).Property(nimbus.digital_release_date))">[COLOR FFFF4D4D]$INFO[Window(home).Property(nimbus.digital_release_date)][/COLOR]</value>
+    <!-- Expired or disabled or fallback - show premiered date in unfocused color -->
+    <value condition="!Skin.HasSetting(Enable.SmartStatus) | String.IsEqual(Window(home).Property(nimbus.digital_release_flag),expired) | !String.IsEmpty(ListItem.Premiered)">[COLOR unfocused_text]$INFO[ListItem.Premiered][/COLOR]</value>
+	</variable>
 	<!-- Aired -->
 	<variable name="RI_Aired">
 		<value condition="!String.IsEmpty(ListItem.Premiered)">[COLOR unfocused_text]$INFO[ListItem.Premiered][/COLOR]</value>
@@ -254,8 +264,7 @@
 
 	<variable name="InfoPanelTop">
 		<!-- MOVIES -->
-		<value condition="!ListItem.IsCollection + $EXP[isMovie] + Integer.IsEqual(ListItem.Property(WatchedProgress),0)">$VAR[RI_Aired]$VAR[RI_Mpaa]$VAR[_Genre]$VAR[RI_MovieCollection]$VAR[RI_Rating_Other]$VAR[RI_Runtime]</value>
-		<value condition="!ListItem.IsCollection + $EXP[isMovie] + !Integer.IsEqual(ListItem.Property(WatchedProgress),0)">$VAR[RI_Aired]$VAR[RI_WatchedProgress]$VAR[RI_Mpaa]$VAR[_Genre]$VAR[RI_Rating_Other]$VAR[RI_Runtime]</value>
+		<value condition="!ListItem.IsCollection + $EXP[isMovie]">$VAR[RI_Digital]$VAR[RI_WatchedProgress]$VAR[RI_Mpaa]$VAR[_Genre]$VAR[RI_Rating_Other]$VAR[RI_Runtime]</value>
 		<!-- SHOWS -->
 		<value condition="!ListItem.IsCollection + $EXP[isTVShow]">$VAR[RI_Aired]$VAR[RI_Mpaa]$VAR[_Genre]$VAR[RI_TotalSeasons]$VAR[RI_EpisodesRemaining]$VAR[RI_Rating_Other]$VAR[RI_Status]</value>
 		<!-- SEASONS -->
@@ -307,6 +316,25 @@
 		<value condition="String.IsEqual(ListItem.Property(episode_type), series_finale)">Series Finale</value>
 		<value condition="String.IsEqual(ListItem.Property(episode_type), season_finale)">Season Finale</value>
 		<value condition="String.IsEqual(ListItem.Property(episode_type), mid_season_finale)">Mid-Season Finale</value>
+	</variable>
+
+	<variable name="DigitalReleaseTextColor">
+    <value condition="Skin.HasSetting(Enable.SmartStatus) + String.IsEqual(Window(home).Property(nimbus.digital_release_flag),true)">FF89dfc5</value>
+    <value condition="Skin.HasSetting(Enable.SmartStatus) + String.IsEqual(Window(home).Property(nimbus.digital_release_flag),recently)">FFeedfb1</value>
+    <value condition="Skin.HasSetting(Enable.SmartStatus) + String.IsEqual(Window(home).Property(nimbus.digital_release_flag),false) + !String.IsEmpty(Window(home).Property(nimbus.digital_release_date))">FFf6aaaa</value>
+    <value condition="!Skin.HasSetting(Enable.SmartStatus) | String.IsEqual(Window(home).Property(nimbus.digital_release_flag),expired) | !String.IsEmpty(Skin.String(TrailerPlaying)) | ControlGroup(996).HasFocus | Control.HasFocus(9000) | !String.IsEmpty(ListItem.Premiered)">unfocused_text</value>
+	</variable>
+
+	<variable name="DigitalReleaseColor">
+    <value condition="Skin.HasSetting(Enable.SmartStatus) + String.IsEqual(Window(home).Property(nimbus.digital_release_flag),true)">3340E0B0</value>
+    <value condition="Skin.HasSetting(Enable.SmartStatus) + String.IsEqual(Window(home).Property(nimbus.digital_release_flag),recently)">33FFC30B</value>
+    <value condition="Skin.HasSetting(Enable.SmartStatus) + String.IsEqual(Window(home).Property(nimbus.digital_release_flag),false) + !String.IsEmpty(Window(home).Property(nimbus.digital_release_date))">33FF4D4D</value>
+    <value condition="!Skin.HasSetting(Enable.SmartStatus) | String.IsEqual(Window(home).Property(nimbus.digital_release_flag),expired) | !String.IsEmpty(Skin.String(TrailerPlaying)) | ControlGroup(996).HasFocus | Control.HasFocus(9000) | !String.IsEmpty(ListItem.Premiered)">26CCCCCC</value>
+	</variable>
+
+	<variable name="DigitalReleaseValue">
+    <value condition="Skin.HasSetting(Enable.SmartStatus) + !String.IsEmpty(Window(home).Property(nimbus.digital_release_date)) + [String.IsEqual(Window(home).Property(nimbus.digital_release_flag),true) | String.IsEqual(Window(home).Property(nimbus.digital_release_flag),recently) | String.IsEqual(Window(home).Property(nimbus.digital_release_flag),false)]">$INFO[Window(home).Property(nimbus.digital_release_date)]</value>
+    <value condition="!Skin.HasSetting(Enable.SmartStatus) | String.IsEqual(Window(home).Property(nimbus.digital_release_flag),expired) | !String.IsEmpty(ListItem.Premiered)">$INFO[ListItem.Premiered]</value>
 	</variable>
 
 	<variable name="EpisodeTypeTextColor">
