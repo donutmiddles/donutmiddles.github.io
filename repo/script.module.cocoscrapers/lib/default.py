@@ -89,6 +89,10 @@ elif action == 'tools_viewLogFile':
 	from cocoscrapers.modules import log_utils
 	log_utils.view_LogFile(params.get('name'))
 
+elif action == 'tools_viewTorrentStats':
+	from cocoscrapers.modules import log_utils
+	log_utils.view_TorrentStats(params.get('name'))
+
 elif action == 'tools_uploadLogFile':
 	from cocoscrapers.modules import log_utils
 	log_utils.upload_LogFile()

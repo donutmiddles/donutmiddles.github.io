@@ -187,6 +187,10 @@ msgctxt "#32057"
 msgid "View CocoScrapers log file"
 msgstr ""
 
+msgctxt "#32569"
+msgid "View CocoScrapers torrent stats"
+msgstr ""
+
 msgctxt "#32058"
 msgid "Upload CocoScrapers log file to pastebin"
 msgstr ""
@@ -403,10 +407,6 @@ msgctxt "#32111"
 msgid "KICKASS2 (Pack Capable)"
 msgstr ""
 
-msgctxt "#32112"
-msgid "LIMETORRENTS (Pack capable)"
-msgstr ""
-
 msgctxt "#32113"
 msgid "MAGNET$NUMBER[4]YOU"
 msgstr ""
@@ -439,10 +439,6 @@ msgctxt "#32120"
 msgid "TOPNOW"
 msgstr ""
 
-msgctxt "#32121"
-msgid "TORLOCK"
-msgstr ""
-
 msgctxt "#32122"
 msgid "TORRENTAPI (Pack capable)"
 msgstr ""
@@ -473,10 +469,6 @@ msgstr ""
 
 msgctxt "#32129"
 msgid "BTDB (Pack capable)"
-msgstr ""
-
-msgctxt "#32130"
-msgid "TORRENTZ2  (Pack capable)"
 msgstr ""
 
 msgctxt "#32131"
@@ -517,14 +509,6 @@ msgstr ""
 
 msgctxt "#32140"
 msgid "Clear ALL Extra Undesirables"
-msgstr ""
-
-msgctxt "#32141"
-msgid "KNIGHTCRAWLER (Pack Capable)"
-msgstr ""
-
-msgctxt "#32142"
-msgid "RUTOR (Pack capable)"
 msgstr ""
 
 msgctxt "#32513"
