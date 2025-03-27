@@ -1,3 +1,6 @@
+[COLOR red][B]Version 1.0.32[/B][/COLOR]
+- Changed mediafusion to allow for custom url, custom strings, and kodi code authorization.
+
 [COLOR red][B]Version 1.0.31[/B][/COLOR]
 - Added mediafusion changes to send encrypted user token as header instead of url.
 

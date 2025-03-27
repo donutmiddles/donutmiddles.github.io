@@ -8,6 +8,7 @@ import base64, re, requests
 from cocoscrapers.modules import source_utils, cache
 from cocoscrapers.modules.control import homeWindow, sleep
 from cocoscrapers.modules import log_utils
+from cocoscrapers.modules import control
 session = requests.Session()
 from time import time
 
@@ -19,7 +20,12 @@ class source:
 	hasEpisodes = True
 	def __init__(self):
 		self.language = ['en']
-		self.base_link = 'https://mediafusion.elfhosted.com'
+		if control.setting('mediafusion.usecustomurl') == 'true': 
+			self.base_link = control.setting('mediafusion.customurl')
+		else:
+			self.base_link = 'https://mediafusion.elfhosted.com'
+		if self.base_link == '':
+			self.base_link = 'https://mediafusion.elfhosted.com'
 		self.movieSearch_link = '/stream/movie/%s.json'
 		self.tvSearch_link = '/stream/series/%s:%s:%s.json'
 		self.item_totals = {
@@ -33,9 +39,14 @@ class source:
 # Currently supports BITSEARCH(+), EZTV(+), ThePirateBay(+), TheRARBG(+), YTS(+)
 
 	def _get_files(self, url):
-		headers = {
-			'encoded_user_data': 'eyJlbmFibGVfY2F0YWxvZ3MiOiBmYWxzZSwgIm1heF9zdHJlYW1zX3Blcl9yZXNvbHV0aW9uIjogOTksICJ0b3JyZW50X3NvcnRpbmdfcHJpb3JpdHkiOiBbXSwgImNlcnRpZmljYXRpb25fZmlsdGVyIjogWyJEaXNhYmxlIl0sICJudWRpdHlfZmlsdGVyIjogWyJEaXNhYmxlIl19'
-		}
+		if control.setting('mediafusion_user_data') == '':
+			headers = {
+				'encoded_user_data': 'eyJlbmFibGVfY2F0YWxvZ3MiOiBmYWxzZSwgIm1heF9zdHJlYW1zX3Blcl9yZXNvbHV0aW9uIjogOTksICJ0b3JyZW50X3NvcnRpbmdfcHJpb3JpdHkiOiBbXSwgImNlcnRpZmljYXRpb25fZmlsdGVyIjogWyJEaXNhYmxlIl0sICJudWRpdHlfZmlsdGVyIjogWyJEaXNhYmxlIl19'
+			}
+		else:
+			headers = {
+				'encoded_user_data': control.setting('mediafusion_user_data')
+			}
 		if self.get_pack_files: return []
 		results = session.get(url, headers=headers, timeout=10)
 		files = results.json()['streams']

@@ -125,3 +125,13 @@ elif action == 'ProwlarrIndexers':
 	from cocoscrapers.modules.prowlarr import Prowlarr
 	prowlarr = Prowlarr()
 	prowlarr.get_indexers()
+
+elif action == 'mediafusionAuth':
+	from cocoscrapers.modules.mediafusion import MediaFusion
+	mediafusion = MediaFusion()
+	mediafusion.auth()
+
+elif action == 'mediafusionReset':
+	from cocoscrapers.modules.mediafusion import MediaFusion
+	mediafusion = MediaFusion()
+	mediafusion.clear()

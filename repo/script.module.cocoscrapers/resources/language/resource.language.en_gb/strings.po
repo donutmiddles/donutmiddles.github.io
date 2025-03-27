@@ -187,10 +187,6 @@ msgctxt "#32057"
 msgid "View CocoScrapers log file"
 msgstr ""
 
-msgctxt "#32569"
-msgid "View CocoScrapers torrent stats"
-msgstr ""
-
 msgctxt "#32058"
 msgid "Upload CocoScrapers log file to pastebin"
 msgstr ""
@@ -725,4 +721,28 @@ msgstr ""
 
 msgctxt "#32568"
 msgid "MEDIAFUSION (Pack Capable)"
+msgstr ""
+
+msgctxt "#32569"
+msgid "View CocoScrapers torrent stats"
+msgstr ""
+
+msgctxt "#32570"
+msgid "Setup Using Device Code"
+msgstr ""
+
+msgctxt "#32571"
+msgid "Mediafusion URL"
+msgstr ""
+
+msgctxt "#32572"
+msgid "Use Custom Mediafusion URL"
+msgstr ""
+
+msgctxt "#32573"
+msgid "Secret String"
+msgstr ""
+
+msgctxt "#32574"
+msgid "Reset Secret"
 msgstr ""
