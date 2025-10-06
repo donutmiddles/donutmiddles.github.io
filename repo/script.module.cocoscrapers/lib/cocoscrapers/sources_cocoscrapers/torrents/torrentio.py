@@ -4,19 +4,20 @@
 	Fenomscrapers Project
 '''
 
-from json import loads as jsloads
-import re
-from cocoscrapers.modules import client
-from cocoscrapers.modules import source_utils, cache
-from cocoscrapers.modules import log_utils
 from time import time
-from cocoscrapers.modules.control import setting as getSetting, homeWindow, sleep
+from json import loads as jsloads
+import re, queue
+from cocoscrapers.modules import client
+from cocoscrapers.modules import source_utils
+from cocoscrapers.modules import log_utils
+from cocoscrapers.modules.control import setting as getSetting
 
 class source:
 	priority = 1
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
+	_queue = queue.SimpleQueue()
 	def __init__(self):
 		self.language = ['en']
 		self.base_link = "https://torrentio.strem.fun"
@@ -31,17 +32,9 @@ class source:
 		self.bypass_filter = getSetting('torrentio.bypass_filter')
 # Currently supports YTS(+), EZTV(+), RARBG(+), 1337x(+), ThePirateBay(+), KickassTorrents(+), TorrentGalaxy(+), HorribleSubs(+), NyaaSi(+), NyaaPantsu(+), Rutor(+), Comando(+), ComoEuBaixo(+), Lapumia(+), OndeBaixa(+), Torrent9(+).
 
-	def _get_files(self, url):
-		if self.get_pack_files: return []
-		results = client.request(url, timeout=10)
-		files = jsloads(results)['streams']
-		return files
-
 	def sources(self, data, hostDict):
-		self.get_pack_files = False
 		sources = []
 		if not data:
-			homeWindow.clearProperty('cocoscrapers.torrentio.performing_single_scrape')
 			return sources
 		sources_append = sources.append
 		try:
@@ -50,7 +43,6 @@ class source:
 			year = data['year']
 			imdb = data['imdb']
 			if 'tvshowtitle' in data:
-				homeWindow.setProperty('cocoscrapers.torrentio.performing_single_scrape', 'true')
 				title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ').replace('$', 's')
 				episode_title = data['title']
 				season = data['season']
@@ -58,20 +50,22 @@ class source:
 				hdlr = 'S%02dE%02d' % (int(season), int(episode))
 				years = None
 				url = '%s%s' % (self.base_link, self.tvSearch_link % (imdb, season, episode))
-				files = cache.get(self._get_files, 10, url)
 			else:
 				title = data['title'].replace('&', 'and').replace('/', ' ').replace('$', 's')
 				episode_title = None
 				hdlr = year
 				years = [str(int(year)-1), str(year), str(int(year)+1)]
 				url = '%s%s' % (self.base_link, self.movieSearch_link % imdb)
-				files = self._get_files(url)
-			homeWindow.clearProperty('cocoscrapers.torrentio.performing_single_scrape')
+			try:
+				results = client.request(url, timeout=10)
+				files = jsloads(results)['streams']
+			except: files = []
+			self._queue.put_nowait(files) # if seasons
+			self._queue.put_nowait(files) # if shows
 			_INFO = re.compile(r'👤.*')
 			undesirables = source_utils.get_undesirables()
 			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
-			homeWindow.clearProperty('cocoscrapers.torrentio.performing_single_scrape')
 			source_utils.scraper_error('TORRENTIO')
 			return sources
 
@@ -105,7 +99,6 @@ class source:
 											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 				self.item_totals[quality] += 1
 			except:
-				homeWindow.clearProperty('cocoscrapers.torrentio.performing_single_scrape')
 				source_utils.scraper_error('TORRENTIO')
 		logged = False
 		for quality in self.item_totals:
@@ -118,16 +111,8 @@ class source:
 		return sources
 
 	def sources_packs(self, data, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
-		self.get_pack_files = True
 		sources = []
 		if not data: return sources
-		count, finished_single_scrape = 0, False
-		sleep(2000)
-		while count < 10000 and not finished_single_scrape:
-			finished_single_scrape = homeWindow.getProperty('cocoscrapers.torrentio.performing_single_scrape') != 'true'
-			sleep(100)
-			count += 100
-		if not finished_single_scrape: return sources
 		sources_append = sources.append
 		try:
 			startTime = time()
@@ -137,7 +122,7 @@ class source:
 			year = data['year']
 			season = data['season']
 			url = '%s%s' % (self.base_link, self.tvSearch_link % (imdb, season, data['episode']))
-			files = cache.get(self._get_files, 10, url)
+			files = self._queue.get(timeout=11)
 			_INFO = re.compile(r'👤.*')
 			undesirables = source_utils.get_undesirables()
 			check_foreign_audio = source_utils.check_foreign_audio()

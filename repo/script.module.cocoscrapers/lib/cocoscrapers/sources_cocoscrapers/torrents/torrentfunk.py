@@ -53,10 +53,16 @@ class source:
 			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']>(.+?)</a>', table, re.DOTALL | re.I)
 			self.undesirables = source_utils.get_undesirables()
 			self.check_foreign_audio = source_utils.check_foreign_audio()
-			from cocoscrapers.modules.Thread_pool import run_and_wait
-			from functools import partial
-			bound_get_sources = partial(self.get_sources)
-			run_and_wait(bound_get_sources, links)
+			# from cocoscrapers.modules.Thread_pool import run_and_wait
+			# from functools import partial
+			# bound_get_sources = partial(self.get_sources)
+			# run_and_wait(bound_get_sources, links)
+			threads = []
+			append = threads.append
+			for link in links:
+				append(workers.Thread(self.get_sources, link))
+			[i.start() for i in threads]
+			[i.join() for i in threads]
 			logged = False
 			for quality in self.item_totals:
 				if self.item_totals[quality] > 0:
@@ -146,15 +152,29 @@ class source:
 				queries = [
 						self.tvsearch_link % quote_plus(query + ' S%s' % self.season_xx),
 						self.tvsearch_link % quote_plus(query + ' Season %s' % self.season_x)]
-			from cocoscrapers.modules.Thread_pool import run_and_wait
-			from functools import partial
-			bound_get_pack_items = partial(self.get_pack_items)
-			links = []
+			# from cocoscrapers.modules.Thread_pool import run_and_wait
+			# from functools import partial
+			# bound_get_pack_items = partial(self.get_pack_items)
+			# links = []
+			# for url in queries:
+			# 	links.append('%s%s' % (self.base_link, url))
+			# run_and_wait(bound_get_pack_items,links)
+			# bound_get_pack_sources = partial(self.get_pack_sources)
+			# run_and_wait(bound_get_pack_sources, self.items)
+			threads = []
+			append = threads.append
 			for url in queries:
-				links.append('%s%s' % (self.base_link, url))
-			run_and_wait(bound_get_pack_items,links)
-			bound_get_pack_sources = partial(self.get_pack_sources)
-			run_and_wait(bound_get_pack_sources, self.items)
+				link = '%s%s' % (self.base_link, url)
+				append(workers.Thread(self.get_pack_items, link))
+			[i.start() for i in threads]
+			[i.join() for i in threads]
+
+			threads2 = []
+			append2 = threads2.append
+			for i in self.items:
+				append2(workers.Thread(self.get_pack_sources, i))
+			[i.start() for i in threads2]
+			[i.join() for i in threads2]
 			logged = False
 			for quality in self.item_totals:
 				if self.item_totals[quality] > 0:

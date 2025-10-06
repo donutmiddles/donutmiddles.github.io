@@ -746,3 +746,7 @@ msgstr ""
 msgctxt "#32574"
 msgid "Reset Secret"
 msgstr ""
+
+msgctxt "#32575"
+msgid "LIMETORRENTS (Pack Capable)"
+msgstr ""

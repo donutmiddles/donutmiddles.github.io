@@ -11,7 +11,7 @@ from cocoscrapers.modules import cache
 from cocoscrapers.modules import client
 from cocoscrapers.modules import source_utils
 from cocoscrapers.modules import workers
-from cocoscrapers.modules.Thread_pool import run_and_wait_multi
+# from cocoscrapers.modules.Thread_pool import run_and_wait_multi
 from functools import partial
 from time import time
 from cocoscrapers.modules import log_utils
@@ -158,11 +158,18 @@ class source:
 				queries = [
 						quote_plus(query + ' S%s' % self.season_xx),
 						quote_plus(query + ' Season %s' % self.season_x)]
-			bound_get_sources_packs = partial(self.get_sources_packs)
-			links = []
+			# bound_get_sources_packs = partial(self.get_sources_packs)
+			# links = []
+			# for url in queries:
+			# 	links.append((('%s%s' % (self.base_link, self.search_link % url)).replace('+', '-'), url.replace('+', '-')))	
+			# run_and_wait_multi(bound_get_sources_packs, links)
+			threads = []
+			append = threads.append
 			for url in queries:
-				links.append((('%s%s' % (self.base_link, self.search_link % url)).replace('+', '-'), url.replace('+', '-')))	
-			run_and_wait_multi(bound_get_sources_packs, links)
+				link = ('%s%s' % (self.base_link, self.search_link % url)).replace('+', '-')
+				append(workers.Thread(self.get_sources_packs, link, url.replace('+', '-')))
+			[i.start() for i in threads]
+			[i.join() for i in threads]
 			logged = False
 			for quality in self.item_totals:
 				if self.item_totals[quality] > 0:

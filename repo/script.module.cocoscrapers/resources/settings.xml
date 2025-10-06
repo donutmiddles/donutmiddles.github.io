@@ -217,6 +217,11 @@
 					<default>false</default>
 					<control type="toggle"/>
 				</setting>
+				<setting id="provider.limetorrents" type="boolean" label="32575" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
 				<setting id="provider.mediafusion" type="boolean" label="32568" help="">
 					<level>0</level>
 					<default>false</default>

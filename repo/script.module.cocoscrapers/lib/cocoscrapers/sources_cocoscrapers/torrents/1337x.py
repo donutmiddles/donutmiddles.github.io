@@ -60,12 +60,24 @@ class source:
 			# log_utils.log('urls = %s' % urls)
 			self.undesirables = source_utils.get_undesirables()
 			self.check_foreign_audio = source_utils.check_foreign_audio()
-			from cocoscrapers.modules.Thread_pool import run_and_wait
-			from functools import partial
-			bound_get_items = partial(self.get_items)
-			run_and_wait(bound_get_items, urls)
-			bound_get_sources = partial(self.get_sources)
-			run_and_wait(bound_get_sources, self.items)
+			# from cocoscrapers.modules.Thread_pool import run_and_wait
+			# from functools import partial
+			# bound_get_items = partial(self.get_items)
+			# run_and_wait(bound_get_items, urls)
+			# bound_get_sources = partial(self.get_sources)
+			# run_and_wait(bound_get_sources, self.items)
+			threads = []
+			append = threads.append
+			for url in urls:
+				append(workers.Thread(self.get_items, url))
+			[i.start() for i in threads]
+			[i.join() for i in threads]
+			threads2 = []
+			append2 = threads2.append
+			for i in self.items:
+				append2(workers.Thread(self.get_sources, i))
+			[i.start() for i in threads2]
+			[i.join() for i in threads2]
 			logged = False
 			for quality in self.item_totals:
 				if self.item_totals[quality] > 0:

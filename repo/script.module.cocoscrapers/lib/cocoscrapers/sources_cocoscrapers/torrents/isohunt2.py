@@ -57,10 +57,16 @@ class source:
 			rows = client.parseDOM(results, 'tr', attrs={'data-key': '0'})
 			self.undesirables = source_utils.get_undesirables()
 			self.check_foreign_audio = source_utils.check_foreign_audio()
-			from cocoscrapers.modules.Thread_pool import run_and_wait
-			from functools import partial
-			bound_get_sources = partial(self.get_sources)
-			run_and_wait(bound_get_sources, rows)
+			# from cocoscrapers.modules.Thread_pool import run_and_wait
+			# from functools import partial
+			# bound_get_sources = partial(self.get_sources)
+			# run_and_wait(bound_get_sources, rows)
+			threads = []
+			append = threads.append
+			for row in rows:
+				append(workers.Thread(self.get_sources, row))
+			[i.start() for i in threads]
+			[i.join() for i in threads]
 			logged = False
 			for quality in self.item_totals:
 				if self.item_totals[quality] > 0 and not logged:

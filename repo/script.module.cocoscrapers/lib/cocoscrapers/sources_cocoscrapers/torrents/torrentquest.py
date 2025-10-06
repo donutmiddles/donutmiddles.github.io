@@ -141,13 +141,20 @@ class source:
 				queries = [
 						self.search_link.format(query[0].lower(), cleantitle.geturl(query + ' S%s' % self.season_xx)),
 						self.search_link.format(query[0].lower(), cleantitle.geturl(query + ' Season %s' % self.season_x))]
-			from cocoscrapers.modules.Thread_pool import run_and_wait
-			from functools import partial
-			bound_get_sources_packs = partial(self.get_sources_packs)
-			links = []
+			# from cocoscrapers.modules.Thread_pool import run_and_wait
+			# from functools import partial
+			# bound_get_sources_packs = partial(self.get_sources_packs)
+			# links = []
+			# for url in queries:
+			# 	links.append('%s%s' % (self.base_link, url))
+			# run_and_wait(bound_get_sources_packs, links)
+			threads = []
+			append = threads.append
 			for url in queries:
-				links.append('%s%s' % (self.base_link, url))
-			run_and_wait(bound_get_sources_packs, links)
+				link = '%s%s' % (self.base_link, url)
+				append(workers.Thread(self.get_sources_packs, link))
+			[i.start() for i in threads]
+			[i.join() for i in threads]
 			logged = False
 			for quality in self.item_totals:
 				if self.item_totals[quality] > 0:

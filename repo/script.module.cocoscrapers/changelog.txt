@@ -1,3 +1,21 @@
+[COLOR red][B]Version 1.0.38[/B][/COLOR]
+- ThreadPool code changed to avoid hang on exit.
+
+[COLOR red][B]Version 1.0.37[/B][/COLOR]
+- ThreadPool code reversion.
+
+[COLOR red][B]Version 1.0.36[/B][/COLOR]
+- Modified Torrentio, Mediafusion, and Comet to use queue module.
+
+[COLOR red][B]Version 1.0.35[/B][/COLOR]
+- Updated cfscrape module.
+
+[COLOR red][B]Version 1.0.34[/B][/COLOR]
+- Added stats and threading to limetorrents.
+
+[COLOR red][B]Version 1.0.33[/B][/COLOR]
+- Added limetorrents support.
+
 [COLOR red][B]Version 1.0.32[/B][/COLOR]
 - Changed mediafusion to allow for custom url, custom strings, and kodi code authorization.
 
