@@ -191,10 +191,10 @@ class RandomLists():
 			if list_type == 'my_lists': self.random_results = [i for i in trakt_get_lists(list_type) if i['item_count']]
 			else: self.random_results = [i['list'] for i in trakt_get_lists(list_type) if i['list']['item_count']]
 			random_list = random.choice(self.random_results)
-			user, slug, list_id = random_list['user']['username'], random_list['user']['ids']['slug'], random_list['ids']['trakt']
+			user, slug, list_id = random_list['user']['username'], random_list['ids']['slug'], random_list['ids']['trakt']
 			list_name = random_list['name']
 			with_auth = list_type == 'my_lists'
-			result = get_trakt_list_contents(list_type, user, slug, with_auth, list_id)
+			result = get_trakt_list_contents(list_type, user, slug, with_auth, list_id, 'skip')
 			random.shuffle(result)
 			if paginate(self.is_external): data = random.sample(result, min(len(result), page_limit(self.is_external)))
 			else: data = random.sample(result, len(result))
@@ -266,7 +266,7 @@ class RandomLists():
 		if not random_list:
 			user, slug, list_id = self.params_get('user'), self.params_get('slug'), self.params_get('list_id')
 			with_auth = list_type == 'my_lists'
-			result = get_trakt_list_contents(list_type, user, slug, with_auth, list_id)
+			result = get_trakt_list_contents(list_type, user, slug, with_auth, list_id, 'skip')
 			random.shuffle(result)
 			if paginate(self.is_external): result = random.sample(result, min(len(result), page_limit(self.is_external)))
 			result = [dict(i, **{'order': c}) for c, i in enumerate(result)]

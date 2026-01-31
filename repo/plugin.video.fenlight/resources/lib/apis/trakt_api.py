@@ -40,12 +40,9 @@ def call_trakt(path, params={}, data=None, is_delete=False, with_auth=True, meth
 			if token: headers['Authorization'] = 'Bearer ' + token
 		try:
 			if method:
-				if method == 'post':
-					resp = requests.post(API_ENDPOINT % path, headers=headers, timeout=10)
-				elif method == 'delete':
-					resp = requests.delete(API_ENDPOINT % path, headers=headers, timeout=10)
-				elif method == 'sort_by_headers':
-					resp = requests.get(API_ENDPOINT % path, params=params, headers=headers, timeout=10)
+				if method == 'post': resp = requests.post(API_ENDPOINT % path, headers=headers, timeout=10)
+				elif method == 'delete': resp = requests.delete(API_ENDPOINT % path, headers=headers, timeout=10)
+				else: resp = requests.get(API_ENDPOINT % path, params=params, headers=headers, timeout=10)
 			elif data is not None:
 				assert not params
 				resp = requests.post(API_ENDPOINT % path, json=data, headers=headers, timeout=10)
@@ -461,32 +458,44 @@ def trakt_lists_with_media(media_type, imdb_id):
 	params = {'path': '%s/%s/lists/personal', 'path_insert': (media_type, imdb_id), 'params': {'limit': 100}, 'pagination': False}
 	return cache_object(_process, string, 'foo', False, 168)
 
-def get_trakt_list_contents(list_type, user, slug, with_auth, list_id=None):
+def get_trakt_list_contents(list_type, user, slug, with_auth, list_id=None, sort_by='default', sort_how='default'):
 	def _process(params):
 		results = []
 		results_append = results.append
-		data = get_trakt(params)
-		for c, i in enumerate(data):
-			try:
-				_type = i['type']
-				if _type in ('movie', 'show'):
-					r_key = 'released' if _type == 'movie' else 'first_aired'
-					data = {'media_ids': i[_type]['ids'], 'title': i[_type]['title'], 'type': _type, 'order': c, 'released': i[_type][r_key], 'media_type': _type}
-				elif _type == 'season':
-					data = {'tmdb_id': i['show']['ids']['tmdb'], 'season': i[_type]['number'], 'type': _type, 'custom_order': c}
-				elif _type == 'episode':
-					data = {'media_ids': i['show']['ids'], 'title': i['show']['title'], 'type': _type,
-							'season': i[_type]['season'], 'episode': i[_type]['number'], 'custom_order': c}
-				results_append(data)
-			except: pass
+		try:
+			data = get_trakt(params)
+			if custom_sort and not skip_sort: data = sort_list(sort_by, sort_how, data, settings.ignore_articles())
+			for c, i in enumerate(data):
+				try:
+					_type = i['type']
+					if _type in ('movie', 'show'):
+						r_key = 'released' if _type == 'movie' else 'first_aired'
+						data = {'media_ids': i[_type]['ids'], 'title': i[_type]['title'], 'type': _type, 'order': c, 'released': i[_type][r_key], 'media_type': _type}
+					elif _type == 'season':
+						data = {'tmdb_id': i['show']['ids']['tmdb'], 'season': i[_type]['number'], 'type': _type, 'custom_order': c}
+					elif _type == 'episode':
+						data = {'media_ids': i['show']['ids'], 'title': i['show']['title'], 'type': _type,
+								'season': i[_type]['season'], 'episode': i[_type]['number'], 'custom_order': c}
+					results_append(data)
+				except: pass
+		except: pass
 		return results
-	if list_id is not None:
+	if sort_by == 'skip':
+		skip_sort, custom_sort, method = True, False, None
+	else:
+		skip_sort = False
+		custom_sort = sort_by != 'default'
+		method = None if custom_sort else 'sort_by_headers'
+	if list_type == 'my_lists':
+		string = 'trakt_list_contents_%s_%s_%s' % (list_type, user, slug)
+		params = {'path': 'users/%s/lists/%s/items', 'path_insert': (user, slug), 'params': {'extended':'full'}, 'method': method, 'with_auth': with_auth}
+	elif list_id is not None:
 		string = 'trakt_list_contents_%s_%s' % (list_type, list_id)
-		params = {'path': 'lists/%s/items', 'path_insert': list_id, 'params': {'extended':'full'}, 'method': 'sort_by_headers'}
+		params = {'path': 'lists/%s/items', 'path_insert': list_id, 'params': {'extended':'full'}, 'method': method}
 	else:
 		string = 'trakt_list_contents_%s_%s_%s' % (list_type, user, slug)
-		if user == 'Trakt Official': params = {'path': 'lists/%s/items', 'path_insert': slug, 'params': {'extended':'full'}, 'method': 'sort_by_headers'}
-		else: params = {'path': 'users/%s/lists/%s/items', 'path_insert': (user, slug), 'params': {'extended':'full'}, 'with_auth': with_auth, 'method': 'sort_by_headers'}
+		if user == 'Trakt Official': params = {'path': 'lists/%s/items', 'path_insert': slug, 'params': {'extended':'full'}, 'method': method}
+		else: params = {'path': 'users/%s/lists/%s/items', 'path_insert': (user, slug), 'params': {'extended':'full'}, 'method': method, 'with_auth': with_auth}
 	return trakt_cache.cache_trakt_object(_process, string, params)
 
 def trakt_get_lists(list_type, page_no='1'):
@@ -511,13 +520,14 @@ def get_trakt_list_selection(included_lists):
 	def personal_lists():
 		trakt_my_lists = trakt_get_lists('my_lists')
 		_lists = [{'name': item['name'], 'display': '[B]PERSONAL:[/B] [I]%s[/I]' % item['name'].upper(), 'user': item['user']['ids']['slug'],
-					'slug': item['ids']['slug'], 'list_type': 'my_lists', 'item_count': item['item_count']} for item in trakt_my_lists]
+			'slug': item['ids']['slug'], 'list_type': 'my_lists', 'list_id': item['ids']['trakt'], 'item_count': item['item_count']} for item in trakt_my_lists]
 		_lists.sort(key=lambda k: k['name'])
 		return _lists
 	def liked_lists():
 		trakt_liked_lists = trakt_get_lists('liked_lists')
 		_lists = [{'name': item['list']['name'], 'display': '[B]LIKED:[/B] [I]%s[/I]' % item['list']['name'].upper(), 'user': item['list']['user']['ids']['slug'],
-						'slug': item['list']['ids']['slug'], 'list_type': 'liked_lists', 'item_count': item['list']['item_count']} for item in trakt_liked_lists]
+			'slug': item['list']['ids']['slug'], 'list_type': 'liked_lists', 'list_id': item['list']['ids']['trakt'], 'item_count': item['list']['item_count']} \
+			for item in trakt_liked_lists]
 		_lists.sort(key=lambda k: (k['display']))
 		return _lists
 	list_dict = {'default': default_lists, 'personal': personal_lists, 'liked': liked_lists}
