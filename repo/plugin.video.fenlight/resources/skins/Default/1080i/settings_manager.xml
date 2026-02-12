@@ -825,10 +825,10 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Avoid Episode Spoilers in Custom Windows</property>
+                          <property name="setting_label">Avoid Episode Spoilers</property>
                           <property name="setting_type">boolean</property>
                           <property name="setting_value">$INFO[Window(10000).Property(fenlight.avoid_episode_spoilers)]</property>
-                          <property name="setting_description">Enable this and Fen Light will hide episode thumb and episode synopsis in Fen Light Custom Windows</property>
+                          <property name="setting_description">Enable this and Fen Light will hide episode thumb and episode synopsis within Fen Light</property>
                           <onclick>RunPlugin(plugin://plugin.video.fenlight/?mode=settings_manager.set_boolean&amp;setting_id=avoid_episode_spoilers)</onclick>
                       </item>
                       <item>
@@ -2746,6 +2746,15 @@
                           <property name="setting_value">$INFO[Window(10000).Property(fenlight.autoplay_use_chapters)]</property>
                           <property name="setting_description">Enable this and Fen Light will attempt to use video file Chapter information to ascertain when to show the Next Episode alert. If unsuccessful, then the percentage of playback value will be used instead</property>
                           <onclick>RunPlugin(plugin://plugin.video.fenlight/?mode=settings_manager.set_boolean&amp;setting_id=autoplay_use_chapters)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(80)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fenlight.auto_play_episode),true) + String.IsEqual(Window(10000).Property(fenlight.autoplay_next_episode),true)</visible>
+                          <property name="setting_label">    - Check Still Watching After... (0=Off)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fenlight.autoplay_watching_check)]</property>
+                          <property name="setting_description">Choose after how many auto played episodes Fen Light will ask if you are still watching. Set to 0 to disable</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fenlight/?mode=settings_manager.set_numeric&amp;setting_id=autoplay_watching_check)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(80)</visible>
