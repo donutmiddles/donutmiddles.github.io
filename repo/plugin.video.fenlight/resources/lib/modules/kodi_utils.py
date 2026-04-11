@@ -43,15 +43,30 @@ def extras_button_label_values():
 				'show_in_trakt_lists': 'In Trakt Lists', 'close_all': 'Close'}}
 
 def extras_items():
-	return ('Plot', 'Cast', 'Recommended', 'Related', 'More Like This', 'Similar', 'Reviews', 'Comments', 'Trivia', 'Blunders', 'Parental Guide', 'In Trakt Lists', 'Videos',
-			'More from Year', 'More from Genres', 'More from Networks', 'More from Collection')
+	return [{'name': 'Plot', 'value': 2050}, {'name': 'Cast', 'value': 2051}, {'name': 'Recommended', 'value': 2052}, {'name': 'Related', 'value': 2053},
+	{'name': 'More Like This', 'value': 2054}, {'name': 'Similar', 'value': 2055}, {'name': 'Reviews', 'value': 2056}, {'name': 'Comments', 'value': 2057},
+	{'name': 'Trivia', 'value': 2058}, {'name': 'Blunders', 'value': 2059}, {'name': 'Parental Guide', 'value': 2060}, {'name': 'In Trakt Lists', 'value': 2061},
+	{'name': 'Videos', 'value': 2062}, {'name': 'More from Year', 'value': 2063}, {'name': 'More from Genres', 'value': 2064}, {'name': 'More from Networks', 'value': 2065},
+	{'name': 'More from Collection', 'value': 2066}]
 
 def context_menu_items():
-	return {'extras': 'Extras', 'options': 'Options', 'playback_options': 'Play Options', 'browse_movie_set': 'Browse Movie Set', 'browse_seasons': 'Browse TV Seasons',
-			'browse_episodes': 'Browse Season Episodes', 'recommended': 'Browse Recommended', 'related': 'Browse Related', 'more_like_this': 'Browse More Like This',
-			'similar': 'Browse Similar', 'in_trakt_list': 'In Trakt Lists', 'trakt_manager':'Trakt Lists Manager', 'personal_manager': 'Personal Lists Manager',
-			'tmdb_manager': 'TMDb Lists Manager', 'favorites_manager': 'Favorites Manager', 'mark_watched': 'Mark Watched/Unwatched',
-			'unmark_previous_episode': 'Unmark Previous Watched Episode', 'exit': 'Exit List', 'refresh': 'Refresh Widgets', 'reload': 'Reload Widgets'}
+	return [
+	{'name': 'Extras', 'value': 'extras'}, {'name': 'Options', 'value': 'options'}, {'name': 'Play Options', 'value': 'playback_options'},
+	{'name': 'Browse Movie Set', 'value': 'browse_movie_set'}, {'name': 'Browse TV Seasons', 'value': 'browse_seasons'},
+	{'name': 'Browse Season Episodes', 'value': 'browse_episodes'}, {'name': 'Browse Recommended', 'value': 'recommended'}, {'name': 'Browse Related', 'value': 'related'},
+	{'name': 'Browse More Like This', 'value': 'more_like_this'}, {'name': 'Browse Similar', 'value': 'similar'}, {'name': 'In Trakt Lists', 'value': 'in_trakt_list'},
+	{'name': 'Trakt Lists Manager', 'value': 'trakt_manager'}, {'name': 'Personal Lists Manager', 'value': 'personal_manager'},
+	{'name': 'TMDb Lists Manager', 'value': 'tmdb_manager'}, {'name': 'Favorites Manager', 'value': 'favorites_manager'}, {'name': 'Mark Watched/Unwatched', 'value': 'mark_watched'},
+	{'name': 'Unmark Previous Watched Episode', 'value': 'unmark_previous_episode'}, {'name': 'Exit List', 'value': 'exit'}, {'name': 'Refresh Widgets', 'value': 'refresh'},
+	{'name': 'Reload Widgets', 'value': 'reload'}]
+
+def rescrape_items():
+	return [
+	{'name': 'Rescrape With No Cache Check', 'value': 'cache_ignored'},
+	{'name': 'Rescrape With IMDb Year Data', 'value': 'imdb_year'},
+	{'name': 'Rescrape With All Scrapers', 'value': 'with_all'},
+	{'name': 'Rescrape With Episode Group', 'value': 'episode_group'},
+	{'name': 'Rescrape with Filters Ignored', 'value': 'ignore_filters'}]
 
 def video_extensions():
 	return ('m4v', '3g2', '3gp', 'nsv', 'tp', 'ts', 'ty', 'pls', 'rm', 'rmvb', 'mpd', 'ifo', 'mov', 'qt', 'divx', 'xvid', 'bivx', 'vob', 'nrg', 'img', 'iso', 'udf', 'pva',

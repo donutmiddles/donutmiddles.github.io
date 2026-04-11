@@ -2,6 +2,7 @@
 <window>
     <defaultcontrol always="true">10</defaultcontrol>
     <controls>
+        <!-- Background -->
         <control type="group">
             <width>1920</width>
             <height>1080</height>
