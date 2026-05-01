@@ -57,7 +57,7 @@ class OnUpdateChanges:
 		return kodi_utils.logger('Fen Light', 'OnUpdateChanges Service Finished')
 
 	def refresh_addon_keys(self):
-	# 	# For update 2.2.01
+	# 	# For update 2.2.01 - 02
 		from caches import trakt_cache
 		from caches.settings_cache import restore_setting_default
 		for item in ('tmdb_api', 'trakt.client', 'trakt.secret'): restore_setting_default({'silent': 'true', 'setting_id': item})
@@ -72,7 +72,7 @@ class OnUpdateChanges:
 		'within this addon, with permission, due to security concerns.'
 		kodi_utils.ok_dialog(heading='Addon Credentials Reset', text=text)
 		text = 'This unfortunately means you will need to re-authenticate your Trakt account through Fen Light AM. My apologies, but with the previous keys being revoked, ' \
-		'this is necessary'
+		'this is necessary.'
 		kodi_utils.ok_dialog(heading='Addon Credentials Reset', text=text)
 
 class CustomWindowsPrepare:
