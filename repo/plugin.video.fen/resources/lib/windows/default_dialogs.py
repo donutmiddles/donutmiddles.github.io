@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
+import json
 from windows.base_window import BaseDialog
-from modules.kodi_utils import json, select_dialog, local_string as ls
 # from modules.kodi_utils import logger
-
-ok_id, cancel_id, selectall_id, deselectall_id = 10, 11, 12, 13
-button_ids = (ok_id, cancel_id, selectall_id, deselectall_id)
-select_deselect_ids = (selectall_id, deselectall_id)
 
 class Select(BaseDialog):
 	def __init__(self, *args, **kwargs):
 		BaseDialog.__init__(self, *args)
+		self.control_id = None
 		self.window_id = 2025
 		self.kwargs = kwargs
 		self.enumerate = self.kwargs.get('enumerate', 'false')
@@ -21,6 +18,7 @@ class Select(BaseDialog):
 		self.media_type = self.kwargs.get('media_type', '')
 		self.narrow_window = self.kwargs.get('narrow_window', 'false')
 		self.enable_context_menu = self.kwargs.get('enable_context_menu', 'false') == 'true'
+		self.set_focus = self.kwargs.get('set_focus', None)
 		self.item_list = []
 		self.chosen_indexes = []
 		self.selected = None
@@ -35,6 +33,7 @@ class Select(BaseDialog):
 				self.item_list[index].setProperty('check_status', 'checked')
 				self.chosen_indexes.append(index)
 		self.setFocusId(self.window_id)
+		if self.set_focus is not None: self.select_item(self.window_id, self.set_focus)
 
 	def run(self):
 		self.doModal()
@@ -43,19 +42,19 @@ class Select(BaseDialog):
 
 	def onClick(self, controlID):
 		self.control_id = None
-		if controlID in button_ids:
-			if controlID == ok_id:
+		if controlID in (10, 11, 12, 13):
+			if controlID == 10:
 				self.selected = sorted(self.chosen_indexes)
 				self.close()
-			elif controlID == cancel_id:
+			elif controlID == 11:
 				self.close()
-			elif controlID in select_deselect_ids:
+			elif controlID in (12, 13):
 				item_list_indexes = list(range(0, len(self.item_list)))
-				if controlID == selectall_id: status, select_property, self.chosen_indexes = 'checked', 'deselect_all', item_list_indexes
+				if controlID == 12: status, select_property, self.chosen_indexes = 'checked', 'deselect_all', item_list_indexes
 				else: status, select_property, self.chosen_indexes = '', 'select_all', []
 				for index in item_list_indexes: self.item_list[index].setProperty('check_status', status)
 				self.setProperty('select_button', select_property)
-				try: self.setFocusId(ok_id)
+				try: self.setFocusId(10)
 				except: pass
 		else: self.control_id = controlID
 
@@ -74,13 +73,7 @@ class Select(BaseDialog):
 			else:
 				self.selected = position
 				return self.close()
-		elif action in self.context_actions:
-			if self.enable_context_menu:
-				choice = self.make_context_menu(chosen_listitem)
-				if choice: self.execute_code('RunPlugin(%s)' % self.build_url(choice))
-			else: return self.close()
-		elif action in self.closing_actions:
-			return self.close()
+		elif action in self.context_actions or action in self.closing_actions: return self.close()
 
 	def make_menu(self):
 		def builder():
@@ -97,22 +90,6 @@ class Select(BaseDialog):
 				yield listitem
 		enum = self.enumerate == 'true'
 		self.item_list = list(builder())
-
-	def make_context_menu(self, chosen_listitem, context_menu_type='imdb_keywords'):
-		choices = []
-		choices_append = choices.append
-		if context_menu_type == 'imdb_keywords':
-			keyword = chosen_listitem.getProperty('line1')
-			mode = 'build_movie_list' if self.media_type == 'movies' else 'build_tvshow_list'
-			menu_item = json.dumps({'mode': mode, 'action': 'imdb_keywords_list_contents', 'iconImage': 'imdb', 'list_id': keyword.lower()})
-			add_external_params = {'mode': 'menu_editor.add_external', 'name': '%s (IMDb)' % keyword.upper(), 'iconImage': 'imdb', 'menu_item': menu_item}
-			add_shortcut_folder_params = {'mode': 'menu_editor.shortcut_folder_add_item', 'name': '%s (IMDb)' % keyword.upper(), 'iconImage': 'imdb', 'menu_item': menu_item}
-			choices_append((ls(32730), add_external_params))
-			choices_append((ls(32731), add_shortcut_folder_params))
-		list_items = [{'line1': i[0]} for i in choices]
-		kwargs = {'items': json.dumps(list_items), 'narrow_window': 'true'}
-		choice = select_dialog([i[1] for i in choices], **kwargs)
-		return choice
 
 	def set_properties(self):
 		self.setProperty('multi_choice', self.multi_choice)
@@ -140,8 +117,7 @@ class Confirm(BaseDialog):
 		return self.selected
 
 	def onClick(self, controlID):
-		if controlID == 10: self.selected = True
-		elif controlID == 11: self.selected = False
+		self.selected = {10: True, 11: False}[controlID]
 		self.close()
 
 	def onAction(self, action):

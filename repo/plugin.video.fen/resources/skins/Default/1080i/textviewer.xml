@@ -7,28 +7,17 @@
             <width>1920</width>
             <height>1080</height>
             <texture colordiffuse="FF000000">fen_common/white.png</texture>
-            <animation type="WindowOpen" reversible="false">
-                <effect type="fade" start="0" end="80" time="120" />
-            </animation>
+            <animation effect="fade" end="85" time="120">WindowOpen</animation>
         </control>
         <control type="group">
             <left>280</left>
             <top>50</top>
-            <animation type="WindowOpen" reversible="false">
-                <effect type="fade" end="100" time="200" />
-            </animation>
+            <animation effect="fade" end="100" time="200">WindowOpen</animation>
             <control type="group">
-                <control type="image">
-                    <left>-2</left>
-                    <top>-2</top>
-                    <width>1362</width>
-                    <height>982</height>
-                    <texture colordiffuse="FFCCCCCC" border="30">fen_common/circle.png</texture>
-                </control>
                 <control type="image">
                     <width>1358</width>
                     <height>978</height>
-                    <texture colordiffuse="FF1F2020" border="30">fen_common/circle.png</texture>
+                    <texture colordiffuse="$INFO[Window(10000).Property(fen.window_theme)]" border="30">fen_common/circle.png</texture>
                 </control>
                 <control type="image">
                     <left>15</left>
@@ -36,9 +25,8 @@
                     <width>70</width>
                     <height>70</height>
                     <align>left</align>
-                    <aligny>top</aligny>
                     <aspectratio aligny="top">keep</aspectratio>
-                    <texture colordiffuse="FFCCCCCC">fen_common/fen.png</texture>
+                    <texture>$INFO[Window(10000).Property(fen.addon_icon)]</texture>
                 </control>
                 <control type="label">
                     <top>40</top>
@@ -62,6 +50,7 @@
                     <textcolor>FFCCCCCC</textcolor>
                     <label>$INFO[Window.Property(text)]</label>
                     <pagecontrol>2060</pagecontrol>
+                    <autoscroll>false</autoscroll>
                 </control>
                 <control type="textbox" id="2000">
                     <visible>String.IsEqual(Window.Property(font_size),large)</visible>
@@ -73,6 +62,7 @@
                     <textcolor>FFCCCCCC</textcolor>
                     <label>$INFO[Window.Property(text)]</label>
                     <pagecontrol>2061</pagecontrol>
+                    <autoscroll>false</autoscroll>
                 </control>
                 <control type="scrollbar" id="2060">
                     <visible>String.IsEqual(Window.Property(font_size),small)</visible>

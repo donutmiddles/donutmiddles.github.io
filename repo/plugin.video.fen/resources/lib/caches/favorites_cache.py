@@ -1,45 +1,40 @@
 # -*- coding: utf-8 -*-
-from modules.kodi_utils import database, favorites_db
+from caches.base_cache import connect_database
+from caches.data_sync_cache import data_sync_wrapper
+from modules.utils import sort_for_article
 # from modules.kodi_utils import logger
 
-INSERT_FAV = 'INSERT INTO favourites VALUES (?, ?, ?)'
-DELETE_FAV = 'DELETE FROM favourites where db_type=? and tmdb_id=?'
-SELECT_FAV = 'SELECT tmdb_id, title FROM favourites WHERE db_type=?'
-DELETE_TYPE = 'DELETE FROM favourites WHERE db_type=?'
-
-class Favorites:
-	def __init__(self):
-		self.make_database_connection()
-		self.set_PRAGMAS()
-
-	def set_favourite(self, media_type, tmdb_id, title):
+class FavoritesCache:
+	@data_sync_wrapper('favorites_db')
+	def set_favorite(self, media_type, tmdb_id, title):
 		try:
-			self.dbcur.execute(INSERT_FAV, (media_type, str(tmdb_id), title))
+			dbcon = connect_database('favorites_db')
+			dbcon.execute('INSERT INTO favorites VALUES (?, ?, ?)', (media_type, str(tmdb_id), title))
 			return True
 		except: return False
 
-	def delete_favourite(self, media_type, tmdb_id, title):
+	@data_sync_wrapper('favorites_db')
+	def delete_favorite(self, media_type, tmdb_id, title):
 		try:
-			self.dbcur.execute(DELETE_FAV, (media_type, str(tmdb_id)))
+			dbcon = connect_database('favorites_db')
+			dbcon.execute('DELETE FROM favorites where db_type=? and tmdb_id=?', (media_type, str(tmdb_id)))
 			return True
 		except: return False
 
+	@data_sync_wrapper('favorites_db')
 	def get_favorites(self, media_type):
-		self.dbcur.execute(SELECT_FAV, (media_type,))
-		result = self.dbcur.fetchall()
-		result = [{'tmdb_id': str(i[0]), 'title': str(i[1])} for i in result]
-		return result
+		dbcon = connect_database('favorites_db')
+		favorites = dbcon.execute('SELECT tmdb_id, title FROM favorites WHERE db_type=?', (media_type,)).fetchall()
+		return [{'tmdb_id': str(i[0]), 'title': str(i[1])} for i in favorites]
 
 	def clear_favorites(self, media_type):
-		self.dbcur.execute(DELETE_TYPE, (media_type,))
-		self.dbcur.execute('VACUUM')
+		dbcon = connect_database('favorites_db')
+		dbcon.execute('DELETE FROM favorites WHERE db_type=?', (media_type,))
+		dbcon.execute('VACUUM')
 
-	def make_database_connection(self):
-		self.dbcon = database.connect(favorites_db, timeout=40.0, isolation_level=None)
+favorites_cache = FavoritesCache()
 
-	def set_PRAGMAS(self):
-		self.dbcur = self.dbcon.cursor()
-		self.dbcur.execute('''PRAGMA synchronous = OFF''')
-		self.dbcur.execute('''PRAGMA journal_mode = OFF''')
-
-favorites = Favorites()
+def get_favorites(media_type, dummy_arg):
+	data = favorites_cache.get_favorites(media_type)
+	data = sort_for_article(data, 'title')
+	return [{'media_id': i['tmdb_id'], 'title': i['title']} for i in data]

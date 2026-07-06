@@ -8,8 +8,7 @@ class Progress(BaseDialog):
 		BaseDialog.__init__(self, *args)
 		self.is_canceled = False
 		self.heading = kwargs.get('heading', '')
-		self.icon = kwargs.get('icon', addon_icon)
-		self.setProperty('highlight_var', self.highlight_var(force=True))
+		self.icon = kwargs.get('icon', addon_icon())
 
 	def run(self):
 		self.doModal()

@@ -1,56 +1,72 @@
 # -*- coding: utf-8 -*-
 import re
+import sys
 import time
-import hashlib
+import random
 import _strptime
 import unicodedata
 from html import unescape
-from importlib import import_module, reload as rel_module
+from queue import SimpleQueue
+from threading import Thread, activeCount
+from importlib import import_module
 from datetime import datetime, timedelta, date
 from modules.settings import max_threads
-from modules.kodi_utils import random, sys, translate_path, sleep, Thread, activeCount, json, get_setting, local_string as ls
-# from modules.kodi_utils import logger
+from modules.kodi_utils import sleep, logger
 
-days_translate = {'Monday': 32971, 'Tuesday': 32972, 'Wednesday': 32973, 'Thursday': 32974, 'Friday': 32975, 'Saturday': 32976, 'Sunday': 32977}
+class TaskPool:
+	def __init__(self):
+		self._queue = SimpleQueue()
 
-def change_image_resolution(image, replace_res):
-	return re.sub(r'(w185|w300|w342|w780|w1280|h632|original|/fanart/|/preview/)', replace_res, image)
+	def _thread_target(self, queue, target):
+		while not queue.empty():
+			try: target(*queue.get())
+			except Exception as e: logger('thread queue error', str(e))
 
-def append_module_to_syspath(location):
-	sys.path.append(translate_path(location))
+	def tasks(self, _target, _list, _max_size=60):
+		if not isinstance(_list[0], tuple): _list = [(i,) for i in _list]
+		[self._queue.put(tag) for tag in _list]
+		threads = [Thread(target=self._thread_target, args=(self._queue, _target)) for i in range(_max_size)]
+		[i.start() for i in threads]
+		return threads
 
-def manual_function_import(location, function_name):
-	return getattr(import_module(location), function_name)
+	def tasks_enumerate(self, _target, _list, _max_size=60):
+		[self._queue.put((p, tag)) for p, tag in enumerate(_list, 1)]
+		threads = [Thread(target=self._thread_target, args=(self._queue, _target)) for i in range(_max_size)]
+		[i.start() for i in threads]
+		return threads
 
-def reload_module(location):
-	return rel_module(manual_module_import(location))
-
-def manual_module_import(location):
-	return import_module(location)
-
-def make_thread_list(_target, _list, _max_threads=None):
-	if not _max_threads: _max_threads = max_threads()
+def make_thread_list(_target, _list):
+	_max_threads = max_threads()
 	for item in _list:
 		while activeCount() > _max_threads: sleep(1)
 		threaded_object = Thread(target=_target, args=(item,))
 		threaded_object.start()
 		yield threaded_object
 
-def make_thread_list_multi_arg(_target, _list, _max_threads=None):
-	if not _max_threads: _max_threads = max_threads()
-	for item in _list:
-		while activeCount() > _max_threads: sleep(1)
-		threaded_object = Thread(target=_target, args=item)
-		threaded_object.start()
-		yield threaded_object
-
-def make_thread_list_enumerate(_target, _list, _max_threads=None):
-	if not _max_threads: _max_threads = max_threads()
+def make_thread_list_enumerate(_target, _list):
+	_max_threads = max_threads()
 	for count, item in enumerate(_list):
 		while activeCount() > _max_threads: sleep(1)
 		threaded_object = Thread(target=_target, args=(count, item))
 		threaded_object.start()
 		yield threaded_object
+
+def change_image_resolution(image, replace_res):
+	return re.sub(r'(w185|w300|w342|w780|w1280|h632|original)', replace_res, image)
+
+def append_module_to_syspath(location):
+	from modules.kodi_utils import translate_path
+	sys.path.append(translate_path(location))
+
+def manual_function_import(location, function_name):
+	return getattr(import_module(location), function_name)
+
+def reload_module(location):
+	from importlib import reload as rel_module
+	return rel_module(manual_module_import(location))
+
+def manual_module_import(location):
+	return import_module(location)
 
 def chunks(item_list, limit):
 	"""
@@ -74,9 +90,10 @@ def string_alphanum_to_num(string):
 	try: return ''.join(c for c in string if c.isdigit())
 	except ValueError: return string
 
-def jsondate_to_datetime(jsondate_object, resformat, remove_time=False):
-	if remove_time: datetime_object = datetime_workaround(jsondate_object, resformat).date()
-	else: datetime_object = datetime_workaround(jsondate_object, resformat)
+def jsondate_to_datetime(jsondate, resformat, remove_time=False):
+	if not jsondate: return None
+	if remove_time: datetime_object = datetime_workaround(jsondate, resformat).date()
+	else: datetime_object = datetime_workaround(jsondate, resformat)
 	return datetime_object
 
 def get_datetime(string=False, dt=False):
@@ -96,15 +113,19 @@ def adjust_premiered_date(orig_date, adjust_hours):
 	adjusted_string = adjusted_datetime.strftime('%Y-%m-%d')
 	return adjusted_datetime.date(), adjusted_string
 
-def make_day(today, date, date_format, use_words=True):
-	day_diff = (date - today).days
-	try: day = date.strftime(date_format)
-	except ValueError: day = date.strftime('%Y-%m-%d')
+def make_day(today, date, date_format='%Y-%m-%d', use_words=True):
 	if use_words:
-		if day_diff == -1: day = ls(32848).upper()
-		elif day_diff == 0: day = ls(32849).upper()
-		elif day_diff == 1: day = ls(32850).upper()
-		elif 1 < day_diff < 7: day = ls(days_translate[date.strftime('%A')])
+		day_diff = (date - today).days
+		if day_diff == -1: day = 'YESTERDAY'
+		elif day_diff == 0: day = 'TODAY'
+		elif day_diff == 1: day = 'TOMORROW'
+		elif 1 < day_diff < 7: day = date.strftime('%A').upper()
+		else:
+			try: day = date.strftime(date_format)
+			except ValueError: day = date.strftime('%Y-%m-%d')
+	else:
+		try: day = date.strftime(date_format)
+		except ValueError: day = date.strftime('%Y-%m-%d')
 	return day
 
 def subtract_dates(date1, date2):
@@ -159,24 +180,13 @@ def clean_file_name(s, use_encoding=False, use_blanks=True):
 	except: pass
 	return s
 
-def clean_title(title):
-	try:
-		if not title: return
-		title = title.lower()
-		title = re.sub(r'&#(\d+);', '', title)
-		title = re.sub(r'(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
-		title = re.sub(r'(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
-		title = title.replace('&quot;', '\"').replace('&amp;', '&')
-		title = re.sub(r'\n|([\[({].+?[})\]])|([:;–\-"\',!_.?~$@])|\s', '', title)
-	except: pass
-	return title
-
 def byteify(data, ignore_dicts=False):
 	try:
 		if isinstance(data, unicode): return data.encode('utf-8')
 		if isinstance(data, list): return [byteify(item, ignore_dicts=True) for item in data]
 		if isinstance(data, dict) and not ignore_dicts:
-			return dict([(byteify(key, ignore_dicts=True), byteify(value, ignore_dicts=True)) for key, value in data.iteritems()])
+			iter_data = data.iteritems()
+			return dict([(byteify(key, ignore_dicts=True), byteify(value, ignore_dicts=True)) for key, value in iter_data])
 	except: pass
 	return data
 
@@ -222,7 +232,16 @@ def replace_html_codes(txt):
 	txt = txt.replace("[/spoiler]", "")
 	return txt
 
+def gen_md5(value):
+	import hashlib
+	try:
+		md5_hash = hashlib.md5()
+		md5_hash.update(str(value).encode('utf-8'))
+		return md5_hash.hexdigest()
+	except: return None
+
 def gen_file_hash(file):
+	import hashlib
 	try:
 		md5_hash = hashlib.md5()
 		with open(file, 'rb') as afile:
@@ -230,6 +249,16 @@ def gen_file_hash(file):
 			md5_hash.update(buf)
 			return md5_hash.hexdigest()
 	except: pass
+
+def extract_json_object(raw_text):
+	import json
+	try:
+		start = raw_text.find("{")
+		end = raw_text.rfind("}")
+		if start == -1 or end == -1 or end <= start: return {}
+		json_str = raw_text[start:end + 1]
+		return json.loads(json_str)
+	except: return {}
 
 def sec2time(sec, n_msec=3):
 	''' Convert seconds to 'D days, HH:MM:SS.FFF' '''
@@ -247,8 +276,7 @@ def released_key(item):
 	if 'first_aired' in item: return item['first_aired'] or '2050-01-01'
 	return '2050-01-01'
 
-def title_key(title, ignore_articles):
-	if not ignore_articles: return title
+def title_key(title):
 	try:
 		if title is None: title = ''
 		articles = ['the', 'a', 'an']
@@ -258,17 +286,17 @@ def title_key(title, ignore_articles):
 		return title[offset:]
 	except: return title
 
-def sort_for_article(_list, _key, ignore_articles):
-	if not ignore_articles: _list.sort(key=lambda k: k[_key])
-	else: _list.sort(key=lambda k: re.sub(r'(^the |^a |^an )', '', k[_key].lower()))
+def sort_for_article(_list, _key):
+	try: _list.sort(key=lambda k: re.sub(r'(^the |^a |^an )', '', k.get(_key).lower()))
+	except: pass
 	return _list
 	
-def sort_list(sort_key, sort_direction, list_data, ignore_articles):
+def sort_list(sort_key, sort_direction, list_data):
 	try:
 		reverse = sort_direction != 'asc'
 		if sort_key == 'rank': return sorted(list_data, key=lambda x: x['rank'], reverse=reverse)
 		if sort_key == 'added': return sorted(list_data, key=lambda x: x['listed_at'], reverse=reverse)
-		if sort_key == 'title': return sorted(list_data, key=lambda x: title_key(x[x['type']].get('title'), ignore_articles), reverse=reverse)
+		if sort_key == 'title': return sorted(list_data, key=lambda x: title_key(x[x['type']].get('title')), reverse=reverse)
 		if sort_key == 'released': return sorted(list_data, key=lambda x: released_key(x[x['type']]), reverse=reverse)
 		if sort_key == 'runtime': return sorted(list_data, key=lambda x: x[x['type']].get('runtime', 0), reverse=reverse)
 		if sort_key == 'popularity': return sorted(list_data, key=lambda x: x[x['type']].get('votes', 0), reverse=reverse)
@@ -278,69 +306,69 @@ def sort_list(sort_key, sort_direction, list_data, ignore_articles):
 		return list_data
 	except: return list_data
 
-def imdb_sort_list():
-	# From Exodus code
-	sort, sort_order = int(get_setting('fen.imdb_lists.sort_type', '0')), int(get_setting('fen.imdb_lists.sort_direction', '0'))
-	if sort == 0: imdb_sort = 'list_order' # Default
-	elif sort == 1: imdb_sort = 'alpha' # Alphabetical
-	elif sort == 2: imdb_sort = 'user_rating' # IMDb Rating
-	elif sort == 3: imdb_sort = 'moviemeter' # Popularity
-	elif sort == 4: imdb_sort = 'your_rating' # Your Rating
-	elif sort == 5: imdb_sort = 'num_votes' # Number Of Ratings
-	elif sort == 6: imdb_sort = 'release_date' # Release Date
-	elif sort == 7: imdb_sort = 'runtime' # Runtime
-	elif sort == 8: imdb_sort = 'date_added' # Date Added
-	imdb_sort_order = ',asc' if sort_order == 0 else ',desc'
-	sort_string = imdb_sort + imdb_sort_order
-	return sort_string
-
 def paginate_list(item_list, page, limit=20, paginate_start=0):
 	if paginate_start:
-		all_pages = json.dumps(list(chunks(item_list, limit)))
 		item_list = item_list[paginate_start:]
 		pages = list(chunks(item_list, limit))
 		pages.insert(0, [])
-	else:
-		pages = list(chunks(item_list, limit))
-		all_pages = json.dumps(pages)
-	all_pages = json.dumps(pages)
-	result = (pages[page - 1], all_pages, len(pages))
+	else: pages = list(chunks(item_list, limit))
+	result = (pages[page - 1], len(pages))
 	return result
 
-def download_github_zip(repo, file, destination):
-	from io import BytesIO
+def unzip(zip_location, destination_location, destination_check, show_busy=True):
 	from zipfile import ZipFile
-	from modules.kodi_utils import requests, path_exists, userdata_path, translate_path
+	from modules.kodi_utils import show_busy_dialog, hide_busy_dialog, path_exists
+	if show_busy: show_busy_dialog()
 	try:
-		url = 'https://github.com/Tikipeter/%s/raw/main/%s.zip' % (repo, file)
-		result = requests.get(url, stream=True)
-		zipfile = ZipFile(BytesIO(result.raw.read()))
-		zipfile.extractall(path=userdata_path)
-		if path_exists(destination): status = True
+		zipfile = ZipFile(zip_location)
+		zipfile.extractall(path=destination_location)
+		if path_exists(destination_check): status = True
 		else: status = False
-	except Exception as e:
-		from modules.kodi_utils import logger
-		logger('download_github_zip error', str(e))
-		status = False
+	except: status = False
+	if show_busy: hide_busy_dialog()
 	return status
 
+def make_qrcode(url):
+	if url == None: return
+	import segno
+	from os import path
+	from modules.kodi_utils import addon_profile
+	try:
+		art_path = path.join(addon_profile(), 'qr.png')
+		qrcode = segno.make(url, micro=False)
+		qrcode.save(art_path, scale=20)
+	except: return
+	return art_path
+
+def make_tinyurl(url):
+	import requests
+	short_url = ''
+	try:
+		tiny_url = 'http://tinyurl.com/api-create.php'
+		response = requests.get(tiny_url, params={'url': url})
+		status = response.status_code
+		if status == 200:
+			short_url = response.text
+		else: pass
+	except: pass
+	return short_url
+
 def copy2clip(txt):
-	from sys import platform
-	if platform == "win32":
+	if sys.platform == "win32":
 		try:
 			from subprocess import check_call
 			cmd = 'echo ' + txt.replace('&', '^&').strip() + '|clip'
 			return check_call(cmd, shell=True)
-		except: pass
-	elif platform == "darwin":
+		except: return
+	if sys.platform == "darwin":
 		try:
 			from subprocess import check_call
 			cmd = 'echo ' + txt.strip() + '|pbcopy'
 			return check_call(cmd, shell=True)
-		except: pass
-	elif platform == "linux":
+		except: return
+	if sys.platform == "linux":
 		try:
 			from subprocess import Popen, PIPE
 			p = Popen(['xsel', '-pi'], stdin=PIPE)
 			p.communicate(input=txt)
-		except: pass
+		except: return

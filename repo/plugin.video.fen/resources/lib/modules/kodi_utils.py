@@ -1,178 +1,233 @@
 # -*- coding: utf-8 -*-
-# TRUMP WON
+import os
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs, xbmcaddon
-import sys
-import json
-import random
-import requests
-import _strptime
-import sqlite3 as database
-from os import path as osPath
-from xml.dom.minidom import parse as mdParse
-from threading import Thread, activeCount
-from urllib.parse import unquote, unquote_plus, urlencode, quote, parse_qsl, urlparse
-from modules import icons
+from urllib.parse import urlencode, unquote
 
-try: xbmc_actor = xbmc.Actor
-except: xbmc_actor = None
-addon_object = xbmcaddon.Addon('plugin.video.fen')
-getLocalizedString = addon_object.getLocalizedString
-player, xbmc_player, numeric_input, xbmc_monitor, translatePath = xbmc.Player(), xbmc.Player, 1, xbmc.Monitor, xbmcvfs.translatePath
-ListItem, getSkinDir, log, getCurrentWindowId, Window = xbmcgui.ListItem, xbmc.getSkinDir, xbmc.log, xbmcgui.getCurrentWindowId, xbmcgui.Window
-File, exists, copy, delete, rmdir, rename = xbmcvfs.File, xbmcvfs.exists, xbmcvfs.copy, xbmcvfs.delete, xbmcvfs.rmdir, xbmcvfs.rename
-get_infolabel, get_visibility, execute_JSON, window_xml_dialog = xbmc.getInfoLabel, xbmc.getCondVisibility, xbmc.executeJSONRPC, xbmcgui.WindowXMLDialog
-executebuiltin, xbmc_sleep, convertLanguage, getSupportedMedia, PlayList = xbmc.executebuiltin, xbmc.sleep, xbmc.convertLanguage, xbmc.getSupportedMedia, xbmc.PlayList
-monitor, window, dialog, progressDialog, progressDialogBG = xbmc_monitor(), Window(10000), xbmcgui.Dialog(), xbmcgui.DialogProgress(), xbmcgui.DialogProgressBG()
-endOfDirectory, addSortMethod, listdir, mkdir, mkdirs = xbmcplugin.endOfDirectory, xbmcplugin.addSortMethod, xbmcvfs.listdir, xbmcvfs.mkdir, xbmcvfs.mkdirs
-addDirectoryItem, addDirectoryItems, setContent, setCategory = xbmcplugin.addDirectoryItem, xbmcplugin.addDirectoryItems, xbmcplugin.setContent, xbmcplugin.setPluginCategory
-window_xml_left_action, window_xml_right_action, window_xml_up_action, window_xml_down_action, window_xml_info_action = 1, 2, 3, 4, 11
-window_xml_selection_actions, window_xml_closing_actions, window_xml_context_actions = (7, 100), (9, 10, 13, 92), (101, 108, 117)
-path_join = osPath.join
-addon_info = addon_object.getAddonInfo
-addon_path = addon_info('path')
-userdata_path = translatePath(addon_info('profile'))
-addon_settings = path_join(addon_path, 'resources', 'settings.xml')
-user_settings = path_join(userdata_path, 'settings.xml')
-addon_icon = path_join(addon_path, 'resources', 'media', 'fen_icon.png')
-addon_fanart = addon_object.getSetting('addon_fanart') or path_join(addon_path, 'resources', 'media', 'fen_fanart.png')
-databases_path = path_join(userdata_path, 'databases/')
-colorpalette_path = path_join(userdata_path, 'color_palette2/')
-colorpalette_zip_path = path_join(addon_path,'resources', 'media', 'color_palette2.zip')
-custom_xml_path = path_join(addon_path, 'resources', 'skins', 'Custom','%s', 'resources', 'skins', 'Default', '1080i', '%s')
-custom_skin_path = path_join(addon_path, 'resources', 'skins', 'Custom/')
-database_path_raw = path_join(userdata_path, 'databases')
-navigator_db = translatePath(path_join(database_path_raw, 'navigator.db'))
-watched_db = translatePath(path_join(database_path_raw, 'watched.db'))
-favorites_db = translatePath(path_join(database_path_raw, 'favourites.db'))
-trakt_db = translatePath(path_join(database_path_raw, 'traktcache4.db'))
-maincache_db = translatePath(path_join(database_path_raw, 'maincache.db'))
-metacache_db = translatePath(path_join(database_path_raw, 'metacache2.db'))
-debridcache_db = translatePath(path_join(database_path_raw, 'debridcache.db'))
-external_db = translatePath(path_join(database_path_raw, 'providerscache2.db'))
-img_url = 'https://i.imgur.com/%s.png'
-invoker_switch_dict = {'true': 'false', 'false': 'true'}
-empty_poster, item_jump, nextpage = img_url % icons.box_office, img_url % icons.item_jump, img_url % icons.nextpage
-nextpage_landscape, item_jump_landscape = img_url % icons.nextpage_landscape, img_url % icons.item_jump_landscape
-tmdb_default_api, fanarttv_default_api = 'b370b60447737762ca38457bd77579b3', 'fa836e1c874ba95ab08a14ee88e05565'
-current_dbs = ('navigator.db', 'watched.db', 'favourites.db', 'traktcache4.db', 'maincache.db', 'metacache2.db', 'debridcache.db', 'providerscache2.db', 'settings.db')
-int_window_prop, pause_services_prop, suppress_sett_dict_prop, highlight_prop = 'fen.internal_results.%s', 'fen.pause_services', 'fen.suppress_settings_dict', 'fen.main_highlight'
-custom_context_main_menu_prop, custom_context_prop, sett_addoninfo_active_prop = 'fen.custom_context_main_menu', 'fen.custom_context_menu', 'fen.setting_addoninfo_active'
-pause_settings_prop, use_skin_fonts_prop, custom_info_prop = 'fen.pause_settings', 'fen.use_skin_fonts', 'fen.custom_info_dialog'
-current_skin_prop, current_font_prop = 'fen.current_skin', 'fen.current_font'
-myvideos_db_paths = {19: '119', 20: '121', 21: '124'}
-sort_method_dict = {'episodes': 24, 'files': 5, 'label': 2}
-playlist_type_dict = {'music': 0, 'video': 1}
-extras_button_label_values = {'movie': {'movies_play': 32174, 'show_trailers': 32606, 'show_images': 32798,  'show_extrainfo': 32605,
-						'show_genres': 32470, 'show_director': 32627, 'show_options': 32516, 'show_recommended': 32503, 'show_trakt_manager': 33117,
-						'playback_choice': 32187, 'show_favorites_manager': 32197, 'show_plot': 32842},
-						'tvshow': {'tvshow_browse': 32838, 'show_trailers': 32606, 'show_images': 32798, 'show_extrainfo': 32605,
-						'show_genres': 32470, 'play_nextep': 33115, 'show_options': 32516, 'show_recommended': 32503, 'show_trakt_manager': 33117,
-						'play_random_episode': 32613, 'show_favorites_manager': 32197, 'show_plot': 32842}}
-movie_extras_buttons_defaults = [('extras.movie.button10', 'movies_play'), ('extras.movie.button11', 'show_trailers'), ('extras.movie.button12', 'show_trakt_manager'),
-					('extras.movie.button13', 'show_images'), ('extras.movie.button14', 'show_extrainfo'), ('extras.movie.button15', 'show_genres'),
-					('extras.movie.button16', 'show_director'), ('extras.movie.button17', 'show_options')]
-tvshow_extras_buttons_defaults = [('extras.tvshow.button10', 'tvshow_browse'), ('extras.tvshow.button11', 'show_trailers'), ('extras.tvshow.button12', 'show_trakt_manager'),
-					('extras.tvshow.button13', 'show_images'), ('extras.tvshow.button14', 'show_extrainfo'), ('extras.tvshow.button15', 'show_genres'),
-					('extras.tvshow.button16', 'play_nextep'), ('extras.tvshow.button17', 'show_options')]
-movie_dict_removals = ('fanart_added', 'cast', 'poster', 'rootname', 'imdb_id', 'tmdb_id', 'tvdb_id', 'all_trailers', 'fanart', 'banner', 'clearlogo', 'clearlogo2', 'clearart',
-						'landscape', 'discart', 'original_title', 'english_title', 'extra_info', 'alternative_titles', 'country_codes', 'fanarttv_fanart', 'fanarttv_poster',
-						'fanart2', 'poster2', 'keyart', 'images', 'custom_poster', 'custom_fanart', 'custom_clearlogo', 'custom_banner', 'custom_clearart', 'custom_landscape',
-						'custom_discart', 'custom_keyart')
-tvshow_dict_removals = ('fanart_added', 'cast', 'poster', 'rootname', 'imdb_id', 'tmdb_id', 'tvdb_id', 'all_trailers', 'discart', 'total_episodes', 'total_seasons', 'fanart',
-						'banner', 'clearlogo', 'clearlogo2', 'clearart', 'landscape', 'season_data', 'original_title', 'extra_info', 'alternative_titles', 'english_title',
-						'season_summary', 'country_codes', 'fanarttv_fanart', 'fanarttv_poster', 'total_aired_eps', 'fanart2', 'poster2', 'keyart', 'images', 'custom_poster',
-						'custom_fanart', 'custom_clearlogo', 'custom_banner', 'custom_clearart', 'custom_landscape', 'custom_discart', 'custom_keyart', 'season_art')
-episode_dict_removals = ('thumb', 'guest_stars')
-tmdb_dict_removals = ('adult', 'backdrop_path', 'genre_ids', 'original_language', 'original_title', 'overview', 'popularity', 'vote_count', 'video', 'origin_country', 'original_name')
-trakt_dict_removals = ('collected_at', 'released')
-view_ids = ('view.main', 'view.movies', 'view.tvshows', 'view.seasons', 'view.episodes', 'view.episodes_single', 'view.premium')
-video_extensions = ('m4v', '3g2', '3gp', 'nsv', 'tp', 'ts', 'ty', 'pls', 'rm', 'rmvb', 'mpd', 'ifo', 'mov', 'qt', 'divx', 'xvid', 'bivx', 'vob', 'nrg', 'img', 'iso', 'udf', 'pva',
-					'wmv', 'asf', 'asx', 'ogm', 'm2v', 'avi', 'bin', 'dat', 'mpg', 'mpeg', 'mp4', 'mkv', 'mk3d', 'avc', 'vp3', 'svq3', 'nuv', 'viv', 'dv', 'fli', 'flv', 'wpl',
-					'xspf', 'vdr', 'dvr-ms', 'xsp', 'mts', 'm2t', 'm2ts', 'evo', 'ogv', 'sdp', 'avs', 'rec', 'url', 'pxml', 'vc1', 'h264', 'rcv', 'rss', 'mpls', 'mpl', 'webm',
-					'bdmv', 'bdm', 'wtv', 'trp', 'f4v', 'pvr', 'disc')
-image_extensions = ('jpg', 'jpeg', 'jpe', 'jif', 'jfif', 'jfi', 'bmp', 'dib', 'png', 'gif', 'webp', 'tiff', 'tif',
-					'psd', 'raw', 'arw', 'cr2', 'nrw', 'k25', 'jp2', 'j2k', 'jpf', 'jpx', 'jpm', 'mj2')
-default_highlights = (('hoster.identify', 'FF0166FF'), ('torrent.identify', 'FFFF00FE'), ('provider.rd_colour', 'FF3C9900'), ('provider.pm_colour', 'FFFF3300'),
-					('provider.ad_colour', 'FFE6B800'), ('provider.furk_colour', 'FFE6002E'), ('provider.easynews_colour', 'FF00B3B2'),
-					('provider.debrid_cloud_colour', 'FF7A01CC'), ('provider.folders_colour', 'FFB36B00'), ('scraper_4k_highlight', 'FFFF00FE'),
-					('scraper_1080p_highlight', 'FFE6B800'), ('scraper_720p_highlight', 'FF3C9900'), ('scraper_SD_highlight', 'FF0166FF'), ('scraper_single_highlight', 'FF008EB2'),
-					('highlight', 'FFC0C0C0'), ('scraper_flag_identify_colour', 'FF7C7C7C'), ('scraper_result_identify_colour', 'FFFFFFFF'))
+def addon_themes():
+	return [{'name': 'Light', 'value': ('FF434343', 'FF2E2E2E'), 'icon': 'light'}, {'name': 'Medium', 'value': ('FF373737', 'FF4a4347'), 'icon': 'medium'},
+			{'name': 'Dark', 'value': ('FF1F2020', 'FF4F4F4F'), 'icon': 'dark'}]
 
-def get_icon(image_name):
-	return img_url % getattr(icons, image_name, 'I1JJhji')
+def addon_themes_opacity():
+	return [{'name': '100%', 'value': 'FF'}, {'name': '95%', 'value': 'F2'}, {'name': '90%', 'value': 'E6'}, {'name': '85%', 'value': 'D9'}, {'name': '80%', 'value': 'CC'},
+			{'name': '75%', 'value': 'BF'}, {'name': '70%', 'value': 'B3'}, {'name': '65%', 'value': 'A6'}, {'name': '60%', 'value': '99'}, {'name': '55%', 'value': '8C'},
+			{'name': '50%', 'value': '80'}]
 
-def local_string(string):
-	if isinstance(string, str):
-		try: string = int(string)
-		except: return string
-	return getLocalizedString(string)
+def random_valid_type_check():
+	return {'build_movie_list': 'movie', 'build_tvshow_list': 'tvshow', 'build_season_list': 'season', 'build_episode_list': 'episode',
+	'build_in_progress_episode': 'single_episode', 'build_next_episode': 'single_episode', 'personal_lists.build_personal_list': 'personal_list',
+	'build_personal_lists_contents': 'personal_list'}
+
+def random_episodes_check():
+	return {'build_in_progress_episode': 'episode.progress', 'build_next_episode': 'episode.next'}
+
+def extras_button_label_values():
+	return {'movie':
+				{'movies_play': 'Play', 'show_trailers': 'Trailer', 'show_images': 'Images',  'show_extrainfo': 'Extra Info', 'show_genres': 'Genres',
+				'show_director': 'Director', 'show_options': 'Options', 'show_cast': 'Cast', 'show_recommended': 'Recommended', 'show_related': 'Related',
+				'show_more_like_this': 'More Like This', 'show_similar': 'Similar', 'show_reviews': 'Reviews', 'show_comments': 'Comments', 'show_trivia': 'Trivia',
+				'show_blunders': 'Blunders','show_faqs': 'FAQs', 'show_quotes': 'Quotes', 'show_year': 'More Year', 'show_genre': 'More Genres',
+				'show_personallists_manager': 'Personal Lists', 'show_favorites_manager': 'Favorites Lists', 'playback_choice': 'Play Options', 'show_plot': 'Plot',
+				'show_keywords': 'Keywords','close_all': 'Close'},
+			'tvshow':
+				{'tvshow_browse': 'Browse', 'show_trailers': 'Trailer', 'show_images': 'Images', 'show_extrainfo': 'Extra Info', 'show_genres': 'Genres',
+				'play_nextep': 'Play Next', 'show_options': 'Options', 'show_cast': 'Cast', 'show_recommended': 'Recommended', 'show_related': 'Related',
+				'show_more_like_this': 'More Like This', 'show_similar': 'Similar', 'show_reviews': 'Reviews', 'show_comments': 'Comments', 'show_trivia': 'Trivia',
+				'show_blunders': 'Blunders', 'show_faqs': 'FAQs', 'show_quotes': 'Quotes', 'show_year': 'More Year', 'show_genre': 'More Genres',
+				'show_personallists_manager': 'Personal Lists', 'show_favorites_manager': 'Favorites Lists', 'play_random_episode': 'Play Random', 'show_plot': 'Plot',
+				'show_keywords': 'Keywords', 'close_all': 'Close'}}
+
+def extras_items():
+	return [{'name': 'Plot', 'value': 2050},
+	{'name': 'Cast', 'value': 2051},
+	{'name': 'Recommended', 'value': 2052},
+	{'name': 'Related', 'value': 2053},
+	{'name': 'More Like This', 'value': 2054},
+	{'name': 'Similar', 'value': 2055},
+	{'name': 'Reviews', 'value': 2060},
+	{'name': 'Comments', 'value': 2061},
+	{'name': 'Trivia', 'value': 2062},
+	{'name': 'Blunders', 'value': 2063},
+	{'name': 'FAQs', 'value': 2064},
+	{'name': 'Quotes', 'value': 2065},
+	{'name': 'Parental Guide', 'value': 2066},
+	{'name': 'IMDb Videos', 'value': 2080},
+	{'name': 'Youtube Videos', 'value': 2081},
+	{'name': 'More from Year', 'value': 2082},
+	{'name': 'More from Genres', 'value': 2083},
+	{'name': 'More from Collection', 'value': 2084}]
+
+def extras_order_default():
+	return '2050,2051,2052,2053,2054,2055,2060,2061,2062,2063,2064,2065,2066,2080,2081,2082,2083,2084'
+
+def extras_display_default():
+	return 'Plot,Cast,Recommended,Related,More Like This,Similar,Reviews,Comments,Trivia,Blunders,Quotes,Parental Guide,IMDb Videos,Youtube Videos,' \
+			'More from Year,More from Genres,More from Collection'
+
+def context_menu_defaults():
+	return 'extras,cast,more_info,options,browse_more,personal_manager,favorites_manager,mark_watched,exit,refresh,reload'
+
+def context_menu_items():
+	return [
+	{'name': 'Extras', 'value': 'extras'},
+	{'name': 'Cast', 'value': 'cast'},
+	{'name': 'More Info', 'value': 'more_info'},
+	{'name': 'Options', 'value': 'options'},
+	{'name': 'Browse More', 'value': 'browse_more'},
+	{'name': 'Personal Lists Manager', 'value': 'personal_manager'},
+	{'name': 'Favorites Manager', 'value': 'favorites_manager'},
+	{'name': 'Mark Watched/Unwatched', 'value': 'mark_watched'},
+	{'name': 'Exit', 'value': 'exit'},
+	{'name': 'Refresh Widgets', 'value': 'refresh'},
+	{'name': 'Reload Widgets', 'value': 'reload'}]
+
+def rescrape_items():
+	return [
+	{'name': 'Rescrape With No Cache Check', 'value': 'cache_ignored'},
+	{'name': 'Rescrape With IMDb Year Data', 'value': 'imdb_year'},
+	{'name': 'Rescrape With All Scrapers', 'value': 'with_all'},
+	{'name': 'Rescrape With Episode Group', 'value': 'episode_group'},
+	{'name': 'Rescrape with Filters Ignored', 'value': 'ignore_filters'}]
+
+def episode_status():
+	return {
+	'series_premiere': ('Series Premiere', 'b30385b5'), 'season_premiere': ('Season Premiere', 'b30385b5'), 'mid_season_premiere': ('Mid-Season Premiere', 'b385b503'),
+	'series_finale': ('Series Finale', 'b38503b5'), 'season_finale': ('Season Finale', 'b3b50385'), 'mid_season_finale': ('Mid-Season Finale', 'b3b58503'), '':  (None, None)}
+
+def video_extensions():
+	return ('m4v', '3g2', '3gp', 'nsv', 'tp', 'ts', 'ty', 'pls', 'rm', 'rmvb', 'mpd', 'ifo', 'mov', 'qt', 'divx', 'xvid', 'bivx', 'vob', 'nrg', 'img', 'iso', 'udf', 'pva',
+			'wmv', 'asf', 'asx', 'ogm', 'm2v', 'avi', 'bin', 'dat', 'mpg', 'mpeg', 'mp4', 'mkv', 'mk3d', 'avc', 'vp3', 'svq3', 'nuv', 'viv', 'dv', 'fli', 'flv', 'wpl',
+			'xspf', 'vdr', 'dvr-ms', 'xsp', 'mts', 'm2t', 'm2ts', 'evo', 'ogv', 'sdp', 'avs', 'rec', 'url', 'pxml', 'vc1', 'h264', 'rcv', 'rss', 'mpls', 'mpl', 'webm',
+			'bdmv', 'bdm', 'wtv', 'trp', 'f4v', 'pvr', 'disc')
+
+def image_extensions():
+	return ('jpg', 'jpeg', 'jpe', 'jif', 'jfif', 'jfi', 'bmp', 'dib', 'png', 'gif', 'webp', 'tiff', 'tif',
+			'psd', 'raw', 'arw', 'cr2', 'nrw', 'k25', 'jp2', 'j2k', 'jpf', 'jpx', 'jpm', 'mj2')
+
+def kodi_progress_background():
+	return xbmcgui.DialogProgressBG()
+
+def get_visibility(obj):
+	return xbmc.getCondVisibility(obj)
+
+def get_infolabel(label):
+	return xbmc.getInfoLabel(label)
+
+def kodi_actor():
+	return xbmc.Actor
+
+def translate_path(_path):
+	return xbmcvfs.translatePath(_path)
+
+def kodi_monitor():
+	return xbmc.Monitor()
+
+def kodi_player():
+	return xbmc.Player()
+
+def kodi_dialog():
+	return xbmcgui.Dialog()
+
+def addon_info(info):
+	return xbmcaddon.Addon('plugin.video.fen').getAddonInfo(info)
+
+def addon_version():
+	return get_property('fen.addon_version') or addon_info('version')
+
+def addon_path():
+	return get_property('fen.addon_path') or addon_info('path')
+
+def addon_profile():
+	return get_property('fen.addon_profile') or translate_path(addon_info('profile'))
+
+def addon_icon():
+	return get_property('fen.addon_icon') or translate_path(addon_info('icon'))
+
+def addon_fanart():
+	return get_property('fen.addon_fanart') or translate_path(addon_info('fanart'))
+
+def get_icon(image_name, image_folder='icons', image_type='png'):
+	return 'special://home/addons/plugin.video.fen/resources/media/%s/%s.%s' % (image_folder, image_name, image_type)
+
+def get_addon_fanart():
+	return get_property('fen.default_addon_fanart') or addon_fanart()
 
 def build_url(url_params):
 	return 'plugin://plugin.video.fen/?%s' % urlencode(url_params)
 
-def remove_keys(dict_item, dict_removals):
-	for k in dict_removals: dict_item.pop(k, None)
-	return dict_item
-
-def add_dir(url_params, list_name, handle, iconImage='folder', fanartImage=None, isFolder=True):
-	fanart = fanartImage or addon_fanart
-	icon = get_icon(iconImage)
+def add_dir(handle, url_params, list_name, icon_image='folder', fanart_image=None, isFolder=True):
+	fanart = fanart_image or get_addon_fanart()
+	icon = get_icon(icon_image)
 	url = build_url(url_params)
 	listitem = make_listitem()
 	listitem.setLabel(list_name)
 	listitem.setArt({'icon': icon, 'poster': icon, 'thumb': icon, 'fanart': fanart, 'banner': fanart})
-	info_tag = listitem.getVideoInfoTag()
+	info_tag = listitem.getVideoInfoTag(True)
 	info_tag.setPlot(' ')
 	add_item(handle, url, listitem, isFolder)
 
 def make_listitem():
-	return ListItem(offscreen=True)
+	return xbmcgui.ListItem(offscreen=True)
 
 def add_item(handle, url, listitem, isFolder):
-	addDirectoryItem(handle, url, listitem, isFolder)
+	xbmcplugin.addDirectoryItem(handle, url, listitem, isFolder)
 
 def add_items(handle, item_list):
-	addDirectoryItems(handle, item_list)
+	xbmcplugin.addDirectoryItems(handle, item_list)
 
 def set_content(handle, content):
-	setContent(handle, content)
+	xbmcplugin.setContent(handle, content)
 
 def set_category(handle, label):
-	setCategory(handle, label)
+	xbmcplugin.setPluginCategory(handle, label)
 
-def end_directory(handle, cacheToDisc=None):
-	if cacheToDisc == None: cacheToDisc = get_setting('fen.kodi_menu_cache') == 'true'
-	endOfDirectory(handle, cacheToDisc=cacheToDisc)
+def end_directory(handle, cacheToDisc=True):
+	xbmcplugin.endOfDirectory(handle, cacheToDisc=cacheToDisc)
 
 def set_view_mode(view_type, content='files', is_external=None):
+	if not get_property('fen.use_viewtypes') == 'true': return
 	if is_external == None: is_external = external()
 	if is_external: return
-	setting_query = 'fen.%s' % view_type
-	view_id = get_setting(setting_query) or None
+	view_id = get_property('fen.%s' % view_type) or None
+	if not view_id: return
 	try:
 		hold = 0
 		sleep(100)
 		while not container_content() == content:
 			hold += 1
-			if hold < 5000: sleep(1)
+			if hold < 3000: sleep(1)
 			else: return
-		if view_id: execute_builtin('Container.SetViewMode(%s)' % view_id)
+		execute_builtin('Container.SetViewMode(%s)' % view_id)
 	except: return
 
+def random_integer(start=1, end=1000000):
+	from random import randint
+	return randint(start, end)
+
+def remove_keys(dict_item, dict_removals):
+	for k in dict_removals: dict_item.pop(k, None)
+	return dict_item
+
 def append_path(_path):
-	sys.path.append(translatePath(_path))
+	import sys
+	sys.path.append(translate_path(_path))
 
 def logger(heading, function):
-	log('###%s###: %s' % (heading, function), 1)
+	xbmc.log('###%s###: %s' % (heading, function), 1)
+
+def kodi_window():
+	return xbmcgui.Window(10000)
 
 def get_property(prop):
-	return window.getProperty(prop)
+	return kodi_window().getProperty(prop)
 
 def set_property(prop, value):
-	return window.setProperty(prop, value)
+	return kodi_window().setProperty(prop, value)
 
 def clear_property(prop):
-	return window.clearProperty(prop)
+	return kodi_window().clearProperty(prop)
+
+def clear_all_properties():
+	return kodi_window().clearProperties()
 
 def addon(addon_id='plugin.video.fen'):
 	return xbmcaddon.Addon(id=addon_id)
@@ -187,72 +242,77 @@ def container_content():
 	return get_infolabel('Container.Content')
 
 def set_sort_method(handle, method):
-	addSortMethod(handle, sort_method_dict[method])
+	xbmcplugin.addSortMethod(handle, {'episodes': 24, 'files': 5, 'label': 2, 'none': 0}[method])
 
 def make_session(url='https://'):
+	import requests
 	session = requests.Session()
 	session.mount(url, requests.adapters.HTTPAdapter(pool_maxsize=100))
 	return session	
 
 def make_playlist(playlist_type='video'):
-	return PlayList(playlist_type_dict[playlist_type])
-
-def convert_language(lang):
-	return convertLanguage(lang, 1)
+	return xbmc.PlayList({'music': 0, 'video': 1}[playlist_type])
 
 def supported_media():
-	return getSupportedMedia('video')
+	return xbmc.getSupportedMedia('video')
 
 def path_exists(path):
-	return exists(path)
+	return xbmcvfs.exists(path)
 
 def open_file(_file, mode='r'):
-	return File(_file, mode)
+	return xbmcvfs.File(_file, mode)
 
 def copy_file(source, destination):
-	return copy(source, destination)
+	return xbmcvfs.copy(source, destination)
 
 def delete_file(_file):
-	delete(_file)
+	xbmcvfs.delete(_file)
 
 def delete_folder(_folder, force=False):
-	rmdir(_folder, force)
+	xbmcvfs.rmdir(_folder, force)
 
 def rename_file(old, new):
-	rename(old, new)
+	xbmcvfs.rename(old, new)
+
+def last_modified_time_for_file(_file, as_datetime_object=False):
+	modification_timestamp = xbmcvfs.Stat(_file).st_mtime()
+	if not as_datetime_object: return modification_timestamp
+	from datetime import datetime
+	return datetime.fromtimestamp(modification_timestamp)
+
+def update_timestamp_for_file(_file):
+	with open_file(_file) as f_read: binary_content = f_read.readBytes()
+	with open_file(_file, mode='w') as f_write: f_write.write(binary_content)
 
 def list_dirs(location):
-	return listdir(location)
+	return xbmcvfs.listdir(location)
 
 def make_directory(path):
-	mkdir(path)
+	xbmcvfs.mkdir(path)
 
 def make_directories(path):
-	mkdirs(path)
-
-def translate_path(path):
-	return translatePath(path)
+	xbmcvfs.mkdirs(path)
 
 def sleep(time):
-	return xbmc_sleep(time)
+	return xbmc.sleep(time)
 
 def execute_builtin(command, block=False):
-	return executebuiltin(command, block)
+	return xbmc.executebuiltin(command, block)
 
 def current_skin():
-	return getSkinDir()
+	return xbmc.getSkinDir()
 
 def get_window_id():
-	return getCurrentWindowId()
+	return xbmcgui.getCurrentWindowId()
 
 def current_window_object():
-	return Window(get_window_id())
+	return xbmcgui.Window(get_window_id())
 
 def kodi_version():
 	return int(get_infolabel('System.BuildVersion')[0:2])
 
 def get_video_database_path():
-	return translate_path('special://profile/Database/MyVideos%s.db' % myvideos_db_paths[kodi_version()])
+	return translate_path('special://profile/Database/MyVideos%s.db' % {19: '119', 20: '121', 21: '124'}[kodi_version()])
 
 def show_busy_dialog():
 	return execute_builtin('ActivateWindow(busydialognocancel)')
@@ -274,19 +334,26 @@ def external():
 	return 'fen' not in get_infolabel('Container.PluginName')
 
 def home():
-	return getCurrentWindowId() == 10000
+	return xbmcgui.getCurrentWindowId() == 10000
 
 def folder_path():
 	return get_infolabel('Container.FolderPath')
 
 def path_check(string):
-	return string in folder_path()
+	return string in unquote(folder_path())
 
 def reload_skin():
 	execute_builtin('ReloadSkin()')
 
 def kodi_refresh():
 	execute_builtin('UpdateLibrary(video,special://skin/foo)')
+
+def refresh_widgets():
+	from caches.settings_cache import get_setting
+	from caches.random_widgets_cache import RandomWidgets
+	RandomWidgets().delete_like('random_list.%')
+	kodi_refresh()
+	if get_setting('fen.widget_refresh_notification', 'true') == 'true': notification('Widgets Refreshed', 2500)
 
 def run_plugin(params, block=False):
 	if isinstance(params, dict): params = build_url(params)
@@ -312,15 +379,11 @@ def replace_window(params, block=False):
 	return execute_builtin('ReplaceWindow(Videos,%s)' % params, block)
 
 def disable_enable_addon(addon_name='plugin.video.fen'):
+	import json
 	try:
-		execute_JSON(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'Addons.SetAddonEnabled', 'params': {'addonid': addon_name, 'enabled': False}}))
-		execute_JSON(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'Addons.SetAddonEnabled', 'params': {'addonid': addon_name, 'enabled': True}}))
+		xbmc.executeJSONRPC(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'Addons.SetAddonEnabled', 'params': {'addonid': addon_name, 'enabled': False}}))
+		xbmc.executeJSONRPC(json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'Addons.SetAddonEnabled', 'params': {'addonid': addon_name, 'enabled': True}}))
 	except: pass
-
-def restart_services():
-	execute_builtin('ActivateWindow(Home)', True)
-	sleep(1000)
-	Thread(target=disable_enable_addon).start()
 
 def update_local_addons():
 	execute_builtin('UpdateLocalAddons', True)
@@ -337,13 +400,16 @@ def update_kodi_addons_db(addon_name='plugin.video.fen'):
 	except: pass
 
 def get_jsonrpc(request):
-	response = execute_JSON(json.dumps(request))
+	import json
+	response = xbmc.executeJSONRPC(json.dumps(request))
 	result = json.loads(response)
 	return result.get('result', None)
 
 def jsonrpc_get_directory(directory, properties=['title', 'file', 'thumbnail']):
 	command = {'jsonrpc': '2.0', 'id': 1, 'method': 'Files.GetDirectory', 'params': {'directory': directory, 'media': 'files', 'properties': properties}}
-	try: results = [i for i in get_jsonrpc(command).get('files') if i['file'].startswith('plugin://') and i['filetype'] == 'directory']
+	try:
+		files = get_jsonrpc(command).get('files')
+		results = [i for i in files if i['file'].startswith('plugin://') and i['filetype'] == 'directory']
 	except: results = None
 	return results
 
@@ -358,14 +424,21 @@ def jsonrpc_get_system_setting(setting_id, setting_value=''):
 	except: result = setting_value
 	return result
 
-def make_global_list():
-	global global_list
-	global_list = []
+def open_settings():
+	from windows.base_window import open_window
+	open_window(('windows.settings_manager', 'SettingsManager'), 'settings_manager.xml')
 
-def progress_dialog(heading=32036, icon=addon_icon):
+def external_scraper_settings():
+	try:
+		external = get_property('fen.external_scraper.module')
+		if external in ('empty_setting', ''): return
+		execute_builtin('Addon.OpenSettings(%s)' % external)
+	except: pass
+
+def progress_dialog(heading='', icon=None):
+	from threading import Thread
 	from windows.base_window import create_window
-	if isinstance(heading, int): heading = local_string(heading)
-	progress_dialog = create_window(('windows.progress', 'Progress'), 'progress.xml', heading=heading, icon=icon)
+	progress_dialog = create_window(('windows.progress', 'Progress'), 'progress.xml', heading=heading, icon=icon or addon_icon())
 	Thread(target=progress_dialog.run).start()
 	return progress_dialog
 
@@ -376,70 +449,30 @@ def select_dialog(function_list, **kwargs):
 	if kwargs.get('multi_choice', 'false') == 'true': return [function_list[i] for i in selection]
 	return function_list[selection]
 
-def confirm_dialog(heading=32036, text=32580, ok_label=32839, cancel_label=32840, default_control=11):
+def confirm_dialog(heading='', text='Are you sure?', ok_label='OK', cancel_label='Cancel', default_control=11):
 	from windows.base_window import open_window
-	if isinstance(heading, int): heading = local_string(heading)
-	if isinstance(text, int): text = local_string(text)
-	if isinstance(ok_label, int): ok_label = local_string(ok_label)
-	if isinstance(cancel_label, int): cancel_label = local_string(cancel_label)
 	kwargs = {'heading': heading, 'text': text, 'ok_label': ok_label, 'cancel_label': cancel_label, 'default_control': default_control}
 	return open_window(('windows.default_dialogs', 'Confirm'), 'confirm.xml', **kwargs)
 
-def ok_dialog(heading=32036, text=32760, ok_label=32839):
+def ok_dialog(heading='', text='No Results', ok_label='OK'):
 	from windows.base_window import open_window
-	if isinstance(heading, int): heading = local_string(heading)
-	if isinstance(text, int): text = local_string(text)
-	if isinstance(ok_label, int): ok_label = local_string(ok_label)
 	kwargs = {'heading': heading, 'text': text, 'ok_label': ok_label}
 	return open_window(('windows.default_dialogs', 'OK'), 'ok.xml', **kwargs)
 
-def show_text(heading=32036, text=None, file=None, font_size='small', kodi_log=False):
+def show_text(heading, text=None, file=None, font_size='small', kodi_log=False):
 	from windows.base_window import open_window
-	if isinstance(heading, int): heading = local_string(heading)
-	if isinstance(text, int): text = local_string(text)
 	heading = heading.replace('[B]', '').replace('[/B]', '')
 	if file:
 		with open(file, encoding='utf-8') as r: text = r.readlines()
 	if kodi_log:
-		confirm = confirm_dialog(text=32855, ok_label=32824, cancel_label=32828)
+		confirm = confirm_dialog(text='Show Log Errors Only?', ok_label='Yes', cancel_label='No')
 		if confirm == None: return
 		if confirm: text = [i for i in text if any(x in i.lower() for x in ('exception', 'error', '[test]'))]
 	text = ''.join(text)
 	return open_window(('windows.textviewer', 'TextViewer'), 'textviewer.xml', heading=heading, text=text, font_size=font_size)
 
-def notification(line1, time=5000, icon=None, sound=False):
-	if isinstance(line1, int): line1 = local_string(line1)
-	icon = icon or addon_icon
-	dialog.notification(local_string(32036), line1, icon, time, sound)
-
-def choose_view(view_type, content):
-	handle = int(sys.argv[1])
-	set_view_str = local_string(32547)
-	settings_icon = get_icon('settings')
-	listitem = make_listitem()
-	listitem.setLabel(set_view_str)
-	params_url = build_url({'mode': 'set_view', 'view_type': view_type})
-	listitem.setArt({'icon': settings_icon, 'poster': settings_icon, 'thumb': settings_icon, 'fanart': addon_fanart, 'banner': settings_icon})
-	info_tag = listitem.getVideoInfoTag()
-	info_tag.setPlot(' ')
-	add_item(handle, params_url, listitem, False)
-	set_content(handle, content)
-	end_directory(handle)
-	set_view_mode(view_type, content, False)
-
-def set_view(view_type):
-	view_id = str(current_window_object().getFocusId())
-	set_setting(view_type, view_id)
-	set_property('fen.%s' % view_type, view_id)
-	notification(get_infolabel('Container.Viewmode').upper(), time=500)
-
-def set_temp_highlight(temp_highlight):
-	current_highlight = get_property(highlight_prop)
-	set_property(highlight_prop, temp_highlight)
-	return current_highlight
-
-def restore_highlight(current_highlight):
-	set_property(highlight_prop, current_highlight)
+def notification(line1, time=5000, icon=None):
+	kodi_dialog().notification('Fen', line1, icon or addon_icon(), time)
 
 def timeIt(func):
 	# Thanks to 123Venom
@@ -455,22 +488,61 @@ def timeIt(func):
 def volume_checker():
 	# 0% == -60db, 100% == 0db
 	try:
-		if get_setting('fen.playback.volumecheck_enabled', 'false') == 'false' or get_visibility('Player.Muted'): return
+		if get_property('fen.playback.volumecheck_enabled') == 'false' or get_visibility('Player.Muted'): return
 		from modules.utils import string_alphanum_to_num
-		max_volume = min(int(get_setting('fen.playback.volumecheck_percent', '50')), 100)
+		max_volume = min(int(get_property('fen.playback.volumecheck_percent') or '50'), 100)
 		if int(100 - (float(string_alphanum_to_num(get_infolabel('Player.Volume').split('.')[0]))/60)*100) > max_volume: execute_builtin('SetVolume(%d)' % max_volume)
 	except: pass
 
-def focus_index(index, sleep_time=1000):
-	show_busy_dialog()
-	sleep(sleep_time)
+def focus_index(index):
 	current_window = current_window_object()
 	focus_id = current_window.getFocusId()
 	try: current_window.getControl(focus_id).selectItem(index)
 	except: pass
+
+def get_all_icons():
+	try: results = [i.replace('.png', '') for i in list_dirs('special://home/addons/plugin.video.fen/resources/media/icons/')[1]]
+	except: results = ['folder']
+	return results
+
+def upload_logfile(params):
+	import json
+	import requests
+	from modules.utils import copy2clip, make_qrcode
+	log_files = [('Current Kodi Log', 'kodi.log'), ('Previous Kodi Log', 'kodi.old.log')]
+	list_items = [{'line1': i[0]} for i in log_files]
+	kwargs = {'items': json.dumps(list_items), 'heading': 'Choose Which Log File to Upload', 'narrow_window': 'true'}
+	log_file = select_dialog(log_files, **kwargs)
+	if log_file == None: return
+	log_name, log_file = log_file
+	if not confirm_dialog(heading=log_name): return
+	show_busy_dialog()
+	url = 'https://paste.kodi.tv/'
+	log_file = translate_path('special://logpath/%s' % log_file)
+	if not path_exists(log_file): return ok_dialog(text='Error. Log Upload Failed')
+	try:
+		with open_file(log_file) as f: text = f.read()
+		UserAgent = 'script.kodi.loguploader: 1.0'
+		response = requests.post('%s%s' % (url, 'documents'), data=text.encode('utf-8', errors='ignore'), headers={'User-Agent': UserAgent}).json()
+		if 'key' in response:
+			user_code = response['key']
+			url = '%s%s' % (url, user_code)
+			copy2clip(url)
+			qr_code = make_qrcode(url) or ''
+			progressDialog = progress_dialog(heading='Kodi Log Uploader', icon=qr_code)
+			count, success = 20, None
+			while not progressDialog.iscanceled() and count >= 0 and success == None:
+				try:
+					count -= 1
+					progressDialog.update('Share or Access with this url: [B]%s[/B][CR]Or Access using this QR Code' % url, count)
+					sleep(2500)
+				except: success = False
+		else: ok_dialog(text='Error. Log Upload Failed')
+	except: ok_dialog(text='Error. Log Upload Failed')
 	hide_busy_dialog()
 
 def fetch_kodi_imagecache(image):
+	import sqlite3 as database
 	result = None
 	try:
 		dbcon = database.connect(translate_path('special://database/Textures13.db'), timeout=40.0)
@@ -479,112 +551,3 @@ def fetch_kodi_imagecache(image):
 		result = dbcur.fetchone()[0]
 	except: pass
 	return result
-
-def get_all_icon_vars(include_values=False):
-	if include_values: return [(k, v) for k, v in vars(icons).items() if not k.startswith('__')]
-	else: return [k for k, v in vars(icons).items() if not k.startswith('__')]
-
-def toggle_language_invoker():
-	close_all_dialog()
-	sleep(100)
-	addon_xml = translate_path('special://home/addons/plugin.video.fen/addon.xml')
-	current_addon_setting = get_setting('fen.reuse_language_invoker', 'true')
-	new_value = invoker_switch_dict[current_addon_setting]
-	if not confirm_dialog(text=local_string(33018) % (current_addon_setting.upper(), new_value.upper())): return
-	if new_value == 'true' and not confirm_dialog(text=33019): return
-	root = mdParse(addon_xml)
-	root.getElementsByTagName("reuselanguageinvoker")[0].firstChild.data = new_value
-	new_xml = str(root.toxml()).replace('<?xml version="1.0" ?>', '')
-	with open(addon_xml, 'w') as f: f.write(new_xml)
-	set_setting('reuse_language_invoker', new_value)
-	ok_dialog(text=32576)
-	execute_builtin('ActivateWindow(Home)', True)
-	update_local_addons()
-	disable_enable_addon()
-
-def unzip(zip_location, destination_location, destination_check, show_busy=True):
-	if show_busy: show_busy_dialog()
-	try:
-		from zipfile import ZipFile
-		zipfile = ZipFile(zip_location)
-		zipfile.extractall(path=destination_location)
-		if path_exists(destination_check): status = True
-		else: status = False
-	except: status = False
-	if show_busy: hide_busy_dialog()
-	return status
-
-def upload_logfile(params):
-	log_files = [(33145, 'kodi.log'), (33146, 'kodi.old.log')]
-	list_items = [{'line1': local_string(i[0])} for i in log_files]
-	kwargs = {'items': json.dumps(list_items), 'heading': local_string(33147), 'narrow_window': 'true'}
-	log_file = select_dialog(log_files, **kwargs)
-	if log_file == None: return
-	log_name, log_file = log_file
-	if not confirm_dialog(heading=log_name, text=32580): return
-	show_busy_dialog()
-	url = 'https://paste.kodi.tv/'
-	log_file = translate_path('special://logpath/%s' % log_file)
-	if not path_exists(log_file): return ok_dialog(text=33039)
-	try:
-		with open_file(log_file) as f: text = f.read()
-		UserAgent = 'Fen %s' % addon_object.getAddonInfo('version')
-		response = requests.post('%s%s' % (url, 'documents'), data=text.encode('utf-8', errors='ignore'), headers={'User-Agent': UserAgent}).json()
-		user_code = response['key']
-		if 'key' in response:
-			try:
-				from modules.utils import copy2clip
-				copy2clip('%s%s' % (url, user_code))
-			except: pass
-			ok_dialog(text='%s%s' % (url, user_code))
-		else: ok_dialog(text=33039)
-	except: ok_dialog(text=33039)
-	hide_busy_dialog()
-
-def open_settings(query, addon='plugin.video.fen'):
-	hide_busy_dialog()
-	if query:
-		try:
-			button, control = 100, 80
-			menu, function = query.split('.')
-			execute_builtin('Addon.OpenSettings(%s)' % addon)
-			execute_builtin('SetFocus(%i)' % (int(menu) - button))
-			execute_builtin('SetFocus(%i)' % (int(function) - control))
-		except: execute_builtin('Addon.OpenSettings(%s)' % addon)
-	else: execute_builtin('Addon.OpenSettings(%s)' % addon)
-
-def external_scraper_settings():
-	try:
-		external = get_setting('fen.external_scraper.module', None)
-		if not external: return
-		execute_builtin('Addon.OpenSettings(%s)' % external)
-	except: pass
-
-def set_setting(setting_id, value):
-	addon_object.setSetting(setting_id, value)
-
-def get_setting(setting_id, fallback=''):
-	return get_property(setting_id) or addon_object.getSetting(setting_id.replace('fen.', '')) or fallback
-
-def manage_settings_reset(cancel=False):
-	if cancel: clear_property(pause_settings_prop); make_settings_props()
-	else: set_property(pause_settings_prop, 'true')
-	return
-
-def make_settings_props():
-	if get_property(sett_addoninfo_active_prop) == 'true': return
-	set_property(sett_addoninfo_active_prop, 'true')
-	while get_visibility('Window.IsActive(addoninformation)') or get_visibility('Window.IsActive(addonsettings)'):
-		if monitor.abortRequested(): break
-		sleep(1000)
-	try:
-		if not path_exists(userdata_path): make_directories(userdata_path)
-		for item in all_settings(): set_property('fen.%s' % item[0], item[1])
-	except Exception as e: logger('error in make_settings_props', str(e))
-	clear_property(sett_addoninfo_active_prop)
-
-def all_settings():
-	try: settings = [(item.getAttribute('id'), item.firstChild.data if item.firstChild and item.firstChild.data is not None else '') \
-						for item in mdParse(user_settings).getElementsByTagName('setting')]
-	except: settings = []
-	return settings

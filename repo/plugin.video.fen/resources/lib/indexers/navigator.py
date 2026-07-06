@@ -1,531 +1,418 @@
 # -*- coding: utf-8 -*-
+import sys
 from caches.navigator_cache import navigator_cache as nc
-from modules import meta_lists as ml, kodi_utils as k, settings as s
-from modules.debrid import debrid_enabled, debrid_authed
-from modules.watched_status import get_recently_watched
+from caches.settings_cache import get_setting, set_setting
+from modules import kodi_utils as k, settings as s
 # logger = k.logger
-
-tp, ls, sys, build_url, notification, addon, make_listitem, list_dirs = k.translate_path, k.local_string, k.sys, k.build_url, k.notification, k.addon, k.make_listitem, k.list_dirs
-add_item, set_content, end_directory, set_view_mode, add_items, get_setting = k.add_item, k.set_content, k.end_directory, k.set_view_mode, k.add_items, k.get_setting
-json, close_all_dialog, sleep, home, external = k.json, k.close_all_dialog, k.sleep, k.home, k.external
-download_directory, furk_active, easynews_active, source_folders_directory, get_icon = s.download_directory, s.furk_active, s.easynews_active, s.source_folders_directory, k.get_icon
-get_shortcut_folders, currently_used_list, get_shortcut_folder_contents, fanart = nc.get_shortcut_folders, nc.currently_used_list, nc.get_shortcut_folder_contents, k.addon_fanart
-set_sort_method, set_category, container_refresh_input, get_property = k.set_sort_method, k.set_category, k.container_refresh_input, k.get_property
-vid_str, fl_str, se_str, acc_str, dl_str, people_str, keywords_str, add_cont_str = ls(32491), ls(32493), ls(32450), ls(32494), ls(32107), ls(32507), ls(32092), ls(33140)
-tools_str, changelog_str, source_str, cl_dbs_str, langinv_str, shortcut_manager_str, ext_str = ls(32456), ls(32508), ls(32515), ls(32512), ls(33017), ls(32514), ls(32118)
-user_str, ml_str, ll_str, rec_str, cal_str, lv_str, lu_str, k_str, genre_select_str = ls(32065), ls(32454), ls(32502), ls(32503), ls(32081), ls(32509), ls(32853), ls(32538), ls(32847)
-recent_added_str, recently_aired_str, random_str, episodes_str, settings_str, res_serv_str, upd_str = ls(32498), ls(32505), ls(32504), ls(32506), ls(32247), ls(32680), ls(32789)
-log_utils_str, tips_use_str, views_str, updates_str, fen_str, all_str, cache_str, clean_str = ls(32777), ls(32518), ls(32510), ls(32196), ls(32036), ls(32129), ls(32524), ls(32526)
-discover_str, history_str, help_str, furk_str, easy_str, rd_str, pm_str, ad_str = ls(32451), ls(32486), ls(32487), ls(32069), ls(32070), ls(32054), ls(32061), ls(32063)
-cloud_str, clca_str, trakt_str, imdb_str, coll_str, wlist_str, ls_str, fav_str = ls(32496), ls(32497), ls(32037), ls(32064), ls(32499), ls(32500), ls(32501), ls(32453)
-root_str, season_str, images_str, make_short_str, delete_str, mcol_str, res_hc, progman_str = ls(32457), ls(32537), ls(32798), ls(32702), ls(32703), ls(33080), ls(33107), ls(32599)
-_in_str, mov_str, tv_str, edit_str, add_menu_str, s_folder_str, mset_str, local_str = ls(32484), ls(32028), ls(32029), ls(32705), ls(32730), ls(32731), ls(33080), ls(33104)
-new_str, spot_str, tips_str, man_acc_str, rename_str, ext_scr_str = ls(32857).upper(), ls(32858).upper(), ls(32546).upper(), ls(32805), '[B]%s[/B]' % ls(32137), ls(33015)
-changelog_utils_str, search_str = '%s & %s' % (changelog_str, log_utils_str), '%s %s' % (se_str, history_str)
-clear_all_str, clear_meta_str, clear_list_str, clear_trakt_str = clca_str % all_str, clca_str % ls(32527), clca_str % ls_str, clca_str % trakt_str
-sources_folders_str, downloads_ins, because_str = '[B]%s (%s): %s[/B]\n     [COLOR=%s][I]%s[/I][/COLOR]', _in_str % (dl_str.upper(), '%s'), '[I]%s[/I]  [B]%s[/B]' % (ls(32474), '%s')
-premium_files_str, ep_lists_str, clear_all_amble = ls(32485), '%s %s' % (episodes_str, ls_str), '[B][I][COLOR=grey] (%s %s & %s)[/COLOR][/I][/B]' % (ls(32189), fav_str, search_str)
-clear_ad_str, clear_fav_str, clear_search_str, clear_all = clca_str % ad_str, clca_str % fav_str, clca_str % search_str, '[B]%s:[/B] %s' % (clear_all_str.upper(), clear_all_amble)
-movh_str, tvh_str, tips_ins = '%s %s' % (mov_str, history_str), '%s %s' % (tv_str, history_str), '[B]%s[/B]: %s'  % (tips_str, '%s')
-corrupt_databases_str, clean_databases_str = ls(32179), '%s %s' % (clean_str, ls(32003))
-kw_mov, kw_tv = '%s %s (%s)' % (imdb_str, keywords_str, mov_str), '%s %s (%s)' % (imdb_str, keywords_str, tv_str)
-clear_imdb_str, clint_str, clext_str, clear_rd_str, clear_pm_str = clca_str % imdb_str, clca_str % ls(32096), clca_str % ext_str, clca_str % rd_str, clca_str % pm_str
-mrec_str, mran_str,  = '%s %s' % (recent_added_str, mov_str), '%s %s' % (random_str, mov_str)
-tvrec_str, tvran_str, ra_str = '%s %s' % (recent_added_str, tv_str), '%s %s' % (random_str, tv_str), '%s %s' % (recently_aired_str, episodes_str)
-tu_str, pu_str, sea_str = '%s %s %s' % (ls(32458), user_str, ls_str), '%s %s %s' % (ls(32459), user_str, ls_str), '%s %s' % (ls(32477), ls_str)
-klv_h_str, klu_h_str = '[B]%s[/B]: %s %s' % (log_utils_str.upper(), k_str, lv_str), '[B]%s[/B]: %s' % (log_utils_str.upper(), lu_str)
-klvo_h_str = '[B]%s[/B]: %s %s (%s)' % (log_utils_str.upper(), k_str, lv_str, ls(32214))
-trakt_watchlist_str, imdb_watchlist_str, imdb_lists_str = '%s %s' % (trakt_str, wlist_str), '%s %s' % (imdb_str, wlist_str), '%s %s' % (imdb_str, ls_str)
-clear_info_ins, set_view_modes_ins = _in_str % (cache_str.upper(), '%s'), _in_str % (views_str.upper(), '%s')
-auth_ins, revoke_ins = '[B]%s: %s[/B]' % (ls(32057).upper(), '%s'), '[B]%s: %s[/B]' % (ls(32059).upper(), '%s')
-alldebrid_ins, my_content_trakt_ins, my_content_imdb_ins = _in_str % (ad_str.upper(), '%s'), _in_str % (trakt_str.upper(), '%s'), _in_str % (imdb_str.upper(), '%s')
-imdb_lists_ins, tools_ins, settings_ins = _in_str % (imdb_lists_str.upper(), '%s'), _in_str % (tools_str.upper(), '%s'), _in_str % (settings_str.upper(), '%s')
-trakt_collections_ins, trakt_watchlists_ins = _in_str % ('%s %s' % (trakt_str.upper(), coll_str.upper()), '%s'), _in_str % (trakt_watchlist_str.upper(), '%s')
-discover_main_ins, premium_ins, furk_ins = _in_str % (discover_str.upper(), '%s'), _in_str % (ls(32488).upper(), '%s'), _in_str % (furk_str.upper(), '%s %s')
-easynews_ins, real_debrid_ins, premiumize_ins = _in_str % (easy_str.upper(), '%s'), _in_str % (rd_str.upper(), '%s'), _in_str % (pm_str.upper(), '%s')
-trakt_lists_ins, tr_rec_ins, local_source_str = _in_str % (trakt_str.upper(), '%s'), _in_str % (rec_str.upper(), '%s'), _in_str % (local_str.upper(), source_str)
-tr_fav_ins = _in_str % (fav_str.upper(), '%s')
-favorites_ins, imdb_watchlists_ins = _in_str % (fav_str.upper(), '%s'), _in_str % (imdb_watchlist_str.upper(), '%s')
-run_plugin, container_update, log_path = 'RunPlugin(%s)', 'Container.Update(%s)', 'special://home/addons/%s/changelog.txt'
-folder_info = (('folder1', ls(32110)), ('folder2', ls(32111)), ('folder3', ls(32112)), ('folder4', ls(32113)), ('folder5', ls(32114)))
-kl_loc, klo_loc = tp('special://logpath/kodi.log'), tp('special://logpath/kodi.old.log')
-tmdb_img = 'https://image.tmdb.org/t/p/original/%s'
-folder_icon, new_icon = get_icon('folder'), get_icon('new')
 
 class Navigator:
 	def __init__(self, params):
 		self.params = params
 		self.params_get = self.params.get
-		self.category_name = ls(self.params_get('name', 32036))
+		self.category_name = self.params_get('name', 'Fen')
 		self.list_name = self.params_get('action', 'RootList')
-		self.is_home = home()
+		self.is_external = k.external()
+		self.make_listitem = k.make_listitem
+		self.build_url = k.build_url
+		self.add_item = k.add_item
+		self.get_icon = k.get_icon
+		self.fanart = k.get_addon_fanart()
+		self.run_plugin = 'RunPlugin(%s)'
 
 	def main(self):
-		add_items(int(sys.argv[1]), list(self.build_main_list()))
+		def _process():
+			for count, item in enumerate(browse_list):
+				try:
+					url = self.build_url(item)
+					icon = item.get('iconImage', '')
+					if not icon.startswith('http'):
+						icon = self.get_icon(icon)
+						item['iconImage'] = icon
+					listitem = self.make_listitem()
+					listitem.setLabel(item.get('name', ''))
+					listitem.setArt({'icon': icon, 'poster': icon, 'thumb': icon, 'fanart': self.fanart, 'banner': icon, 'landscape': icon})
+					info_tag = listitem.getVideoInfoTag(True)
+					info_tag.setPlot(' ')
+					if not self.is_external:
+						cm_items = [
+						('[B]Move[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.move', 'active_list': self.list_name, 'position': count})),
+						('[B]Remove[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.remove', 'active_list': self.list_name, 'position': count})),
+						('[B]Add Content[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.add', 'active_list': self.list_name, 'position': count})),
+						('[B]Restore Menu[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.restore', 'active_list': self.list_name, 'position': count})),
+						('[B]Check for New Menu Items[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.update', 'active_list': self.list_name, 'position': count})),
+						('[B]Reload Menu[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.reload', 'active_list': self.list_name, 'position': count})),
+						('[B]Browse Removed items[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.browse', 'active_list': self.list_name, 'position': count})),
+						('[B]Add to Shortcut Folder[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url}))]
+						listitem.addContextMenuItems(cm_items)
+					yield ((url, listitem, True), count)
+				except: pass
+		if self.params_get('full_list', 'false') == 'true': browse_list = nc.get_main_lists(self.list_name)[0]
+		else: browse_list = nc.currently_used_list(self.list_name)
+		results = sorted(list(_process()), key=lambda k: k[1])
+		k.add_items(int(sys.argv[1]), [i[0] for i in results])
 		self.end_directory()
 
-	def discover_main(self):
-		self.add({'mode': 'discover.movie', 'media_type': 'movie', 'name': mov_str}, discover_main_ins % mov_str, 'discover')
-		self.add({'mode': 'discover.tvshow', 'media_type': 'tvshow', 'name': tv_str}, discover_main_ins % tv_str, 'discover')
-		self.add({'mode': 'discover.history', 'media_type': 'movie', 'name': movh_str}, discover_main_ins % movh_str, 'discover')
-		self.add({'mode': 'discover.history', 'media_type': 'tvshow', 'name': tvh_str}, discover_main_ins % tvh_str, 'discover')
-		self.add({'mode': 'discover.help', 'isFolder': 'false'}, discover_main_ins % help_str, 'information')
-		self.end_directory()
-
-	def premium(self):
-		furk, easynews, debrids = furk_active(), easynews_active(), debrid_enabled()
-		if 'Real-Debrid' in debrids: self.add({'mode': 'navigator.real_debrid'}, premium_ins % rd_str, 'realdebrid')
-		if 'Premiumize.me' in debrids: self.add({'mode': 'navigator.premiumize'}, premium_ins % pm_str, 'premiumize')
-		if 'AllDebrid' in debrids: self.add({'mode': 'navigator.alldebrid'}, premium_ins % ad_str, 'alldebrid')
-		if furk: self.add({'mode': 'navigator.furk'}, premium_ins % furk_str, 'furk')
-		if easynews: self.add({'mode': 'navigator.easynews'}, premium_ins % easy_str, 'easynews')
-		self.add({'mode': 'navigator.sources_folders', 'action': 'browse'}, local_source_str, 'folder')
-		self.end_directory()
-
-	def furk(self):
-		self.add({'mode': 'history.search', 'action': 'furk_video'}, furk_ins % (se_str, ''), 'search')
-		self.add({'mode': 'furk.my_furk_files'}, furk_ins % (vid_str, fl_str), 'furk')
-		self.add({'mode': 'furk.account_info', 'isFolder': 'false'}, furk_ins % (acc_str, ''), 'furk')
-		self.end_directory()
-
-	def easynews(self):
-		self.add({'mode': 'history.search', 'action': 'easynews_video'}, easynews_ins % se_str, 'search')
-		self.add({'mode': 'easynews.account_info', 'isFolder': 'false'}, easynews_ins % acc_str, 'easynews')
-		self.end_directory()
-
-	def real_debrid(self):
-		self.add({'mode': 'real_debrid.rd_torrent_cloud'}, real_debrid_ins % cloud_str, 'realdebrid')
-		self.add({'mode': 'real_debrid.rd_downloads'}, real_debrid_ins % history_str, 'realdebrid')
-		self.add({'mode': 'real_debrid.rd_account_info', 'isFolder': 'false'}, real_debrid_ins % acc_str, 'realdebrid')
-		self.end_directory()
-
-	def premiumize(self):
-		self.add({'mode': 'premiumize.pm_torrent_cloud'}, premiumize_ins % cloud_str, 'premiumize')
-		self.add({'mode': 'premiumize.pm_transfers'}, premiumize_ins % history_str, 'premiumize')
-		self.add({'mode': 'premiumize.pm_account_info', 'isFolder': 'false'}, premiumize_ins % acc_str, 'premiumize')
-		self.end_directory()
-
-	def alldebrid(self):
-		self.add({'mode': 'alldebrid.ad_torrent_cloud'}, alldebrid_ins % cloud_str, 'alldebrid')
-		self.add({'mode': 'alldebrid.ad_account_info', 'isFolder': 'false'}, alldebrid_ins % acc_str, 'alldebrid')
+	def my_lists(self):
+		self.add({'mode': 'navigator.discover'}, 'Discover', 'discover')
+		self.add({'mode': 'navigator.favorites'}, 'Favorites', 'favorites')
+		self.add({'mode': 'navigator.shortcut_folders'}, 'Shortcut Folders', 'folder')
+		self.add({'mode': 'personal_lists.get_personal_lists'}, 'Personal Lists', 'lists')
+		self.add({'mode': 'navigator.trakt_lists_public'}, 'Trakt Public Lists', 'trakt')
+		self.add({'mode': 'navigator.random_lists'}, 'Random Lists', 'random')
 		self.end_directory()
 
 	def favorites(self):
-		self.add({'mode': 'build_movie_list', 'action': 'favorites_movies', 'name': mov_str}, favorites_ins % mov_str, 'movies')
-		self.add({'mode': 'build_tvshow_list', 'action': 'favorites_tvshows', 'name': tv_str}, favorites_ins % tv_str, 'tv')
+		self.add({'mode': 'build_movie_list', 'action': 'favorites_movies', 'name': 'Movies'}, 'Movies', 'movies')
+		self.add({'mode': 'build_tvshow_list', 'action': 'favorites_tvshows', 'name': 'TV Shows'}, 'TV Shows', 'tv'),
+		self.add({'mode': 'favorite_people_list_image_results', 'isFolder': 'false', 'name': 'People'}, 'People', 'empty_person')
 		self.end_directory()
 
-	def favourites(self):
-		self.favorites()
-
-	def my_content(self):
-		if get_setting('fen.trakt.user', ''):
-			self.add({'mode': 'navigator.trakt_collections'}, my_content_trakt_ins % coll_str, 'trakt')
-			self.add({'mode': 'navigator.trakt_watchlists'}, my_content_trakt_ins % wlist_str, 'trakt')
-			self.add({'mode': 'trakt.list.get_trakt_lists', 'list_type': 'my_lists', 'build_list': 'true', 'category_name': ml_str}, trakt_lists_ins % ml_str, 'trakt')
-			self.add({'mode': 'trakt.list.get_trakt_lists', 'list_type': 'liked_lists', 'build_list': 'true', 'category_name': ll_str}, trakt_lists_ins % ll_str, 'trakt')
-			self.add({'mode': 'navigator.trakt_favorites', 'category_name': fav_str}, trakt_lists_ins % fav_str, 'trakt')
-			self.add({'mode': 'navigator.trakt_recommendations', 'category_name': rec_str}, trakt_lists_ins % rec_str, 'trakt')
-			self.add({'mode': 'build_my_calendar'}, trakt_lists_ins % cal_str, 'trakt')
-		self.add({'mode': 'trakt.list.get_trakt_trending_popular_lists', 'list_type': 'trending', 'category_name': tu_str}, trakt_lists_ins % tu_str, 'trakt')
-		self.add({'mode': 'trakt.list.get_trakt_trending_popular_lists', 'list_type': 'popular', 'category_name': pu_str}, trakt_lists_ins % pu_str, 'trakt')
-		self.add({'mode': 'get_search_term', 'search_type': 'trakt_lists', 'isFolder': 'false'}, trakt_lists_ins % sea_str, 'trakt')
-		if get_setting('fen.imdb_user', ''):
-			self.add({'mode': 'navigator.imdb_watchlists'}, my_content_imdb_ins % wlist_str, 'imdb')
-			self.add({'mode': 'navigator.imdb_lists'}, my_content_imdb_ins % ls_str, 'imdb')
+	def trakt_lists_public(self):
+		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'trending', 'list_mode': 'personal', 'category_name': 'Trending User Lists'},
+				'Trending User Lists', 'trakt')
+		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'popular', 'list_mode': 'personal', 'category_name': 'Popular User Lists'},
+				'Popular User Lists', 'trakt')
+		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'trending', 'list_mode': 'official', 'category_name': 'Trending Official Lists'},
+				'Trending Official Lists', 'trakt')
+		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'popular', 'list_mode': 'official', 'category_name': 'Popular Official Lists'},
+				'Popular Official Lists', 'trakt')
+		self.add({'mode': 'navigator.search_history', 'action': 'trakt_lists'}, 'Search User Lists', 'search')
 		self.end_directory()
 
-	def trakt_lists(self):
-		# for FENtastic skin
-		self.my_content()
-
-	def trakt_collections(self):
-		self.category_name = coll_str
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_collection', 'category_name': '%s %s' % (mov_str, coll_str)}, trakt_collections_ins % mov_str, 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_collection', 'category_name': '%s %s' % (tv_str, coll_str)}, trakt_collections_ins % tv_str, 'trakt')
-		self.add({'mode': 'trakt.list.build_trakt_movie_sets', 'category_name': mcol_str}, trakt_collections_ins % mcol_str, 'trakt')
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_collection_lists', 'new_page': 'recent', 'category_name': mrec_str}, trakt_collections_ins % mrec_str, 'trakt')
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_collection_lists', 'new_page': 'random', 'category_name': mran_str}, trakt_collections_ins % mran_str, 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_collection_lists', 'new_page': 'recent', 'category_name': tvrec_str}, trakt_collections_ins % tvrec_str, 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_collection_lists', 'new_page': 'random', 'category_name': tvran_str}, trakt_collections_ins % tvran_str, 'trakt')
-		self.add({'mode': 'build_my_calendar', 'recently_aired': 'true'}, trakt_collections_ins % ra_str, 'trakt')
+	def discover(self):
+		self.add({'mode': 'navigator.discover_contents', 'media_type': 'movie'}, 'Movies', 'movies')
+		self.add({'mode': 'navigator.discover_contents', 'media_type': 'tvshow'}, 'TV Shows', 'tv')
 		self.end_directory()
 
-	def trakt_watchlists(self):
-		self.category_name = wlist_str
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_watchlist', 'category_name': '%s %s' % (mov_str, wlist_str)}, trakt_watchlists_ins % mov_str, 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_watchlist', 'category_name': '%s %s' % (tv_str, wlist_str)}, trakt_watchlists_ins % tv_str, 'trakt')
+	def random_lists(self):
+		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'movie'}, 'Random Movie Lists', 'movies')
+		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'tvshow'}, 'Random TV Show Lists', 'tv')
+		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'personal_lists'}, 'Random Personal Lists', 'lists')
 		self.end_directory()
 
-	def trakt_recommendations(self):
-		self.category_name = rec_str
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_recommendations', 'new_page': 'movies', 'category_name': '%s %s' % (mov_str, rec_str)}, tr_rec_ins % mov_str, 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_recommendations', 'new_page': 'shows', 'category_name': '%s %s' % (tv_str, rec_str)}, tr_rec_ins % tv_str, 'trakt')
+	def people(self):
+		self.add({'mode': 'tmdb_people_list_image_results', 'action': 'popular', 'isFolder': 'false', 'name': 'Popular'}, 'Popular', 'popular')
+		self.add({'mode': 'tmdb_people_list_image_results', 'action': 'day', 'isFolder': 'false', 'name': 'Trending'}, 'Trending', 'trending')
+		self.add({'mode': 'tmdb_people_list_image_results', 'action': 'week', 'isFolder': 'false', 'name': 'Trending This Week'}, 'Trending This Week', 'trending_recent')
 		self.end_directory()
 
-	def trakt_favorites(self):
-		self.category_name = 'Favorites'
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_favorites', 'category_name': '%s %s' % (mov_str, fav_str)}, tr_fav_ins % mov_str, 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_favorites', 'category_name': '%s %s' % (tv_str, fav_str)}, tr_fav_ins % tv_str, 'trakt')
+	def services(self):
+		if s.authorized_debrid_check('rd'): self.add({'mode': 'navigator.real_debrid'}, 'Real Debrid', 'realdebrid')
+		if s.authorized_debrid_check('pm'): self.add({'mode': 'navigator.premiumize'}, 'Premiumize', 'premiumize')
+		if s.authorized_debrid_check('tb'): self.add({'mode': 'navigator.torbox'}, 'TorBox', 'torbox')
+		if s.authorized_debrid_check('oc'): self.add({'mode': 'navigator.offcloud'}, 'Off Cloud', 'offcloud')
+		if s.easynews_authorized(): self.add({'mode': 'navigator.easynews'}, 'Easynews', 'easynews')
 		self.end_directory()
 
-	def imdb_watchlists(self):
-		self.category_name = imdb_watchlist_str
-		self.add({'mode': 'build_movie_list', 'action': 'imdb_watchlist', 'category_name': '%s %s' % (imdb_watchlist_str, mov_str)}, imdb_watchlists_ins % mov_str, 'imdb')
-		self.add({'mode': 'build_tvshow_list', 'action': 'imdb_watchlist', 'category_name': '%s %s' % (imdb_watchlist_str, tv_str)}, imdb_watchlists_ins % tv_str, 'imdb')
+	def easynews(self):
+		self.add({'mode': 'navigator.search_history', 'action': 'easynews_video'}, 'Search Videos', 'search')
+		self.add({'mode': 'navigator.search_history', 'action': 'easynews_image'}, 'Search Images', 'search')
+		self.add({'mode': 'easynews.account_info', 'isFolder': 'false'}, 'Account Info', 'easynews')
 		self.end_directory()
 
-	def imdb_lists(self):
-		self.category_name = imdb_lists_str
-		self.add({'mode': 'imdb_build_user_lists', 'media_type': 'movie', 'category_name': '%s %s' % (imdb_lists_str, mov_str)}, imdb_lists_ins % mov_str, 'imdb')
-		self.add({'mode': 'imdb_build_user_lists', 'media_type': 'tvshow', 'category_name': '%s %s' % (imdb_lists_str, tv_str)}, imdb_lists_ins % tv_str, 'imdb')
+	def real_debrid(self):
+		self.add({'mode': 'real_debrid.rd_cloud'}, 'Cloud Storage', 'realdebrid')
+		self.add({'mode': 'real_debrid.rd_downloads'}, 'History', 'realdebrid')
+		self.add({'mode': 'real_debrid.rd_account_info', 'isFolder': 'false'}, 'Account Info', 'realdebrid')
+		self.end_directory()
+
+	def premiumize(self):
+		self.add({'mode': 'premiumize.pm_cloud'}, 'Cloud Storage', 'premiumize')
+		self.add({'mode': 'premiumize.pm_transfers'}, 'History', 'premiumize')
+		self.add({'mode': 'premiumize.pm_account_info', 'isFolder': 'false'}, 'Account Info', 'premiumize')
+		self.end_directory()
+
+	def offcloud(self):
+		self.add({'mode': 'offcloud.oc_cloud'}, 'Cloud Storage', 'offcloud')
+		self.add({'mode': 'offcloud.oc_account_info', 'isFolder': 'false'}, 'Account Info', 'offcloud')
+		self.end_directory()
+
+	def torbox(self):
+		self.add({'mode': 'torbox.tb_cloud'}, 'Cloud Storage', 'torbox')
+		self.add({'mode': 'torbox.tb_account_info', 'isFolder': 'false'}, 'Account Info', 'torbox')
 		self.end_directory()
 
 	def search(self):
-		self.add({'mode': 'history.search', 'action': 'movie', 'name': mov_str}, _in_str % (se_str.upper(), mov_str), 'search_movie')
-		self.add({'mode': 'history.search', 'action': 'tvshow', 'name': tv_str}, _in_str % (se_str.upper(), tv_str), 'search_tv')
-		self.add({'mode': 'history.search', 'action': 'people', 'name': people_str}, _in_str % (se_str.upper(), people_str), 'search_people')
-		self.add({'mode': 'history.search', 'action': 'tmdb_movie_sets', 'name': mset_str}, _in_str % (se_str.upper(), mset_str), 'search_tmdb')
-		self.add({'mode': 'history.search', 'action': 'imdb_keyword_movie', 'name': kw_mov}, _in_str % (se_str.upper(), kw_mov), 'search_imdb')
-		self.add({'mode': 'history.search', 'action': 'imdb_keyword_tvshow', 'name': kw_tv}, _in_str % (se_str.upper(), kw_tv), 'search_imdb')
+		self.add({'mode': 'navigator.search_history', 'action': 'movie', 'name': 'Search History Movies'}, 'Search Movies', 'movies')
+		self.add({'mode': 'navigator.search_history', 'action': 'tvshow', 'name': 'Search History TV Shows'}, 'Search TV Shows', 'tv')
+		self.add({'mode': 'navigator.search_history', 'action': 'people', 'name': 'Search History People'}, 'Search People', 'people')
+		self.add({'mode': 'navigator.search_history', 'action': 'tmdb_keyword_movie', 'name': 'Search History Keywords (Movies)'}, 'Search Keywords (Movies)', 'tmdb')
+		self.add({'mode': 'navigator.search_history', 'action': 'tmdb_keyword_tvshow', 'name': 'Search History Keywords (TV Shows)'}, 'Search Keywords (TV Shows)', 'tmdb')
+		self.add({'mode': 'navigator.search_history', 'action': 'trakt_lists'}, 'Search Trakt User Lists', 'search')
+		if s.easynews_authorized():
+			self.add({'mode': 'navigator.search_history', 'action': 'easynews_video'}, 'Search Easynews Videos', 'easynews')
+			self.add({'mode': 'navigator.search_history', 'action': 'easynews_image'}, 'Search Easynews Images', 'easynews')
 		self.end_directory()
 
 	def downloads(self):
-		self.add({'mode': 'download_manager', 'folder_type': 'movie', 'name': mov_str}, downloads_ins % mov_str, 'movies')
-		self.add({'mode': 'download_manager', 'folder_type': 'episode', 'name': tv_str}, downloads_ins % tv_str, 'tv')
-		self.add({'mode': 'download_manager', 'folder_type': 'premium', 'name': premium_files_str}, downloads_ins % premium_files_str, 'premium')
-		self.add({'mode': 'browser_image', 'folder_path': download_directory('image'), 'isFolder': 'false'}, downloads_ins % images_str, 'people')
+		self.add({'mode': 'downloader.manager', 'name': 'Download Manager', 'isFolder': 'false'}, 'Download Manager', 'downloads')
+		self.add({'mode': 'downloader.viewer', 'folder_type': 'movie', 'name': 'Movies'}, 'Movies', 'movies')
+		self.add({'mode': 'downloader.viewer', 'folder_type': 'episode', 'name': 'TV Shows'}, 'TV Shows', 'tv')
+		self.add({'mode': 'downloader.viewer', 'folder_type': 'premium', 'name': 'Premium Files'}, 'Premium Files', 'premium')
+		self.add({'mode': 'browser_image', 'folder_path': s.download_directory('image'), 'isFolder': 'false'}, 'Images', 'people')
 		self.end_directory()
 
 	def tools(self):
-		self.add({'mode': 'open_settings', 'isFolder': 'false'}, settings_ins % fen_str, 'settings')
-		if get_setting('fen.external_scraper.module', None):
-			self.add({'mode': 'open_external_scraper_settings', 'isFolder': 'false'}, settings_ins % ext_scr_str, 'settings')
-		self.add({'mode': 'navigator.tips'}, tools_ins % tips_use_str, 'settings2')
-		self.add({'mode': 'navigator.accounts_manager'}, tools_ins % man_acc_str, 'settings2')
-		self.add({'mode': 'build_next_episode_manager'}, tools_ins % progman_str, 'settings2')
-		self.add({'mode': 'navigator.shortcut_folders'}, tools_ins % shortcut_manager_str, 'settings2')
-		self.add({'mode': 'navigator.changelog_utils'}, tools_ins % changelog_utils_str, 'settings2')
-		self.add({'mode': 'navigator.set_view_modes'}, tools_ins % views_str, 'settings2')
-		self.add({'mode': 'navigator.maintenance'}, tools_ins % cl_dbs_str, 'settings2')
-		self.add({'mode': 'default_highlight_colors_choice', 'isFolder': 'false'}, tools_ins % res_hc, 'settings2')
-		self.add({'mode': 'restart_services', 'isFolder': 'false'}, tools_ins % res_serv_str, 'settings')
-		# self.add({'mode': 'update_check', 'isFolder': 'false'}, tools_ins % upd_str, 'settings2')
-		self.add({'mode': 'toggle_language_invoker', 'isFolder': 'false'}, tools_ins % langinv_str, 'settings2')
+		self.add({'mode': 'navigator.settings_manager'}, 'Settings Utilities', 'settings2')
+		self.add({'mode': 'navigator.data_sync_manager'}, 'Data Sync Utilities', 'backup')
+		self.add({'mode': 'navigator.update_utils'}, 'Update Utilities', 'settings2')
+		self.add({'mode': 'navigator.maintenance'}, 'Database & Cache Maintenance', 'settings2')
+		self.add({'mode': 'navigator.log_utils'}, 'Log Utils', 'settings2')
+		self.add({'mode': 'navigator.set_view_modes'}, 'Set Views', 'settings2')
+		self.add({'mode': 'build_next_episode_manager'}, 'TV Shows Progress Manager', 'settings2')
+		self.add({'mode': 'language_invoker_choice', 'isFolder': 'false'}, 'Toggle Language Invoker (ADVANCED!!)', 'settings2')
 		self.end_directory()
 
-	def accounts_manager(self):
-		trakt_active = get_setting('fen.trakt.user') != ''
-		debrids = debrid_authed()
-		rd_active, pm_active, ad_active = 'Real-Debrid' in debrids, 'Premiumize.me' in debrids, 'AllDebrid' in debrids
-		folder_active = len([i for i in folder_info for media_type in ('movie', 'tvshow') if (source_folders_directory(media_type, i[0]) or '')]) > 0
-		trakt_info = (revoke_ins % trakt_str, 'trakt_green') if trakt_active else (auth_ins % trakt_str, 'trakt_red')
-		rd_info = (revoke_ins % rd_str, 'realdebrid_green') if rd_active else (auth_ins % rd_str, 'realdebrid_red')
-		pm_info = (revoke_ins % pm_str, 'premiumize_green') if pm_active else (auth_ins % pm_str, 'premiumize_red')
-		ad_info = (revoke_ins % ad_str, 'alldebrid_green') if ad_active else (auth_ins % ad_str, 'alldebrid_red')
-		folder_icon = 'folder_green' if folder_active else 'folder_red'
-		self.add({'mode': 'auth_accounts_choice', 'service': 'trakt', 'active': trakt_active, 'isFolder': 'false'}, trakt_info[0], trakt_info[1])
-		self.add({'mode': 'auth_accounts_choice', 'service': 'realdebrid', 'active': rd_active, 'isFolder': 'false'}, rd_info[0], rd_info[1])
-		self.add({'mode': 'auth_accounts_choice', 'service': 'premiumize', 'active': pm_active, 'isFolder': 'false'}, pm_info[0], pm_info[1])
-		self.add({'mode': 'auth_accounts_choice', 'service': 'alldebrid', 'active': ad_active, 'isFolder': 'false'}, ad_info[0], ad_info[1])
-		self.add({'mode': 'navigator.sources_folders', 'action': 'set'}, local_source_str, folder_icon)
+	def settings_manager(self):
+		self.add({'mode': 'open_settings', 'isFolder': 'false'}, 'Open Settings', 'settings')
+		self.add({'mode': 'sync_settings', 'silent': 'false', 'isFolder': 'false'}, 'Remake Settings Cache', 'settings')
+		self.end_directory()
+
+	def data_sync_manager(self):
+		self.add({'mode': 'data_sync_manager.full_sync', 'silent': 'false', 'isFolder': 'false'}, 'Force Data Sync', 'backup')
+		self.add({'mode': 'data_sync_manager.full_import', 'silent': 'false', 'isFolder': 'false'}, 'Force Data Import', 'backup')
+		self.add({'mode': 'data_sync_manager.full_export', 'silent': 'false', 'isFolder': 'false'}, 'Force Data Export', 'backup')
 		self.end_directory()
 
 	def maintenance(self):
-		self.add({'mode': 'check_corrupt_databases_cache', 'isFolder': 'false'}, clear_info_ins % corrupt_databases_str, 'settings')
-		self.add({'mode': 'clean_databases_cache', 'isFolder': 'false'}, clear_info_ins % clean_databases_str, 'settings')
-		self.add({'mode': 'clear_all_cache', 'isFolder': 'false'}, clear_all, 'settings')
-		self.add({'mode': 'clear_favorites_choice', 'isFolder': 'false'}, clear_info_ins % clear_fav_str, 'settings')
-		self.add({'mode': 'history.clear_search', 'isFolder': 'false'}, clear_info_ins % clear_search_str, 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'meta', 'isFolder': 'false'}, clear_info_ins % clear_meta_str, 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'list', 'isFolder': 'false'}, clear_info_ins % clear_list_str, 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'trakt', 'isFolder': 'false'}, clear_info_ins % clear_trakt_str, 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'imdb', 'isFolder': 'false'}, clear_info_ins % clear_imdb_str, 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'internal_scrapers', 'isFolder': 'false'}, clear_info_ins % clint_str, 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'external_scrapers', 'isFolder': 'false'}, clear_info_ins % clext_str, 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'rd_cloud', 'isFolder': 'false'}, clear_info_ins % clear_rd_str, 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'pm_cloud', 'isFolder': 'false'}, clear_info_ins % clear_pm_str, 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'ad_cloud', 'isFolder': 'false'}, clear_info_ins % clear_ad_str, 'settings')
+		self.add({'mode': 'check_databases_integrity_cache', 'isFolder': 'false'}, 'Check for Corrupt Databases', 'settings2')
+		self.add({'mode': 'clean_databases_cache', 'isFolder': 'false'}, 'Clean Databases', 'settings2')
+		self.add({'mode': 'clear_all_cache', 'isFolder': 'false'}, 'Clear All Cache (Excluding Favorites)', 'settings2')
+		self.add({'mode': 'clear_favorites_choice', 'isFolder': 'false'}, 'Clear Favorites Cache', 'settings2')
+		self.add({'mode': 'search.clear_search', 'isFolder': 'false'}, 'Clear Search History Cache', 'settings2')
+		self.add({'mode': 'clear_cache', 'cache': 'main', 'isFolder': 'false'}, 'Clear Main Cache', 'settings2')
+		self.add({'mode': 'clear_cache', 'cache': 'meta', 'isFolder': 'false'}, 'Clear Meta Cache', 'settings2')
+		self.add({'mode': 'clear_cache', 'cache': 'list', 'isFolder': 'false'}, 'Clear Lists Cache', 'settings2')
+		self.add({'mode': 'clear_cache', 'cache': 'ai_functions', 'isFolder': 'false'}, 'Clear AI Data Cache', 'settings2')
+		self.add({'mode': 'clear_cache', 'cache': 'imdb', 'isFolder': 'false'}, 'Clear IMDb Cache', 'settings2')
+		self.add({'mode': 'clear_cache', 'cache': 'internal_scrapers', 'isFolder': 'false'}, 'Clear Internal Scrapers Cache', 'settings2')
+		self.add({'mode': 'clear_cache', 'cache': 'external_scrapers', 'isFolder': 'false'}, 'Clear External Scrapers Cache', 'settings2')
+		self.add({'mode': 'clear_cache', 'cache': 'rd_cloud', 'isFolder': 'false'}, 'Clear Real Debrid Cache', 'settings2')
+		self.add({'mode': 'clear_cache', 'cache': 'pm_cloud', 'isFolder': 'false'}, 'Clear Premiumize Cache', 'settings2')
+		self.add({'mode': 'clear_cache', 'cache': 'oc_cloud', 'isFolder': 'false'}, 'Clear Off Cloud Cache', 'settings2')
+		self.add({'mode': 'clear_cache', 'cache': 'tb_cloud', 'isFolder': 'false'}, 'Clear TorBox Cache', 'settings2')
 		self.end_directory()
 
 	def set_view_modes(self):
-		self.add({'mode': 'choose_view', 'view_type': 'view.main', 'content': ''},set_view_modes_ins % root_str, 'settings', False)
-		self.add({'mode': 'choose_view', 'view_type': 'view.movies', 'content': 'movies'},set_view_modes_ins % mov_str, 'settings', False)
-		self.add({'mode': 'choose_view', 'view_type': 'view.tvshows', 'content': 'tvshows'},set_view_modes_ins % tv_str, 'settings', False)
-		self.add({'mode': 'choose_view', 'view_type': 'view.seasons', 'content': 'seasons'},set_view_modes_ins % season_str, 'settings', False)
-		self.add({'mode': 'choose_view', 'view_type': 'view.episodes', 'content': 'episodes'},set_view_modes_ins % episodes_str, 'settings', False)
-		self.add({'mode': 'choose_view', 'view_type': 'view.episodes_single', 'content': 'episodes'},set_view_modes_ins % ep_lists_str, 'settings', False)
-		self.add({'mode': 'choose_view', 'view_type': 'view.premium', 'content': 'files'},set_view_modes_ins % premium_files_str, 'settings', False)
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.main', 'content': '', 'name': 'menus'}, 'Set Menus', 'folder')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.movies', 'content': 'movies'}, 'Set Movies', 'movies')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.tvshows', 'content': 'tvshows'}, 'Set TV Shows', 'tv')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.seasons', 'content': 'seasons'}, 'Set Seasons', 'ontheair')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.episodes', 'content': 'episodes'}, 'Set Episodes', 'next_episodes')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.episodes_single', 'content': 'episodes', 'name': 'episode lists'}, 'Set Episode Lists', 'calender')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.premium', 'content': 'files', 'name': 'premium files'}, 'Set Premium Files', 'premium')
 		self.end_directory()
 
-	def changelog_utils(self):
-		fen_clogpath = tp(log_path % 'plugin.video.fen/resources/text')
-		mh_str = '[B]%s[/B]: %s  [I](v.%s)[/I]' % (changelog_str.upper(), fen_str, addon().getAddonInfo('version'))
-		self.add({'mode': 'show_text', 'heading': mh_str, 'file': fen_clogpath, 'font_size': 'large', 'isFolder': 'false'}, mh_str, 'lists', False)
-		self.add({'mode': 'show_text', 'heading': klv_h_str, 'file': kl_loc, 'kodi_log': 'true', 'isFolder': 'false'}, klv_h_str, 'lists', False)
-		self.add({'mode': 'show_text', 'heading': klvo_h_str, 'file': klo_loc, 'kodi_log': 'true', 'isFolder': 'false'}, klvo_h_str, 'lists', False)
-		self.add({'mode': 'upload_logfile', 'isFolder': 'false'}, klu_h_str, 'lists', False)
+	def update_utils(self):
+		self.add({'mode': 'updater.update_check', 'isFolder': 'false'}, 'Check For Updates', 'github')
+		self.add({'mode': 'updater.rollback_check', 'isFolder': 'false'}, 'Rollback to a Previous Version', 'github')
+		self.end_directory()
+
+	def log_utils(self):
+		log_location = k.translate_path('special://logpath/kodi.log')
+		self.add({'mode': 'show_text', 'heading': 'Kodi Log Viewer', 'file': log_location, 'kodi_log': 'true', 'isFolder': 'false'}, 'Kodi Log Viewer', 'lists')
+		self.add({'mode': 'upload_logfile', 'isFolder': 'false'}, 'Upload Kodi Log to Pastebin', 'lists')
 		self.end_directory()
 
 	def certifications(self):
-		if self.params_get('menu_type') == 'movie': mode, action, certifications = 'build_movie_list', 'tmdb_movies_certifications', ml.movie_certifications
-		else: mode, action, certifications = 'build_tvshow_list', 'trakt_tv_certifications', ml.tvshow_certifications
-		for i in certifications: self.add({'mode': mode, 'action': action, 'certification': i, 'name': i.upper()}, i.upper(), 'certifications')
+		from modules.meta_lists import movie_certifications as function
+		mode, action = 'build_movie_list', 'tmdb_movies_certifications'
+		for i in function(): self.add({'mode': mode, 'action': action, 'key_id': i['id'], 'name': i['name']}, i['name'], 'certifications')
 		self.end_directory()
 
 	def languages(self):
-		if self.params_get('menu_type') == 'movie': mode, action = 'build_movie_list', 'tmdb_movies_languages'
-		else: mode, action = 'build_tvshow_list', 'tmdb_tv_languages'
-		for i in ml.languages: self.add({'mode': mode, 'action': action, 'language': i[1], 'name': i[0]}, i[0], 'languages')
+		from modules.meta_lists import languages as function
+		mode, action = 'build_movie_list', 'tmdb_movies_languages'
+		for i in function(): self.add({'mode': mode, 'action': action, 'key_id': i['id'], 'name': i['name']}, i['name'], 'languages')
 		self.end_directory()
 
 	def years(self):
-		if self.params_get('menu_type') == 'movie': mode, action, years = 'build_movie_list', 'tmdb_movies_year', ml.years_movies
-		else: mode, action, years = 'build_tvshow_list', 'tmdb_tv_year', ml.years_tvshows
-		for i in years: self.add({'mode': mode, 'action': action, 'year': str(i), 'name': '%s.' % str(i)}, str(i), 'calender')
-		self.end_directory()
-
-	def decades(self):
-		if self.params_get('menu_type') == 'movie': mode, action, decades = 'build_movie_list', 'tmdb_movies_decade', ml.decades_movies
-		else: mode, action, decades = 'build_tvshow_list', 'tmdb_tv_decade', ml.decades_tvshows
-		for i in decades: self.add({'mode': mode, 'action': action, 'decade': str(i), 'name': '%ss' % str(i)}, '%ss' % str(i), 'calendar_decades')
-		self.end_directory()
-
-	def networks(self):
-		if self.params_get('menu_type') == 'movie':
-			mode, action, networks = 'build_movie_list', 'tmdb_movies_networks', ml.watch_providers
-			image_insert, original_image = tmdb_img, True
+		menu_type = self.params_get('menu_type')
+		if menu_type == 'movie':
+			from modules.meta_lists import years_movies as function
+			mode, action = 'build_movie_list', 'tmdb_movies_year'
 		else:
-			mode, action, networks = 'build_tvshow_list', 'tmdb_tv_networks', sorted(ml.networks, key=lambda k: k['name'])
-			image_insert, original_image = '%s', False
-		for i in networks: self.add({'mode': mode, 'action': action, 'network_id': i['id'], 'name': i['name']}, i['name'], image_insert % i['logo'], original_image=original_image)
+			from modules.meta_lists import years_tvshows as function
+			mode, action = 'build_tvshow_list', 'tmdb_tv_year'
+		for i in function(): self.add({'mode': mode, 'action': action, 'key_id': i['id'], 'name': i['name']}, i['name'], 'calender')
 		self.end_directory()
 
 	def genres(self):
 		menu_type = self.params_get('menu_type')
-		if menu_type == 'movie': genre_list, mode, action = ml.movie_genres, 'build_movie_list', 'tmdb_movies_genres'
-		else: genre_list, mode, action = ml.tvshow_genres, 'build_tvshow_list', 'tmdb_tv_genres'
-		for i, v in sorted(genre_list.items()): self.add({'mode': mode, 'action': action, 'genre_id': v[0], 'name': i}, i, v[1])
+		if menu_type == 'movie':
+			from modules.meta_lists import movie_genres as function
+			mode, action = 'build_movie_list', 'tmdb_movies_genres'
+		else:
+			from modules.meta_lists import tvshow_genres as function
+			mode, action = 'build_tvshow_list', 'tmdb_tv_genres'
+		for i in function(): self.add({'mode': mode, 'action': action, 'key_id': i['id'], 'name': i['name']}, i['name'], i['icon'])
 		self.end_directory()
 
-	def folder_navigator(self):
-		from os.path import join as pjoin
-		from modules.utils import clean_file_name, normalize
-		from modules.source_utils import gather_assigned_content, test_assigned_content
-		def _process():
-			for info in results:
-				try:
-					cm = []
-					cm_append = cm.append
-					path = info[0]
-					link_id = '%s_%s' % (setting_id, path)
-					clean_title = clean_file_name(normalize(path))
-					linked_folder = test_assigned_content('FEN_FOLDERS_%s' % link_id, assigned_content)
-					if linked_folder: display = '%s [COLOR limegreen]| %s | %s[/COLOR]' % (clean_title, ls(33074).upper(), linked_folder)
-					else: display = clean_title
-					link_folders_add = {'mode': 'link_folders_choice', 'service': 'FOLDERS', 'folder_id': link_id, 'action': 'add'}
-					link_folders_remove = {'mode': 'link_folders_choice', 'service': 'FOLDERS', 'folder_id': link_id, 'action': 'remove'}
-					cm_append((ls(33078),'RunPlugin(%s)' % build_url(link_folders_add)))
-					cm_append((ls(33079),'RunPlugin(%s)' % build_url(link_folders_remove)))
-					url = pjoin(folder_path, path)
-					listitem = make_listitem()
-					listitem.addContextMenuItems(cm)
-					listitem.setLabel(display)
-					listitem.setArt({'fanart': fanart})
-					info_tag = listitem.getVideoInfoTag()
-					info_tag.setPlot(' ')
-					listitem.setProperty('fen.context_main_menu_params', build_url({'mode': 'menu_editor.edit_menu_external', 'name': clean_title, 'iconImage': folder_icon,
-										'service': 'FOLDERS', 'id': link_id}))
-					yield (url, listitem, info[1])
-				except: pass
-		folder_path, setting_id = self.params_get('folder_path'), self.params_get('setting_id')
-		assigned_content = gather_assigned_content("'FEN_FOLDERS_%s" % setting_id + "_%'")
-		dirs, files = list_dirs(folder_path)
-		results = [(i, True) for i in dirs] + [(i, False) for i in files]
-		item_list = list(_process())
+	def search_history(self):
+		from urllib.parse import unquote
+		from caches.main_cache import main_cache
+		search_mode_dict = {
+		'movie': ('movie_queries', {'mode': 'search.get_key_id', 'media_type': 'movie', 'isFolder': 'false'}),
+		'tvshow': ('tvshow_queries', {'mode': 'search.get_key_id', 'media_type': 'tv_show', 'isFolder': 'false'}),
+		'people': ('people_queries', {'mode': 'search.get_key_id', 'search_type': 'people', 'isFolder': 'false'}),
+		'tmdb_keyword_movie': ('keyword_tmdb_movie_queries', {'mode': 'search.get_key_id', 'search_type': 'tmdb_keyword', 'media_type': 'movie', 'isFolder': 'false'}),
+		'tmdb_keyword_tvshow': ('keyword_tmdb_tvshow_queries', {'mode': 'search.get_key_id', 'search_type': 'tmdb_keyword', 'media_type': 'tvshow', 'isFolder': 'false'}),
+		'easynews_video': ('easynews_video_queries', {'mode': 'search.get_key_id', 'search_type': 'easynews_video', 'isFolder': 'false'}),
+		'easynews_image': ('easynews_image_queries', {'mode': 'search.get_key_id', 'search_type': 'easynews_image', 'isFolder': 'false'}),
+		'trakt_lists': ('trakt_list_queries', {'mode': 'search.get_key_id', 'search_type': 'trakt_lists', 'isFolder': 'false'})}
+		setting_id, action_dict = search_mode_dict[self.list_name]
+		url_params = dict(action_dict)
+		data = main_cache.get(setting_id) or []
+		self.add(action_dict, '[B]NEW SEARCH...[/B]', 'new')
+		for i in data:
+			try:
+				key_id = unquote(i)
+				url_params['key_id'] = key_id
+				url_params['setting_id'] = setting_id
+				cm_items = [('[B]Remove from history[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'search.remove', 'setting_id':setting_id, 'key_id': key_id})),
+							('[B]Clear All History[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'search.clear_all', 'setting_id':setting_id, 'refresh': 'true'}))]
+				self.add(url_params, key_id, 'calender', cm_items=cm_items)
+			except: pass
+		self.category_name = self.params_get('name') or 'History'
+		self.end_directory()
+
+	def keyword_results(self):
+		from apis.tmdb_api import tmdb_keywords_by_query
+		media_type, key_id = self.params_get('media_type'), self.params_get('key_id') or self.params_get('query')
+		try: page_no = int(self.params_get('new_page', '1'))
+		except: page_no = self.params_get('new_page')
+		mode = 'build_movie_list' if media_type == 'movie' else 'build_tvshow_list'
+		action = 'tmdb_movie_keyword_results' if media_type == 'movie' else 'tmdb_tv_keyword_results'
+		data = tmdb_keywords_by_query(key_id, page_no)
+		results = data['results']
+		for item in results:
+			name = item['name'].upper()
+			self.add({'mode': mode, 'action': action, 'key_id': item['id'], 'iconImage': 'tmdb', 'category_name': name}, name, iconImage='tmdb')
+		if data['total_pages'] > page_no:
+			new_page = {'mode': 'navigator.keyword_results', 'key_id': key_id, 'category_name': self.category_name, 'new_page': str(data['page'] + 1)}
+			self.add(new_page, 'Next Page (%s) >>' % new_page['new_page'], 'nextpage', False)
+		self.category_name = 'Search Results for %s' % key_id.upper()
+		self.end_directory()
+
+	def choose_view(self):
 		handle = int(sys.argv[1])
-		add_items(handle, item_list)
-		set_sort_method(handle, 'files')
-		self.end_directory()
-		set_view_mode('view.main', '')
-	
-	def sources_folders(self):
-		def _builder():
-			for item in folder_info:
-				for media_type in ('movie', 'tvshow'):
-					listitem = make_listitem()
-					setting_id, default_name = item[0], item[1]
-					folder_path = source_folders_directory(media_type, setting_id) or ''
-					display_name = get_setting('fen.%s.display_name' % setting_id)
-					if action == 'browse':
-						if not folder_path or not display_name: continue
-						display = '%s (%s)' % (display_name.upper(), media_type.upper())
-					else:
-						if display_name == 'None': display_name = ''
-						if folder_path: folder_display, color = folder_path, 'green'
-						else: folder_display, color = 'Not Set', 'red'
-						display = sources_folders_str % (item[1].upper(), media_type.upper(), display_name.upper(), color, folder_display)
-					url = build_url({'mode': mode, 'setting_id': setting_id, 'media_type': media_type, 'folder_path': folder_path,
-									'display_name': display_name, 'default_name': default_name})
-					listitem.setLabel(display)
-					listitem.setArt({'icon': folder_icon, 'poster': folder_icon, 'thumb': folder_icon, 'fanart': fanart, 'banner': folder_icon, 'landscape': folder_icon})
-					info_tag = listitem.getVideoInfoTag()
-					info_tag.setPlot(' ')
-					yield (url, listitem, isFolder)
-		action = self.params_get('action')
-		if action == 'browse': mode, isFolder = 'navigator.folder_navigator', True
-		else: mode, isFolder = 'folder_scraper_manager_choice', False
-		add_items(int(sys.argv[1]), list(_builder()))
-		self.end_directory()
+		content = self.params['content']
+		view_type, name = self.params['view_type'], self.params.get('name') or content
+		self.add({'mode': 'navigator.set_view', 'view_type': view_type, 'name': name, 'isFolder': 'false'}, 'Set view and then click here', 'settings')
+		k.set_content(handle, content)
+		k.end_directory(handle)
+		k.set_view_mode(view_type, content, False)
+
+	def set_view(self):
+		set_setting(self.params['view_type'], str(k.current_window_object().getFocusId()))
+		k.notification('%s: %s' % (self.params['name'].upper(), k.get_infolabel('Container.Viewmode').upper()), time=500)
 
 	def shortcut_folders(self):
-		def _make_new_item():
-			url = build_url({'mode': 'menu_editor.shortcut_folder_make'})
-			listitem = make_listitem()
-			listitem.setLabel('[I]%s...[/I]' % make_short_str)
-			listitem.setArt({'icon': new_icon, 'poster': new_icon, 'thumb': new_icon, 'fanart': fanart, 'banner': new_icon})
-			info_tag = listitem.getVideoInfoTag()
-			info_tag.setPlot(' ')
-			add_item(int(sys.argv[1]), url, listitem, False)
-		def _builder():
+		folders = nc.get_shortcut_folders()
+		if folders:
 			for i in folders:
-				try:
-					cm = []
-					name = i[0]
-					listitem = make_listitem()
-					url = build_url({'mode': 'navigator.build_shortcut_folder_list', 'name': name, 'iconImage': 'folder', 'shortcut_folder': 'True', 'external_list_item': 'True'})
-					cm.append((rename_str, run_plugin % build_url({'mode': 'menu_editor.shortcut_folder_rename'})))
-					cm.append((delete_str, run_plugin % build_url({'mode': 'menu_editor.shortcut_folder_delete'})))
-					listitem.addContextMenuItems(cm)
-					listitem.setLabel(name)
-					listitem.setArt({'icon': folder_icon, 'poster': folder_icon, 'thumb': folder_icon, 'fanart': fanart, 'banner': folder_icon})
-					info_tag = listitem.getVideoInfoTag()
-					info_tag.setPlot(' ')
-					listitem.setProperty('fen.context_main_menu_params', build_url({'mode': 'menu_editor.edit_menu_external', 'name': name, 'iconImage': folder_icon}))
-					if self.is_home: listitem.setProperty('fen.external', 'true')
-					yield (url, listitem, True)
-				except: pass
-		_make_new_item()
-		folders = get_shortcut_folders()
-		if folders: add_items(int(sys.argv[1]), list(_builder()))
+				name = i[0]
+				convert_sr = '[B]Remove Random[/B]' if '[COLOR red][RANDOM][/COLOR]' in name else '[B]Make Random[/B]'
+				cm_items = [('[B]Rename[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_rename'})),
+							('[B]Delete Folder[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_delete'})),
+							('[B]Make New Folder[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_make'})),
+							(convert_sr , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_convert', 'name': name}))]
+				self.add({'mode': 'navigator.build_shortcut_folder_contents', 'name': name, 'iconImage': 'folder'}, name, 'folder', cm_items=cm_items)
+		else: self.add({'mode': 'menu_editor.shortcut_folder_make', 'isFolder': 'false'}, '[I]Make New Folder...[/I]', 'new')
+		self.category_name = 'Shortcut Folders'
 		self.end_directory()
 
-	def build_shortcut_folder_list(self):
-		def _make_new_item():
-			url = build_url({'mode': 'menu_editor.shortcut_folder_browse_for_content', 'list_name': list_name})
-			listitem = make_listitem()
-			listitem.setLabel('[I]%s...[/I]' % add_cont_str)
-			listitem.setArt({'icon': new_icon, 'poster': new_icon, 'thumb': new_icon, 'fanart': fanart, 'banner': new_icon})
-			info_tag = listitem.getVideoInfoTag()
-			info_tag.setPlot(' ')
-			add_item(int(sys.argv[1]), url, listitem, False)
-		def _process():
-			for item_position, item in enumerate(contents):
-				try:
-					cm = []
-					item_get = item.get
-					name = item_get('name', 'Error: No Name')
-					iconImage = item_get('iconImage', None)
-					if iconImage: icon = iconImage if iconImage.startswith('http') else get_icon(item_get('iconImage'))
-					else: icon = folder_icon
-					menu_editor_url = build_url({'mode': 'menu_editor.edit_menu_shortcut_folder', 'list_name': list_name, 'active_list': list_name, 'position': item_position})
-					cm.append((edit_str, run_plugin % menu_editor_url))
-					listitem = make_listitem()
-					listitem.setLabel(name)
-					listitem.setArt({'icon': icon, 'poster': icon, 'thumb': icon, 'fanart': fanart, 'banner': icon})
-					info_tag = listitem.getVideoInfoTag()
-					info_tag.setPlot(' ')
-					listitem.addContextMenuItems(cm)
-					listitem.setProperty('fen.context_main_menu_params', menu_editor_url)
-					isFolder = item.get('isFolder', 'true') == 'true'
-					if self.is_home: listitem.setProperty('fen.external', 'true')
-					yield (build_url(item), listitem, isFolder)
-				except: pass
+	def build_shortcut_folder_contents(self):
 		list_name = self.params_get('name')
-		contents = get_shortcut_folder_contents(list_name)
-		if len(contents) == 0: _make_new_item()
-		add_items(int(sys.argv[1]), list(_process()))
+		is_random = '[COLOR red][RANDOM][/COLOR]' in list_name
+		contents = nc.get_shortcut_folder_contents(list_name)
+		folder_icon = self.get_icon('folder')
+		if is_random:
+			from indexers.random_lists import random_shortcut_folders
+			return random_shortcut_folders(list_name.replace(' [COLOR red][RANDOM][/COLOR]', ''), contents)
+		if contents:
+			for count, item in enumerate(contents):
+				item_get = item.get
+				iconImage = item_get('iconImage', None)
+				icon = iconImage
+				if iconImage:
+					if iconImage.startswith('http') or 'plugin.video.fen' in iconImage: original_image = True
+					else: original_image = False
+				else: icon, original_image = folder_icon, False
+				cm_items = [
+				('[B]Move[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'move'})),
+				('[B]Remove[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'remove'})),
+				('[B]Add Content[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add', 'name': list_name})),
+				('[B]Rename[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'rename'})),
+				('[B]Clear All[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'clear'}))]
+				self.add(item, item_get('name'), icon, original_image, cm_items=cm_items)
+		elif is_random: pass
+		else: self.add({'mode': 'menu_editor.shortcut_folder_add', 'name': list_name, 'isFolder': 'false'}, '[I]Add Content...[/I]', 'new')
 		self.end_directory()
+
+	def discover_contents(self):
+		from caches.discover_cache import discover_cache
+		action, media_type = self.params_get('action', ''), self.params_get('media_type')
+		if not action:
+			results = discover_cache.get_all(media_type)
+			if not results and not self.is_external: self.add({'mode': 'discover_choice', 'media_type': media_type, 'isFolder': 'false'}, '[I]Make New Discover List...[/I]', 'new')
+			else:
+				if media_type == 'movie': mode, action = 'build_movie_list', 'tmdb_movies_discover'
+				else: mode, action = 'build_tvshow_list', 'tmdb_tv_discover'
+				for item in results:
+					name, data = item['id'], item['data']
+					cm_items = [
+					('[B]Make New Discover List[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'discover_choice', 'media_type': media_type, 'isFolder': 'false'})),
+					('[B]Remove from history[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'navigator.discover_contents', 'action':'delete_one', 'name': name})),
+					('[B]Clear All History[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'navigator.discover_contents', 'action':'clear_cache', 'media_type': media_type}))]
+					if '[random]' in data:
+						self.add({'mode': 'random.%s' % mode, 'action': action, 'name': name, 'url': data, 'new_page': 'random', 'random': 'true'},
+									name, 'discover', cm_items=cm_items)
+					else: self.add({'mode': mode, 'action': action, 'name': name, 'url': data}, name, 'discover', cm_items=cm_items)
+			self.end_directory()
+		else:
+			if action == 'delete_one': discover_cache.delete_one(self.params_get('name'))
+			elif action == 'clear_cache': discover_cache.clear_cache(media_type)
+			k.container_refresh()
 
 	def exit_media_menu(self):
-		params = get_property('fen.exit_params')
-		if params: return container_refresh_input(params)
+		params = k.get_property('fen.exit_params')
+		if params: return k.container_refresh_input(params)
 
-	def tips(self):
-		tips_location = 'special://home/addons/plugin.video.fen/resources/text/tips'
-		files = sorted(list_dirs(tips_location)[1])
-		tips_location = tips_location + '/%s'
-		tips_list = []
-		tips_append = tips_list.append
-		for item in files:
-			tip = item.replace('.txt', '')[4:]
-			if '!!HELP!!' in tip: tip, sort_order = tip.replace('!!HELP!!', '[COLOR crimson]%s!!![/COLOR] ' % help_str.upper()), 0
-			elif '!!NEW!!' in tip: tip, sort_order = tip.replace('!!NEW!!', '[COLOR chartreuse]%s!![/COLOR] ' % new_str), 1
-			elif '!!SPOTLIGHT!!' in tip: tip, sort_order = tip.replace('!!SPOTLIGHT!!', '[COLOR orange]%s![/COLOR] ' % spot_str), 2
-			else: sort_order = 3
-			tip_name = tips_ins % tip
-			action = {'mode': 'show_text', 'heading': tip, 'file': tp(tips_location % item), 'font_size': 'large', 'isFolder': 'false'}
-			tips_append((action, tip_name, sort_order))
-		item_list = sorted(tips_list, key=lambda x: x[2])
-		for c, i in enumerate(item_list, 1): self.add(i[0], '[B]%02d. [/B]%s' % (c, i[1]), 'information', False)
+	def build_random_lists(self):
+		random_list_dict = {
+		'movie': ('Random Movie Lists', nc.random_movie_lists), 'tvshow': ('Random TV Show Lists', nc.random_tvshow_lists),
+		'personal_lists': ('Random Personal Lists', nc.random_personal_lists)}
+		self.category_name, function = random_list_dict[self.params_get('menu_type')]
+		func = function()
+		for item in func: self.add(item, item['name'], item['iconImage'])
 		self.end_directory()
 
-	def because_you_watched(self):
-		media_type = self.params_get('menu_type')
-		mode, action = ('build_movie_list', 'tmdb_movies_recommendations') if media_type == 'movie' else ('build_tvshow_list', 'tmdb_tv_recommendations')
-		recently_watched = get_recently_watched(media_type, short_list=0)
-		for item in recently_watched:
-			if media_type == 'movie': name, tmdb_id = item['title'], item['media_id']
-			else: name, tmdb_id = '%s - %sx%s' % (item['title'], str(item['season']), str(item['episode'])), item['media_ids']['tmdb']
-			self.add({'mode': mode, 'action': action, 'tmdb_id': tmdb_id}, name, 'because_you_watched', False)
-		self.end_directory()
-
-	def build_main_list(self):
-		for item_position, item in enumerate(currently_used_list(self.list_name)):
-			try:
-				item_get = item.get
-				isFolder = item_get('isFolder', 'true') == 'true'
-				if not isFolder and self.is_home: continue
-				cm = []
-				iconImage = item_get('iconImage')
-				icon = iconImage if iconImage.startswith('http') else get_icon(iconImage)
-				menu_editor_url = build_url({'mode': 'menu_editor.edit_menu', 'active_list': self.list_name, 'position': item_position})
-				cm.append((edit_str, run_plugin % menu_editor_url))
-				listitem = make_listitem()
-				listitem.setLabel(ls(item_get('name', '')))
-				listitem.setArt({'icon': icon, 'poster': icon, 'thumb': icon, 'fanart': fanart, 'banner': icon, 'landscape': icon})
-				info_tag = listitem.getVideoInfoTag()
-				info_tag.setPlot(' ')
-				listitem.addContextMenuItems(cm)
-				listitem.setProperty('fen.context_main_menu_params', menu_editor_url)
-				if self.is_home: listitem.setProperty('fen.external', 'true')
-				yield (build_url(item), listitem, isFolder)
-			except: pass
-
-	def add(self, url_params, list_name, iconImage='folder', contextmenu_edit=True, original_image=False):
+	def add(self, url_params, list_name, iconImage='folder', original_image=False, cm_items=[]):
 		isFolder = url_params.get('isFolder', 'true') == 'true'
-		if original_image: icon = iconImage
-		else: icon = get_icon(iconImage)
+		try:
+			if original_image: icon = iconImage
+			else: icon = self.get_icon(iconImage)
+		except: pass
 		url_params['iconImage'] = icon
-		url = build_url(url_params)
-		listitem = make_listitem()
+		url = self.build_url(url_params)
+		listitem = self.make_listitem()
 		listitem.setLabel(list_name)
-		listitem.setArt({'icon': icon, 'poster': icon, 'thumb': icon, 'fanart': fanart, 'banner': icon, 'landscape': icon})
-		info_tag = listitem.getVideoInfoTag()
+		listitem.setArt({'icon': icon, 'poster': icon, 'thumb': icon, 'fanart': self.fanart, 'banner': icon, 'landscape': icon})
+		info_tag = listitem.getVideoInfoTag(True)
 		info_tag.setPlot(' ')
-		if contextmenu_edit:
-			cm = []
-			cm_append = cm.append
-			cm_append((add_menu_str, run_plugin % build_url({'mode': 'menu_editor.add_external', 'name': list_name, 'iconImage': iconImage})))
-			cm_append((s_folder_str, run_plugin % build_url({'mode': 'menu_editor.shortcut_folder_add_item', 'name': list_name, 'iconImage': iconImage})))
-			listitem.addContextMenuItems(cm)
-			listitem.setProperty('fen.context_main_menu_params', build_url({'mode': 'menu_editor.edit_menu_external', 'name': list_name, 'iconImage': iconImage}))
-			if self.is_home: listitem.setProperty('fen.external', 'true')
-		add_item(int(sys.argv[1]), url, listitem, isFolder)
+		if not self.is_external:
+			if isFolder:
+				url_params.update({'iconImage': iconImage, 'name': list_name})
+				folder_item = ('[B]Add to Shortcut Folder[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': self.build_url(url_params)}))
+				if cm_items: cm_items.append(folder_item)
+				else: cm_items = [folder_item]
+			listitem.addContextMenuItems(cm_items)
+		self.add_item(int(sys.argv[1]), url, listitem, isFolder)
 
 	def end_directory(self):
 		handle = int(sys.argv[1])
-		set_content(handle, '')
-		set_category(handle, self.category_name)
-		end_directory(handle)
-		set_view_mode('view.main', '')
+		k.set_content(handle, '')
+		k.set_category(handle, self.category_name)
+		k.end_directory(handle)
+		k.set_view_mode('view.main', '')

@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 import os
+import json
 from windows.base_window import open_window
-from apis.tmdb_api import tmdb_people_full_info, tmdb_popular_people
-from apis.imdb_api import imdb_images, imdb_people_id, imdb_people_images
-from modules import kodi_utils
-# logger = kodi_utils.logger
-
-json, notification, set_property, make_listitem, list_dirs = kodi_utils.json, kodi_utils.notification, kodi_utils.set_property, kodi_utils.make_listitem, kodi_utils.list_dirs
-delete_file, show_busy_dialog, hide_busy_dialog, get_icon = kodi_utils.delete_file, kodi_utils.show_busy_dialog, kodi_utils.hide_busy_dialog, kodi_utils.get_icon
-Thread, image_extensions, tmdb_image_base = kodi_utils.Thread, kodi_utils.image_extensions, 'https://image.tmdb.org/t/p/%s%s'
+from apis.tmdb_api import tmdb_people_info, tmdb_people_full_info, tmdb_popular_people, tmdb_trending_people_day, tmdb_trending_people_week, tmdb_media_images
+from apis.imdb_api import imdb_photos
+from apis.easynews_api import EasyNews
+from modules.kodi_utils import notification, make_listitem, list_dirs, delete_file, show_busy_dialog, hide_busy_dialog, get_icon, image_extensions
+# from modules.kodi_utils import logger
 
 class Images():
 	def run(self, params):
@@ -16,19 +14,277 @@ class Images():
 		self.list_items = []
 		self.params = params
 		self.mode = self.params.pop('mode')
-		if self.mode == 'people_image_results': self.people_image_results()
-		elif self.mode == 'people_tagged_image_results': self.people_tagged_image_results()
+		self.direct_search_result = None
+		self.tmdb_image_base = 'https://image.tmdb.org/t/p/%s%s'
+		if self.mode == 'imageviewer': return self.imageviewer()
+		if self.mode == 'delete_image': return self.delete_image()
+		if self.mode == 'tmdb_cast_dialog_image_results': self.tmdb_cast_dialog_image_results()
+		if self.mode == 'tmdb_people_search_dialog_image_results': self.tmdb_people_search_dialog_image_results()
+		if self.mode == 'tmdb_people_list_image_results': self.tmdb_people_list_image_results()
+		elif self.mode == 'tmdb_people_search_image_results': self.tmdb_people_search_image_results()
+		elif self.mode == 'favorite_people_list_image_results': self.favorite_people_list_image_results()
+		elif self.mode == 'tmdb_media_image_results': self.tmdb_media_image_results()
 		elif self.mode == 'imdb_image_results': self.imdb_image_results()
-		elif self.mode == 'popular_people_image_results': self.popular_people_image_results()
-		elif self.mode == 'browser_image': self.browser_image(params['folder_path'])
-		elif self.mode == 'imageviewer': return self.imageviewer()
-		elif self.mode == 'delete_image': return self.delete_image()
+		elif self.mode == 'tmdb_people_image_results': self.tmdb_people_image_results()
+		elif self.mode == 'favorites_image_results': self.favorites_image_results()
+		elif self.mode == 'easynews_image_results': self.easynews_image_results()
+		elif self.mode == 'browser_image': self.browser_image()
 		hide_busy_dialog()
-		if len(self.list_items) == 0: return notification(32575)
-		if not 'in_progress' in params: self.open_window_xml()
+		if self.direct_search_result: return self.direct_search_result
+		if len(self.list_items) == 0: return notification('None Found')
+		if '_dialog_' in self.mode: return self.dialogviewer()
+		if not 'in_progress' in params: self.thumbviewer()
 		else: return self.list_items, self.next_page_params
 
-	def open_window_xml(self):
+	def tmdb_cast_dialog_image_results(self):
+		from modules import metadata
+		from modules.utils import get_datetime
+		from modules.settings import tmdb_api_key
+		def builder():
+			for item in cast:
+				try:
+					listitem = make_listitem()
+					name = item['name']
+					listitem.setProperties({'thumbnail': item['thumbnail'] or empty_icon, 'lookup': name, 'action': 'cast',
+										'display': '%s%s' % (name, ' as %s' % item['role'] if item['role'] else '')})
+					yield listitem
+				except: pass
+		try:
+			tmdb_id, media_type = self.params['tmdb_id'], self.params['media_type']
+			function = metadata.movie_meta if media_type == 'movie' else metadata.tvshow_meta
+			empty_icon = get_icon('empty_person')
+			meta = function('tmdb_id', tmdb_id, tmdb_api_key(), get_datetime())
+			cast = meta.get('cast', [])
+			if media_type == 'episode' and self.params.get('season', None) and self.params.get('episode', None):
+				cast.extend([i for i in metadata.episodes_meta(self.params['season'], meta) if i['episode'] == int(self.params['episode'])][0]['guest_stars'])
+			self.list_items = list(builder())
+			self.params['list_items'] = self.list_items
+			self.params['list_heading'] = 'Cast (x%02d)' % len(self.list_items)
+			self.next_page_params = {}
+		except: pass
+
+	def tmdb_people_search_dialog_image_results(self):
+		from modules import metadata
+		from modules.utils import get_datetime
+		from modules.settings import tmdb_api_key
+		def builder():
+			for item in results:
+				try:
+					name, actor_id = item['name'], item['id']
+					p_path = item['profile_path']
+					known = item['known_for']
+					known_for_list = [i.get('title', 'NA') for i in known]
+					known_for_list = [i for i in known_for_list if not i == 'NA']
+					known_for = ' | [I]%s[/I]' % ', '.join(known_for_list) if known_for_list else ''
+					if p_path: actor_poster, actor_image = self.tmdb_image_base % ('w185', p_path), self.tmdb_image_base % ('h632', p_path)
+					else: actor_poster, actor_image = empty_icon, empty_icon
+					listitem = make_listitem()
+					listitem.setProperties({'thumbnail': actor_poster, 'lookup': str(actor_id), 'action': 'search',
+										'display': name + known_for})
+					yield listitem
+				except: pass
+		try:
+			empty_icon = get_icon('empty_person')
+			data = tmdb_people_info(self.params.get('key_id'), 1)
+			results = data['results']
+			results = sorted(results, key=lambda k: k.get('popularity', 0.0), reverse=True)
+		except: pass
+		if len(results) == 1:
+			self.direct_search_result = results[0]['id']
+			return 
+		self.list_items = list(builder())
+		self.params['list_items'] = self.list_items
+		self.params['list_heading'] = 'Results (x%02d)' % len(self.list_items)
+		self.next_page_params = {}
+
+	def tmdb_people_list_image_results(self):
+		def builder():
+			results = image_info['results']
+			for item in results:
+				try:
+					name, actor_id = item['name'], item['id']
+					p_path = item['profile_path']
+					if p_path:
+						actor_poster, actor_image = self.tmdb_image_base % ('w185', p_path), self.tmdb_image_base % ('h632', p_path)
+						actor_url = self.tmdb_image_base % ('original', p_path)
+					else:
+						actor_poster, actor_image = get_icon('empty_person'), get_icon('empty_person')
+						actor_url = ''
+					url_params = {'mode': 'person_menu_choice', 'actor_name': name, 'actor_id': actor_id, 'actor_image': actor_image}
+					listitem = make_listitem()
+					listitem.setProperties({'thumb': actor_poster, 'path': actor_url, 'name': name, 'actor_name': name, 'actor_id': actor_id,
+											'fav_enabled': 'true', 'action': json.dumps(url_params)})
+					yield listitem
+				except: pass
+		action = self.params['action']
+		page_no = self.params.get('page_no', 1)
+		function = tmdb_popular_people if action == 'popular' else tmdb_trending_people_day if action == 'day' else tmdb_trending_people_week
+		image_info = function(page_no)
+		self.list_items = list(builder())
+		if image_info['total_pages'] > page_no: page_no += 1
+		else: page_no = 'final_page'
+		self.next_page_params = {'mode': 'tmdb_people_list_image_results', 'action': action, 'page_no': page_no}
+
+	def tmdb_people_search_image_results(self):
+		def builder():
+			for item in results:
+				try:
+					name, actor_id = item['name'], item['id']
+					p_path = item['profile_path']
+					known = item['known_for']
+					known_for_list = [i.get('title', 'NA') for i in known]
+					known_for_list = [i for i in known_for_list if not i == 'NA']
+					known_for = ' | [I]%s[/I]' % ', '.join(known_for_list) if known_for_list else ''
+					if p_path: actor_poster, actor_image = self.tmdb_image_base % ('w185', p_path), self.tmdb_image_base % ('h632', p_path)
+					else: actor_poster, actor_image = get_icon('empty_person'), get_icon('empty_person')
+					url_params = {'mode': 'person_menu_choice', 'actor_name': name, 'actor_id': actor_id, 'actor_image': actor_image}
+					listitem = make_listitem()
+					listitem.setProperties({'thumb': actor_poster, 'name': name + known_for, 'actor_name': name, 'actor_id': actor_id,
+											'fav_enabled': 'true', 'action': json.dumps(url_params)})
+					yield listitem
+				except: pass
+		page_no = self.params['page_no']
+		key_id = self.params.get('key_id') or self.params.get('query')
+		try:
+			data = tmdb_people_info(key_id, page_no)
+			results = data['results']
+			results = sorted(results, key=lambda k: k.get('popularity', 0.0), reverse=True)
+		except: return
+		if len(results) == 1:
+			item = results[0]
+			self.direct_search_result = item
+			return open_window(('windows.people', 'People'), 'people.xml', key_id=None, actor_name=item['name'], actor_id=item['id'],
+					actor_image=self.tmdb_image_base % ('h632', item['profile_path']) if item['profile_path'] else get_icon('empty_person'))
+		self.list_items = list(builder())
+		if data['total_pages'] > page_no: page_no += 1
+		else: page_no = 'final_page'
+		self.next_page_params = {'mode': 'tmdb_people_search_image_results', 'key_id': key_id, 'page_no': page_no}
+
+	def favorite_people_list_image_results(self, return_items=False):
+		from caches.favorites_cache import get_favorites
+		def builder():
+			for item in image_info:
+				try:
+					title, actor_id = item['title'], item['media_id']
+					name, actor_poster, actor_image = title.split('|')
+					url_params = {'mode': 'person_menu_choice', 'actor_name': name, 'actor_id': actor_id, 'actor_image': actor_image}
+					listitem = make_listitem()
+					listitem.setProperties({'thumb': actor_poster, 'name': name, 'actor_name': name, 'actor_id': actor_id, 'action': json.dumps(url_params), 'in_favorites': 'true'})
+					yield listitem
+				except: pass
+		image_info = get_favorites('people', 'dummy_arg')
+		self.list_items = list(builder())
+		self.next_page_params = {}
+		if return_items: return self.list_items
+
+	def tmdb_media_image_results(self):
+		def builder():
+			for item in all_images:
+				try:
+					listitem = make_listitem()
+					listitem.setProperties({'thumb': item[2], 'path': item[0], 'name': item[1], 'action': image_action, 'image_subject': rootname})
+					yield listitem
+				except: pass
+		rootname = self.params['rootname']
+		all_images = []
+		try:
+			results = tmdb_media_images(self.params['media_type'], self.params['tmdb_id'])
+			posters, clearlogos = [i for i in results['posters']], [dict(i, **{'file_path': '%s.png' % i['file_path'].split('.')[0]}) for i in results['logos']]
+			fanarts, landscapes = [i for i in results['backdrops'] if i['iso_639_1'] in (None, 'xx')], [i for i in results['backdrops'] if i['iso_639_1'] == 'en']
+			for item in ((posters, '%s _Poster_%03d'), (fanarts, '%s _Fanart_%03d'), (landscapes, '%s _Landscape_%03d'), (clearlogos, '%s _Clearlogo_%03d')):
+				if item[0]: all_images.extend([(self.tmdb_image_base % ('original', i['file_path']), item[1] % (rootname, count), self.tmdb_image_base % ('w300', i['file_path'])) \
+												for count, i in enumerate(item[0], 1)])
+		except: pass
+		image_action = json.dumps({'mode': 'imageviewer', 'all_images': all_images})
+		self.list_items = list(builder())
+		self.next_page_params = {}
+
+	def imdb_image_results(self):
+		def builder():
+			for item in image_info:
+				try:
+					listitem = make_listitem()
+					listitem.setProperties({'thumb': item['thumb'], 'path': item['path'], 'name': item['name'], 'action': image_action, 'image_subject': rootname})
+					yield listitem
+				except: pass
+		rootname = self.params['rootname']
+		all_images = []
+		from apis.imdb_api import imdb_photos
+		image_info = imdb_photos(self.params['imdb_id'])
+		all_images = [(i['path'], i['name']) for i in image_info]
+		image_action = json.dumps({'mode': 'imageviewer', 'all_images': all_images})
+		self.list_items = list(builder())
+		self.next_page_params = {}
+
+	def tmdb_people_image_results(self):
+		def builder():
+			for item in all_images:
+				try:
+					listitem = make_listitem()
+					listitem.setProperties({'thumb': item[2], 'path': item[0], 'name': item[1], 'action': image_action, 'image_subject': actor_name})
+					yield listitem
+				except: pass
+		all_images = []
+		actor_name, actor_id = self.params['actor_name'], self.params['actor_id']
+		try:
+			results = tmdb_people_full_info(actor_id).get('images', [])
+			image_info = results['profiles']
+			image_info.sort(key=lambda x: x['file_path'])
+			all_images = [(self.tmdb_image_base % ('original', i['file_path']), '%s_%03d' % (actor_name, count),
+						self.tmdb_image_base % ('w185', i['file_path'])) for count, i in enumerate(image_info, 1)]
+		except: pass
+		image_action = json.dumps({'mode': 'imageviewer', 'all_images': all_images})
+		self.list_items = list(builder())
+		self.next_page_params = {}
+
+	def easynews_image_results(self):
+		def builder():
+			for item in image_info:
+				try:
+					listitem = make_listitem()
+					listitem.setProperties({'thumb': item['thumbnail'], 'path': item['down_url'], 'name': item['name'], 'action': image_action, 'image_subject': key_id})
+					yield listitem
+				except: pass
+		key_id, page_no = self.params['key_id'], self.params['page_no']
+		results = EasyNews.search_images(key_id, page_no)
+		image_info, total_pages = results['results'], results['total_pages']
+		all_images = [(i['url_dl'], i['name']) for i in image_info]
+		image_action = json.dumps({'mode': 'imageviewer', 'all_images': all_images})
+		self.list_items = list(builder())
+		new_page = page_no + 1
+		if new_page > total_pages: new_page = 'final_page'
+		self.next_page_params = {'mode': 'easynews_image_results', 'key_id': key_id, 'page_no': new_page}
+
+	def browser_image(self, folder_path=None, return_items=False):
+		def builder():
+			for item in image_info:
+				try:
+					listitem = make_listitem()
+					image_url = os.path.join(folder_path, item)
+					if item in thumbs_info:
+						try: thumb_url = os.path.join(thumbs_path, item)
+						except: thumb_url = image_url
+					else: thumb_url = fallback_image
+					listitem.setProperties({'thumb': thumb_url, 'path': image_url, 'name': item, 'action': image_action, 'delete': 'true'})
+					yield listitem
+				except: pass
+		fallback_image = get_icon('empty_person')
+		if not folder_path: folder_path = self.params.get('folder_path')
+		thumbs_path = os.path.join(folder_path, '.thumbs')
+		extensions = image_extensions()
+		image_info = list_dirs(folder_path)[1]
+		image_info = [i for i in image_info if i.endswith(extensions)]
+		image_info.sort()
+		thumbs_info = list_dirs(thumbs_path)[1]
+		thumbs_info = [i for i in thumbs_info if i.endswith(extensions)]
+		thumbs_info.sort()
+		all_images = [(os.path.join(folder_path, i), i) for i in image_info]
+		image_action = json.dumps({'mode': 'imageviewer', 'all_images': all_images, 'page_no': 'final_page'})
+		self.list_items = list(builder())
+		self.next_page_params = {}
+		if return_items: return self.list_items
+
+	def thumbviewer(self):
 		hide_busy_dialog()
 		open_window(('windows.imageviewer', 'ThumbImageViewer'), 'thumbviewer.xml', list_items=self.list_items, next_page_params= self.next_page_params, ImagesInstance=self)
 
@@ -36,162 +292,12 @@ class Images():
 		hide_busy_dialog()
 		return open_window(('windows.imageviewer', 'ImageViewer'), 'imageviewer.xml', all_images=self.params['all_images'], index=int(self.params['current_index']))
 
-	def popular_people_image_results(self):
-		def builder():
-			for item in image_info['results']:
-				if item['profile_path']: actor_poster, actor_image = tmdb_image_base % ('w185', item['profile_path']), tmdb_image_base % ('h632', item['profile_path'])
-				else: actor_poster, actor_image = get_icon('genre_family'), get_icon('genre_family')
-				url_params = {'mode': 'person_data_dialog', 'actor_name': item['name'], 'actor_id': item['id'], 'actor_image': actor_image}
-				listitem = make_listitem()
-				listitem.setProperty('thumb', actor_poster)
-				listitem.setProperty('name', item['name'])
-				listitem.setProperty('action', json.dumps(url_params))
-				yield listitem
-		page_no = self.params['page_no']
-		image_info = tmdb_popular_people(page_no)
-		self.list_items = list(builder())
-		if image_info['total_pages'] > page_no: page_no += 1
-		else: page_no = 'final_page'
-		self.next_page_params = {'mode': 'popular_people_image_results', 'page_no': page_no}
-
-	def imdb_image_results(self):
-		def builder(rolling_count):
-			for item in image_info:
-				try:
-					listitem = make_listitem()
-					rolling_count += 1
-					name = '%s_%s_%03d' % (media_title, item['title'], rolling_count)
-					listitem.setProperty('thumb', item['thumb'])
-					listitem.setProperty('path', item['image'])
-					listitem.setProperty('name', name)
-					listitem.setProperty('action', image_action)
-					yield listitem
-				except: pass
-		imdb_id, page_no, rolling_count_list = self.params['imdb_id'], self.params['page_no'], self.params['rolling_count_list']
-		rolling_count = rolling_count_list[page_no-1]
-		media_title = self.params['media_title']
-		image_info, next_page = imdb_images(imdb_id, page_no)
-		image_info.sort(key=lambda x: x['title'])
-		all_images = [(i['image'], '%s_%s' % (media_title, i['title'])) for i in image_info]
-		image_action = json.dumps({'mode': 'imageviewer', 'all_images': all_images})
-		self.list_items = list(builder(rolling_count))
-		rolling_count += len(image_info)
-		if len(image_info) == 48:
-			if len(rolling_count_list) == page_no: rolling_count_list.insert(page_no, rolling_count)
-			page_no = next_page
-		else: page_no = 'final_page'
-		self.next_page_params = {'mode': 'imdb_image_results', 'imdb_id': imdb_id, 'page_no': page_no, 'rolling_count_list': rolling_count_list, 'media_title': media_title}
-
-	def people_image_results(self):
-		def get_tmdb():
-			try: tmdb_append(tmdb_people_full_info(actor_id).get('images', []))
-			except: pass
-		def get_imdb():
-			try: imdb_append(imdb_people_images(actor_imdb_id, page_no)[0])
-			except: pass
-		def builder():
-			for item in all_images:
-				try:
-					listitem = make_listitem()
-					listitem.setProperty('path', item[0])
-					listitem.setProperty('name', item[1])
-					listitem.setProperty('thumb', item[2])
-					listitem.setProperty('action', image_action)
-					yield listitem
-				except: pass
-		threads, tmdb_images, all_images, tmdb_results, imdb_results = [], [], [], [], []
-		tmdb_append, imdb_append = tmdb_results.append, imdb_results.append
-		actor_name, actor_id = self.params['actor_name'], self.params['actor_id']
-		actor_imdb_id = self.params['actor_imdb_id'] or imdb_people_id(actor_name)
-		actor_image = self.params.get('actor_image', '')
-		page_no = self.params['page_no']
-		rolling_count_list = self.params['rolling_count_list']
-		rolling_count = rolling_count_list[page_no-1]
-		if page_no == 1: threads.append(Thread(target=get_tmdb))
-		threads.append(Thread(target=get_imdb))
-		[i.start() for i in threads]
-		[i.join() for i in threads]
-		if page_no == 1:
-			try:
-				tmdb_image_info = tmdb_results[0]['profiles']
-				tmdb_image_info.sort(key=lambda x: x['file_path'])
-				tmdb_images = [(tmdb_image_base % ('original', i['file_path']), '%s_%03d' % (actor_name, count),
-								tmdb_image_base % ('w185', i['file_path'])) for count, i in enumerate(tmdb_image_info, rolling_count+1)]
-				all_images.extend(tmdb_images)
-			except: pass
-		rolling_count += len(tmdb_images)
-		imdb_image_info = imdb_results[0]
-		imdb_image_info.sort(key=lambda x: x['title'])
-		imdb_images = [(i['image'], '%s_%s_%03d' % (actor_name, i['title'], count), i['thumb']) for count, i in enumerate(imdb_image_info, rolling_count+1)]
-		all_images.extend(imdb_images)
-		rolling_count += len(imdb_images)
-		image_action = json.dumps({'mode': 'imageviewer', 'all_images': all_images})
-		self.list_items = list(builder())
-		if len(imdb_image_info) == 48:
-			if len(rolling_count_list) == page_no: rolling_count_list.insert(page_no, rolling_count)
-			page_no += 1
-		else: page_no = 'final_page'
-		self.next_page_params = {'mode': 'people_image_results', 'actor_id': actor_id, 'actor_name': actor_name, 'actor_imdb_id': actor_imdb_id,
-								'actor_image': actor_image, 'page_no': page_no, 'rolling_count_list': rolling_count_list}
-
-	def people_tagged_image_results(self):
-		def builder():
-			for count, item in enumerate(image_info, 1):
-				try:
-					media = item['media']
-					if 'title' in media: name_key = 'title'
-					else: name_key = 'name'
-					thumb_url = tmdb_image_base % ('w185', item['file_path'])
-					image_url = tmdb_image_base % ('original', item['file_path'])
-					name = '%s_%s_%03d' % (actor_name, media[name_key], count)
-					listitem = make_listitem()
-					listitem.setProperty('thumb', thumb_url)
-					listitem.setProperty('path', image_url)
-					listitem.setProperty('name', name)
-					listitem.setProperty('action', image_action)
-					yield listitem
-				except: pass
-		actor_name, actor_id = self.params['actor_name'], self.params['actor_id']
-		try: results = tmdb_people_full_info(actor_id)['tagged_images']
-		except: return
-		image_info = results['results']
-		image_info.sort(key=lambda x: x['file_path'])
-		all_images = [(tmdb_image_base % ('original', i['file_path']), (i['media']['title']) if 'title' in i['media'] else i['media']['name']) for i in image_info]
-		image_action = json.dumps({'mode': 'imageviewer', 'all_images': all_images})
-		self.list_items = list(builder())
-		self.next_page_params = {'mode': 'people_tagged_image_results', 'actor_id': actor_id, 'actor_name': actor_name}
-
-	def browser_image(self, folder_path, return_items=False):
-		def builder():
-			for item in image_info:
-				try:
-					listitem = make_listitem()
-					image_url = os.path.join(folder_path, item)
-					try: thumb_url = os.path.join(thumbs_path, item)
-					except: thumb_url = image_url
-					listitem.setProperty('thumb', thumb_url)
-					listitem.setProperty('path', image_url)
-					listitem.setProperty('name', item)
-					listitem.setProperty('action', image_action)
-					listitem.setProperty('delete', 'true')
-					yield listitem
-				except: pass
-		image_info = list_dirs(folder_path)[1]
-		image_info.sort()
-		thumbs_path = os.path.join(folder_path, '.thumbs')
-		thumbs_info = list_dirs(thumbs_path)[1]
-		thumbs_info.sort()
-		thumbs_info = [i for i in thumbs_info if i.endswith(image_extensions)]
-		image_info = [i for i in image_info if i in thumbs_info]
-		all_images = [(os.path.join(folder_path, i), i) for i in image_info if i in thumbs_info]
-		image_action = json.dumps({'mode': 'imageviewer', 'all_images': all_images, 'page_no': 'final_page'})
-		self.list_items = list(builder())
-		self.next_page_params = {}
-		if return_items: return self.list_items
-
-	def delete_image(self):
-		delete_file(self.params['thumb_url'])
-		delete_file(self.params['image_url'])
+	def dialogviewer(self):
 		hide_busy_dialog()
-		set_property('fen.delete_image_finished', 'true')
+		return open_window(('windows.imageviewer', 'DialogImageViewer'), 'imageviewer_dialog.xml', **self.params)
 
+	def delete_image(self, image_url=None, thumb_url=None):
+		image_url, thumb_url = image_url or self.params['image_url'], thumb_url or self.params['thumb_url']
+		delete_file(thumb_url)
+		delete_file(image_url)
+		hide_busy_dialog()

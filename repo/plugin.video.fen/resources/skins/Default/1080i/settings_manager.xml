@@ -1,0 +1,2007 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window>
+    <onload>SetFocus(2000,0,absolute)</onload>
+    <controls>
+        <!-- Background -->
+        <control type="image">
+            <left>0</left>
+            <top>0</top>
+            <width>1920</width>
+            <height>1080</height>
+            <texture colordiffuse="FF000000">fen_common/white.png</texture>
+            <animation effect="fade" end="85" time="120">WindowOpen</animation>
+        </control>
+        <control type="group">
+            <left>100</left>
+            <top>30</top>
+            <animation effect="fade" end="100" time="200">WindowOpen</animation>
+            <!-- Logo and Background-->
+            <control type="group">
+                <control type="image">
+                    <width>1720</width>
+                    <height>1020</height>
+                    <texture colordiffuse="$INFO[Window(10000).Property(fen.window_theme)]" border="30">fen_common/circle.png</texture>
+                </control>
+                <control type="image">
+                    <left>12</left>
+                    <top>12</top>
+                    <width>40</width>
+                    <height>40</height>
+                    <align>left</align>
+                    <aspectratio aligny="top">keep</aspectratio>
+                    <texture>$INFO[Window(10000).Property(fen.addon_icon)]</texture>
+                </control>
+                <control type="label">
+                    <width max="1700">auto</width>
+                    <top>22</top>
+                    <left>0</left>
+                    <height>20</height>
+                    <font>font12</font> <!-- FEN_26 -->
+                    <textcolor>FFCCCCCC</textcolor>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>[UPPERCASE][B]FEN - SETTINGS[/B][/UPPERCASE]</label>
+                </control>
+            </control>
+            <control type="fixedlist" id="2000">
+                <animation effect="slide" end="0,-340" time="0" condition="Integer.IsEqual(Container(2000).NumItems,1) | Integer.IsEqual(Container(2000).NumItems,2)">Conditional</animation>
+                <animation effect="slide" end="0,-255" time="0" condition="Integer.IsEqual(Container(2000).NumItems,3) | Integer.IsEqual(Container(2000).NumItems,4)">Conditional</animation>
+                <animation effect="slide" end="0,-170" time="0" condition="Integer.IsEqual(Container(2000).NumItems,5) | Integer.IsEqual(Container(2000).NumItems,6)">Conditional</animation>
+                <animation effect="slide" end="0,-85" time="0" condition="Integer.IsEqual(Container(2000).NumItems,7) | Integer.IsEqual(Container(2000).NumItems,8)">Conditional</animation>
+                <left>20</left>
+                <top>100</top>
+                <width>470</width>
+                <height>765</height>
+                <onleft>10025</onleft>
+                <onright>SetFocus(2100,1,absolute)</onright>
+                <onup>2000</onup>
+                <ondown>2000</ondown>
+                <orientation>Vertical</orientation>
+                <focusposition>4</focusposition>
+                <movement>4</movement>
+                <scrolltime tween="cubic" easing="out">500</scrolltime>
+                <itemlayout height="85" width="470">
+                    <control type="label">
+                        <left>40</left>
+                        <width>390</width>
+                        <height>85</height>
+                        <label>[UPPERCASE]$INFO[ListItem.Property(setting_label)][/UPPERCASE]</label>
+                        <font>font12</font> <!-- FEN_26 -->
+                        <textcolor>FFCCCCCC</textcolor>
+                        <aligny>center</aligny>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="85" width="470">
+                    <control type="image">
+                        <animation effect="fade" start="100" end="50" time="0" condition="!Control.HasFocus(2000)">Conditional</animation>
+                        <height>85</height>
+                        <width>470</width>
+                        <texture colordiffuse="FFCCCCCC" border="30">fen_common/circle.png</texture>
+                    </control>
+                    <control type="label">
+                        <left>40</left>
+                        <width>390</width>
+                        <height>85</height>
+                        <label>[UPPERCASE]$INFO[ListItem.Property(setting_label)][/UPPERCASE]</label>
+                        <font>font12</font> <!-- FEN_26 -->
+                        <textcolor>FF1F2020</textcolor>
+                        <aligny>center</aligny>
+                        <scroll>Control.HasFocus(2000)</scroll>
+                    </control>
+                </focusedlayout>
+                <content>
+                      <item id="10">
+                          <property name="setting_label">General</property>
+                      </item>
+                      <item id="20">
+                          <property name="setting_label">Features</property>
+                      </item>
+                      <item id="30">
+                          <property name="setting_label">Content</property>
+                      </item>
+                      <item id="40">
+                          <property name="setting_label">Meta Accounts</property>
+                      </item>
+                      <item id="50">
+                          <property name="setting_label">Sources Accounts</property>
+                      </item>
+                      <item id="60">
+                        <property name="setting_label">Results</property>
+                      </item>
+                      <item id="70">
+                        <property name="setting_label">Playback</property>
+                      </item>'
+                </content>
+            </control>
+            <control type="fixedlist" id="2100">
+                <animation effect="slide" end="0,-340" time="0" condition="Integer.IsEqual(Container(2100).NumItems,1) | Integer.IsEqual(Container(2100).NumItems,2)">Conditional</animation>
+                <animation effect="slide" end="0,-255" time="0" condition="Integer.IsEqual(Container(2100).NumItems,3) | Integer.IsEqual(Container(2100).NumItems,4)">Conditional</animation>
+                <animation effect="slide" end="0,-170" time="0" condition="Integer.IsEqual(Container(2100).NumItems,5) | Integer.IsEqual(Container(2100).NumItems,6)">Conditional</animation>
+                <animation effect="slide" end="0,-85" time="0" condition="Integer.IsEqual(Container(2100).NumItems,7) | Integer.IsEqual(Container(2100).NumItems,8)">Conditional</animation>
+                <left>520</left>
+                <top>100</top>
+                <width>1160</width>
+                <height>765</height>
+                <onleft>2000</onleft>
+                <onleft>SetFocus(2100,1,absolute)</onleft>
+                <onright>10025</onright>
+                <pagecontrol>10025</pagecontrol>
+                <orientation>Vertical</orientation>
+                <focusposition>4</focusposition>
+                <movement>4</movement>
+                <scrolltime tween="cubic" easing="out">500</scrolltime>
+                <itemlayout height="85" width="1160">
+                    <!-- SEPARATOR -->
+                    <control type="group">
+                        <visible>String.IsEqual(ListItem.Property(setting_type),separator)</visible>
+                        <control type="label">
+                            <left>40</left>
+                            <width>630</width>
+                            <height>85</height>
+                            <label>[UPPERCASE]$INFO[ListItem.Property(setting_label)][/UPPERCASE]</label>
+                            <font>font12</font> <!-- FEN_26 -->
+                            <textcolor>FFCCCCCC</textcolor>
+                            <aligny>center</aligny>
+                            <align>center</align>
+                        </control>
+                        <control type="image">
+                            <top>70</top>
+                            <left>30</left>
+                            <height>2</height>
+                            <width>1100</width>
+                            <texture colordiffuse="FFCCCCCC">fen_common/white.png</texture>
+                        </control>
+                    </control>
+                    <!-- INFO ICON -->
+                    <control type="image">
+                        <visible>String.IsEqual(ListItem.Property(setting_type),info) + Control.HasFocus(2100)</visible>
+                        <top>27</top>
+                        <left>5</left>
+                        <width>30</width>
+                        <height>30</height>
+                        <texture colordiffuse="FFCCCCCC">fen_common/info.png</texture>
+                    </control>
+                    <!-- LABEL -->
+                    <control type="label">
+                        <visible>!String.IsEqual(ListItem.Property(setting_type),separator)</visible>
+                        <left>40</left>
+                        <width>630</width>
+                        <height>85</height>
+                        <label>[UPPERCASE]$INFO[ListItem.Property(setting_label)][/UPPERCASE]</label>
+                        <font>font12</font> <!-- FEN_26 -->
+                        <textcolor>FFCCCCCC</textcolor>
+                        <aligny>center</aligny>
+                        <scroll>false</scroll>
+                    </control>
+                    <!-- BOOLEAN -->
+                    <control type="group">
+                        <visible>String.IsEqual(ListItem.Property(setting_type),boolean)</visible>
+                        <control type="image">
+                            <visible>String.IsEqual(ListItem.Property(setting_value),false)</visible>
+                            <top>0</top>
+                            <left>1030</left>
+                            <width>150</width>
+                            <align>right</align>
+                            <aligny>center</aligny>
+                            <aspectratio>keep</aspectratio>
+                            <texture colordiffuse="FFCCCCCC">fen_buttons/radio_button_off.png</texture>
+                        </control>
+                        <control type="image">
+                            <visible>String.IsEqual(ListItem.Property(setting_value),true)</visible>
+                            <top>0</top>
+                            <left>1030</left>
+                            <width>150</width>
+                            <align>right</align>
+                            <aligny>center</aligny>
+                            <aspectratio>keep</aspectratio>
+                            <texture colordiffuse="FFCCCCCC">fen_buttons/radio_button_on.png</texture>
+                        </control>
+                    </control>
+                    <!-- SETTING VALUE LABEL -->
+                    <control type="group">
+                        <visible>!String.IsEqual(ListItem.Property(setting_type),boolean)</visible>
+                        <!-- EMPTY LABEL -->
+                        <control type="label">
+                            <visible>String.IsEqual(ListItem.Property(setting_value),empty_setting)</visible>
+                            <left>700</left>
+                            <width>425</width>
+                            <height>85</height>
+                            <label>[B]...[/B]</label>
+                            <font>font12</font> <!-- FEN_26 -->
+                            <textcolor>FFCCCCCC</textcolor>
+                            <align>right</align>
+                            <aligny>center</aligny>
+                            <scroll>Control.HasFocus(100)</scroll>
+                        </control>
+                        <!-- LABEL -->
+                        <control type="label">
+                            <visible>!String.IsEqual(ListItem.Property(setting_value),empty_setting)</visible>
+                            <left>700</left>
+                            <width>425</width>
+                            <height>85</height>
+                            <label>[UPPERCASE][B]$INFO[ListItem.Property(setting_value)][/B][/UPPERCASE]</label>
+                            <font>font12</font> <!-- FEN_26 -->
+                            <textcolor>FFCCCCCC</textcolor>
+                            <align>right</align>
+                            <aligny>center</aligny>
+                            <scroll>Control.HasFocus(100)</scroll>
+                        </control>
+                    </control>
+                </itemlayout>
+                <focusedlayout height="85" width="1160">
+                    <!-- HIGHLIGHT -->
+                    <control type="image">
+                        <visible>Control.HasFocus(2100)</visible>
+                        <height>85</height>
+                        <width>1160</width>
+                        <texture colordiffuse="FFCCCCCC" border="30">fen_common/circle.png</texture>
+                    </control>
+                    <!-- SEPARATOR -->
+                    <control type="group">
+                        <visible>String.IsEqual(ListItem.Property(setting_type),separator)</visible>
+                        <control type="label">
+                            <left>40</left>
+                            <width>630</width>
+                            <height>85</height>
+                            <label>[UPPERCASE]$INFO[ListItem.Property(setting_label)][/UPPERCASE]</label>
+                            <font>font12</font> <!-- FEN_26 -->
+                            <textcolor>FFCCCCCC</textcolor>
+                            <aligny>center</aligny>
+                            <align>center</align>
+                        </control>
+                        <control type="image">
+                            <top>70</top>
+                            <left>30</left>
+                            <height>2</height>
+                            <width>1100</width>
+                            <texture colordiffuse="FFCCCCCC">fen_common/white.png</texture>
+                        </control>
+                    </control>
+                    <!-- INFO ICON -->
+                    <control type="image">
+                        <visible>String.IsEqual(ListItem.Property(setting_type),info) + Control.HasFocus(2100)</visible>
+                        <top>27</top>
+                        <left>5</left>
+                        <width>30</width>
+                        <height>30</height>
+                        <texture colordiffuse="FF1F2020">fen_common/info.png</texture>
+                    </control>
+                    <!-- LABEL -->
+                    <control type="group">
+                        <visible>!String.IsEqual(ListItem.Property(setting_type),separator)</visible>
+                        <control type="label">
+                            <visible>Control.HasFocus(2100)</visible>
+                            <left>40</left>
+                            <width>630</width>
+                            <height>85</height>
+                            <label>[UPPERCASE]$INFO[ListItem.Property(setting_label)][/UPPERCASE]</label>
+                            <font>font12</font> <!-- FEN_26 -->
+                            <textcolor>FF1F2020</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>Control.HasFocus(2100)</scroll>
+                        </control>
+                        <control type="label">
+                            <visible>!Control.HasFocus(2100)</visible>
+                            <left>40</left>
+                            <width>630</width>
+                            <height>85</height>
+                            <label>[UPPERCASE]$INFO[ListItem.Property(setting_label)][/UPPERCASE]</label>
+                            <font>font12</font> <!-- FEN_26 -->
+                            <textcolor>FFCCCCCC</textcolor>
+                            <aligny>center</aligny>
+                            <scroll>false</scroll>
+                        </control>
+                    </control>
+                    <!-- BOOLEAN -->
+                    <control type="group">
+                        <visible>String.IsEqual(ListItem.Property(setting_type),boolean)</visible>
+                        <control type="group">
+                            <visible>!Control.HasFocus(2100)</visible>
+                            <control type="image">
+                                <visible>String.IsEqual(ListItem.Property(setting_value),false)</visible>
+                                <top>0</top>
+                                <left>1030</left>
+                                <width>150</width>
+                                <align>right</align>
+                                <aligny>center</aligny>
+                                <aspectratio>keep</aspectratio>
+                                <texture colordiffuse="FFCCCCCC">fen_buttons/radio_button_off.png</texture>
+                            </control>
+                            <control type="image">
+                                <visible>String.IsEqual(ListItem.Property(setting_value),true)</visible>
+                                <top>0</top>
+                                <left>1030</left>
+                                <width>150</width>
+                                <align>right</align>
+                                <aligny>center</aligny>
+                                <aspectratio>keep</aspectratio>
+                                <texture colordiffuse="FFCCCCCC">fen_buttons/radio_button_on.png</texture>
+                            </control>
+                        </control>
+                        <control type="group">
+                            <visible>Control.HasFocus(2100)</visible>
+                            <control type="image">
+                                <visible>String.IsEqual(ListItem.Property(setting_value),false)</visible>
+                                <top>0</top>
+                                <left>1030</left>
+                                <width>150</width>
+                                <align>right</align>
+                                <aligny>center</aligny>
+                                <aspectratio>keep</aspectratio>
+                                <texture colordiffuse="FF1F2020">fen_buttons/radio_button_off.png</texture>
+                            </control>
+                            <control type="image">
+                                <visible>String.IsEqual(ListItem.Property(setting_value),true)</visible>
+                                <top>0</top>
+                                <left>1030</left>
+                                <width>150</width>
+                                <align>right</align>
+                                <aligny>center</aligny>
+                                <aspectratio>keep</aspectratio>
+                                <texture colordiffuse="FF1F2020">fen_buttons/radio_button_on.png</texture>
+                            </control>
+                        </control>
+                    </control>
+                    <!-- SETTING VALUE LABEL -->
+                    <control type="group">
+                        <visible>!String.IsEqual(ListItem.Property(setting_type),boolean)</visible>
+                        <!-- EMPTY LABEL -->
+                        <control type="group">
+                            <visible>String.IsEqual(ListItem.Property(setting_value),empty_setting)</visible>
+                            <control type="label">
+                                <visible>Control.HasFocus(2100)</visible>
+                                <left>700</left>
+                                <width>425</width>
+                                <height>85</height>
+                                <label>[B]...[/B]</label>
+                                <font>font12</font> <!-- FEN_26 -->
+                                <textcolor>FF1F2020</textcolor>
+                                <align>right</align>
+                                <aligny>center</aligny>
+                                <scroll>Control.HasFocus(2100)</scroll>
+                            </control>
+                            <control type="label">
+                                <visible>!Control.HasFocus(2100)</visible>
+                                <left>700</left>
+                                <width>425</width>
+                                <height>85</height>
+                                <label>[B]...[/B]</label>
+                                <font>font12</font> <!-- FEN_26 -->
+                                <textcolor>FFCCCCCC</textcolor>
+                                <align>right</align>
+                                <aligny>center</aligny>
+                                <scroll>false</scroll>
+                            </control>
+                        </control>
+                        <!-- SETTING VALUE LABEL -->
+                        <control type="group">
+                            <visible>!String.IsEqual(ListItem.Property(setting_value),empty_setting)</visible>
+                            <control type="label">
+                                <visible>Control.HasFocus(2100)</visible>
+                                <left>700</left>
+                                <width>425</width>
+                                <height>85</height>
+                                <label>[UPPERCASE][B]$INFO[ListItem.Property(setting_value)][/B][/UPPERCASE]</label>
+                                <font>font12</font> <!-- FEN_26 -->
+                                <textcolor>FF1F2020</textcolor>
+                                <align>right</align>
+                                <aligny>center</aligny>
+                                <scroll>Control.HasFocus(2100)</scroll>
+                            </control>
+                            <control type="label">
+                                <visible>!Control.HasFocus(2100)</visible>
+                                <left>700</left>
+                                <width>425</width>
+                                <height>85</height>
+                                <label>[UPPERCASE][B]$INFO[ListItem.Property(setting_value)][/B][/UPPERCASE]</label>
+                                <font>font12</font> <!-- FEN_26 -->
+                                <textcolor>FFCCCCCC</textcolor>
+                                <align>right</align>
+                                <aligny>center</aligny>
+                                <scroll>false</scroll>
+                            </control>
+                        </control>
+                    </control>
+                </focusedlayout>
+                <content>
+<!-- GENERAL 10-->
+        <!-- General -->
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">General</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                     </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <visible>String.EndsWith(Window(10000).Property(fen.default_addon_fanart),Window(10000).Property(fen.addon_fanart))</visible>
+                          <property name="setting_label">Assign Addon Background Image</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.default_addon_fanart)]</property>
+                          <property name="setting_description">Choose any custom background you would like to use within Fen</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_path&amp;setting_id=default_addon_fanart)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <visible>!String.EndsWith(Window(10000).Property(fen.default_addon_fanart),Window(10000).Property(fen.addon_fanart))</visible>
+                          <property name="setting_label">Restore Default Background Image</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.default_addon_fanart)]</property>
+                          <property name="setting_description">Restore default Fen background</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.restore_setting_default&amp;setting_id=default_addon_fanart)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Limit Concurrent Threads</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.limit_concurrent_threads)]</property>
+                          <property name="setting_description">Enable this and Fen will limit the threads enacted simultaneously. Best to leave this disabled unless you are having issues with your device not supporting high numbers of concurrent threads in python</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=limit_concurrent_threads)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.limit_concurrent_threads),true)</visible>
+                          <property name="setting_label">    - Maximum Active Threads</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.max_threads)]</property>
+                          <property name="setting_description">Choose the maximum active concurrent threads Fen will be limited to</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=max_threads)</onclick>
+                      </item>
+        <!-- Manage Addon Updates -->
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Manage Addon Updates</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Update Action</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.update.action_name)]</property>
+                          <property name="setting_description">Choose the manner in which Fen handles updates</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=update.action)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.update.action),3)</visible>
+                          <property name="setting_label">    - Delay Before Running (secs)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.update.delay)]</property>
+                          <property name="setting_description">Choose the delay time before Fen checks for updates after Kodi start</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=update.delay)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Github Username</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.update.username)]</property>
+                          <property name="setting_description">Leave this setting as default unless you wsh to update Fen through a different user repository. If you do, enter the Github Username of the new github location</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_string&amp;setting_id=update.username)</onclick>
+                      </item>
+        <!-- DataSync -->
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">DataSync</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                     </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">DataSync Directory</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.datasync.location)]</property>
+                          <property name="setting_description">Choose your location for Importing and Exporting Fen settings</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_folder_path&amp;setting_id=datasync.location)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Choose Data to include in DataSync</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Choose here which Fen databases you wish to include in the DataSync</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=sync_databases_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Auto DataSync</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.datasync.autosync)]</property>
+                          <property name="setting_description">Enable this and Fen will sync from the DataSync Folder to this install on startup and sync back to the DataSync Folder periodically</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=datasync.autosync)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.datasync.autosync),true)</visible>
+                          <property name="setting_label">    - Choose Sync Interval (in minutes)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.datasync.autosync_timer)]</property>
+                          <property name="setting_description">Choose the interval between DataSync. This is set in minutes</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=datasync.autosync_timer)</onclick>
+                      </item>
+        <!-- Window Theme -->
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Window Theme</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                     </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Assign Window Theme</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.window_theme_name)]</property>
+                          <property name="setting_description">Choose the theme Fen will use for custom windows. Choices are Light, Medium and Dark</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=window_theme_choice&amp;type=theme)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Assign Window Theme Opacity</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.window_theme_opacity_name)]</property>
+                          <property name="setting_description">Choose the Opacity Fen will use for custom window themes. Choose between 10% - 100%</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=window_theme_choice&amp;type=opacity)</onclick>
+                      </item>
+        <!-- UTC Time Offset -->
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">UTC Time Offset</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">UTC (+/-)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.datetime.offset)]</property>
+                          <property name="setting_description">Choose the correct UTC offset based on your location</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=datetime.offset)</onclick>
+                      </item>
+        <!-- Downloads -->
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Downloads</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Movies Directory</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.movie_download_directory)]</property>
+                          <property name="setting_description">Choose your download location for Movies</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_path&amp;setting_id=movie_download_directory)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">TV Shows Directory</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.tvshow_download_directory)]</property>
+                          <property name="setting_description">Choose your download location for TV Shows</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_path&amp;setting_id=tvshow_download_directory)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Premium Files Directory</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.premium_download_directory)]</property>
+                          <property name="setting_description">Choose your download location for Premium files. Includes downloads from debrid service caches or Easynews</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_path&amp;setting_id=premium_download_directory)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <property name="setting_label">Image Files Directory</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.image_download_directory)]</property>
+                          <property name="setting_description">Choose your download location for Images</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_path&amp;setting_id=image_download_directory)</onclick>
+                      </item>
+<!-- FEATURES 20-->
+        <!-- Extras -->
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Extras</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Extras Lists Content</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.extras.enabled_name)]</property>
+                          <property name="setting_description">Choose what content is included within the Extras window</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=extras_lists_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Extras Lists Order</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.extras.order_name)]</property>
+                          <property name="setting_description">Choose how the content within the Extras window is ordered</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=extras_order_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Restore Extras Lists Defaults</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Restore default Extras Lists</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.default_extras_list)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Set Actions for Extras Buttons</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Choose the function and order of the buttons in the Extras window. You can set separate button functions for Movies and TV Shows</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=extras_buttons_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.omdb_api),empty_setting)</visible>
+                          <property name="setting_label">Enable Extra Ratings</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.extras.enable_extra_ratings)]</property>
+                          <property name="setting_description">Enable this and the Extras menu will show ratings from more services than just TMDb. Must have a valid OMDb API assigned in the Accounts settings for this to show</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=extras.enable_extra_ratings)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.omdb_api),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.extras.enable_extra_ratings),true)</visible>
+                          <property name="setting_label">    - Enabled Ratings</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.extras.enabled_ratings)]</property>
+                          <property name="setting_description">Choose the ratings displayed from OMDb</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=extras_ratings_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rpdb_api),empty_setting)</visible>
+                          <property name="setting_label">Enable Poster Ratings (RPDb) for Extras Lists</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.extras.enable_item_ratings)]</property>
+                          <property name="setting_description">Choose this and the widgets displayed in the Extras window will show RPDb ratings posters</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=extras.enable_item_ratings)</onclick>
+                      </item>
+        <!-- Special Open Actions -->
+                    <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Special Open Actions</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Movies</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.media_open_action_movie_name)]</property>
+                          <property name="setting_description">Choose the Open Action when a Movie is selected in Fen. Choices Are None, Open Extras, Open Movie Set, Both. "Both" will open the Movie Set if available or open Extras</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=media_open_action_movie)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">TV Shows</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.media_open_action_tvshow_name)]</property>
+                          <property name="setting_description">Choose the Open Action when a TV Show is selected in Fen. Choices Are None or Open Extras</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=media_open_action_tvshow)</onclick>
+                      </item>
+        <!-- RPDb Ratings Posters -->
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Ratings Posters</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.rpdb_api),empty_setting)</visible>
+                          <property name="setting_label">[I]Enter an RPDb API Key in Meta Accounts[/I]</property>
+                          <property name="setting_type">info</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Navigate within these settings to Meta Accounts->RPDb (Ratings Posters) and enter an API key to access this</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rpdb_api),empty_setting)</visible>
+                          <property name="setting_label">Use RPDb Ratings Posters For...</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.rpdb_enabled_name)]</property>
+                          <property name="setting_description">Choose which media types utilize that Rated Posters provided by RPDb. Choices are None, Movies, TV Shows or Both</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=rpdb_enabled)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rpdb_api),empty_setting)</visible>
+                          <property name="setting_label">RPDb Poster Format</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.rpdb_format_name)]</property>
+                          <property name="setting_description">Choose the format used for RPDb Posters. Choices are Default, Blocks or Rounded</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=rpdb_poster_format_choice)</onclick>
+                      </item>
+        <!-- AI Generated Similar Titles -->
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">AI Generated Similar Titles</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.google_api),empty_setting) + String.IsEqual(Window(10000).Property(fen.groq_api),empty_setting)</visible>
+                          <property name="setting_label">[I]Enter API Keys for Google/Groq for access[/I]</property>
+                          <property name="setting_type">info</property>
+                          <property name="setting_value"></property>
+                          <property name="setting_description">Navigate to Meta Accounts to enter your Google AI and/or Groq AI API Keys for access to this feature</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.google_api),empty_setting) | !String.IsEqual(Window(10000).Property(fen.groq_api),empty_setting)</visible>
+                          <property name="setting_label">Choose AI Model Priorities</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Choose the order AI Models will be used for Similar Titles. Top will be used first, bottom used last. You will normally want to keep this order as default. If you don't have an API Key for the model listed, it will be skipped</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=ai_model_order_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.google_api),empty_setting) | !String.IsEqual(Window(10000).Property(fen.groq_api),empty_setting)</visible>
+                          <property name="setting_label">Choose Maximum Similar Titles Results</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.ai_model.limit)]</property>
+                          <property name="setting_description">Choose the maximum number of AI Similar Results returned by Fen</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=ai_model.limit)</onclick>
+                      </item>
+        <!-- Context Menu -->
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Context Menu</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Context Menu Content</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.context_menu.enabled)]</property>
+                          <property name="setting_description">Choose what content is included within the Context Menu</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=context_menu_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Context Menu Order</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.context_menu.order)]</property>
+                          <property name="setting_description">Choose how the content within the Context Menu is ordered</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=context_menu_order_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Restore Context Menu Defaults</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Restore default Fen Context Menus</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.default_context_menu)</onclick>
+                      </item>
+<!-- CONTENT 30 -->
+        <!-- General -->
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">General</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Paginate Lists When Available</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.paginate.lists_name)]</property>
+                          <property name="setting_description">Enable this and Fen will attempt to paginate lists when possible. This is mainly applicable to personal lists</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=paginate.lists)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.paginate.lists),1) | String.IsEqual(Window(10000).Property(fen.paginate.lists),3)</visible>
+                          <property name="setting_label">    - Addon Item Limit</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.paginate.limit_addon)]</property>
+                          <property name="setting_description">Choose the limit of pagination when within Fen</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=paginate.limit_addon)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.paginate.lists),2) | String.IsEqual(Window(10000).Property(fen.paginate.lists),3)</visible>
+                          <property name="setting_label">    - Widgets Item Limit</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.paginate.limit_widgets)]</property>
+                          <property name="setting_description">Choose the limit of pagination for Fen widgets</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=paginate.limit_widgets)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Control Viewtypes within Addon</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.use_viewtypes)]</property>
+                          <property name="setting_description">Enable this and Fen will control view types used within the addon. This can be disabled if the skin you are using has a helper that provides a "lock view" type function. If enabled, views can be set in Tools->Set Views within the addon</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=use_viewtypes)</onclick>
+                      </item>
+        <!-- Contents Sort Order For Watched Progress -->
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Contents Sort Order For Watched Progress</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">In Progress</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.sort.progress_name)]</property>
+                          <property name="setting_description">Choose the sort order for your In Progress media</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=sort.progress)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Watched</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.sort.watched_name)]</property>
+                          <property name="setting_description">Choose the sort order for your Watched media</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=sort.watched)</onclick>
+                      </item>
+        <!-- Single Episode Lists -->
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Single Episode Lists</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Single Episode Display Format - Within Addon</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.single_ep_display_name)]</property>
+                          <property name="setting_description">Choose the display format Fen uses when naming single episodes within the addon. Applicable for lists like Next Episodes, In Progress Episodes etc</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=single_ep_display)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Single Episode Display Format - Widgets</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.single_ep_display_widget_name)]</property>
+                          <property name="setting_description">Choose the display format Fen uses when naming single episodes for widgets. Applicable for lists like Next Episodes, In Progress Episodes etc</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=single_ep_display_widget)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Include Fen Favorites in Next Episodes</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.nextep.include_favorites)]</property>
+                          <property name="setting_description">Choose to include your Fen Favorites within Fens Next Episodes</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=nextep.include_favorites)</onclick>
+                      </item>
+        <!-- Widgets -->
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Widgets</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Refresh Widgets on Timer</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.widget_refresh_timer_name)]</property>
+                          <property name="setting_description">Choose whether Fen refreshes widgets based on a set timer. You should set a value here if you are using random widgets from Fen, and wish for their contents to update between Kodi starts</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=widget_refresh_timer_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.widget_refresh_timer),0)</visible>
+                          <property name="setting_label">    - Show Notification after Refresh</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.widget_refresh_notification)]</property>
+                          <property name="setting_description">Enable this and Fen will show a notification whenever widgets are refreshed by the timer</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=widget_refresh_notification)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Hide Next Page Item in Widgets</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.widget_hide_next_page)]</property>
+                          <property name="setting_description">Enable this and the "Next Page" item will be hidden in Fen widgets</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=widget_hide_next_page)</onclick>
+                      </item>
+        <!-- RPDb Ratings Posters -->
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Ratings Posters</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.rpdb_api),empty_setting)</visible>
+                          <property name="setting_label">[I]Enter an RPDb API Key in Meta Accounts[/I]</property>
+                          <property name="setting_type">info</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Navigate within these settings to Meta Accounts->RPDb (Ratings Posters) and enter an API key to access this</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rpdb_api),empty_setting)</visible>
+                          <property name="setting_label">Use RPDb Ratings Posters For...</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.rpdb_enabled_name)]</property>
+                          <property name="setting_description">Choose which media types utilize that Rated Posters provided by RPDb. Choices are None, Movies, TV Shows or Both</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=rpdb_enabled)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rpdb_api),empty_setting)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rpdb_enabled),0)</visible>
+                          <property name="setting_label">    - RPDb Poster Format</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.rpdb_format_name)]</property>
+                          <property name="setting_description">Choose the format used for RPDb Posters. Choices are Default, Blocks or Rounded</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=rpdb_poster_format_choice)</onclick>
+                      </item>
+<!-- META ACCOUNTS 40 -->
+        <!-- Trakt -->
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">Trakt</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">Client ID Key</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.trakt.client)]</property>
+                          <property name="setting_description">Enter here your Trakt Client ID key</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_string&amp;setting_id=trakt.client)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">Client Secret Key</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.trakt.secret)]</property>
+                          <property name="setting_description">Enter here your Trakt Client Secret key</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_string&amp;setting_id=trakt.secret)</onclick>
+                      </item>
+        <!-- TMDb API -->
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">TMDb API</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">API Key</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.tmdb_api)]</property>
+                          <property name="setting_description">Enter here your TMDb API key</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_string&amp;setting_id=tmdb_api)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.tmdb_api),empty_setting)</visible>
+                          <property name="setting_label">    - Test API Key</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Test if your TMDb API is activated and working</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=tmdb_api_check_choice)</onclick>
+                      </item>
+        <!-- OMDb -->
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">OMDb</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">API Key</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.omdb_api)]</property>
+                          <property name="setting_description">Enter here your OMDb API key. This will allow you to utilize extra ratings information in Fens Extras window</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_string&amp;setting_id=omdb_api)</onclick>
+                      </item>
+        <!-- RPDb -->
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">RPDb (Ratings Posters)</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">API Key</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.rpdb_api)]</property>
+                          <property name="setting_description">Enter here your RPDb API key. This will allow you to utilize posters that include built in ratings information when available</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_string&amp;setting_id=rpdb_api)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rpdb_api),t0-free-rpdb)</visible>
+                          <property name="setting_label">    - Restore Default RPDb Key</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Restore default RPDb API key</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.restore_setting_default&amp;setting_id=rpdb_api)</onclick>
+                      </item>
+        <!-- GOOGLE -->
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">Google (Gemini/Gemma) AI</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">API Key</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.google_api)]</property>
+                          <property name="setting_description">Enter here your Gemini/Gemma AI API key. This will allow you to utilize the features within Fen that use AI, such as Browse AI Similar</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_string&amp;setting_id=google_api)</onclick>
+                      </item>
+        <!-- GROQ -->
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">Groq AI</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">API Key</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.groq_api)]</property>
+                          <property name="setting_description">Enter here your Groq AI API key. This will allow you to utilize the features within Fen that use AI, such as Browse AI Similar</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_string&amp;setting_id=groq_api)</onclick>
+                      </item>
+<!-- STREAMING ACCOUNTS 50 -->
+        <!-- External Scrapers -->
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">External Scrapers</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Enable</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.provider.external)]</property>
+                          <property name="setting_description">Enable this to use external scrapers. No support is provided when you choose to use external scrapers within Fen</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=provider.external)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.external),true)</visible>
+                          <property name="setting_label">Choose External Scrapers Module</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.external_scraper.name)]</property>
+                          <property name="setting_description">Choose the external scraper module to use within Fen. No support is provided when you choose to use external scrapers within Fen</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=external_scraper_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.external),true)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.external_scraper.name),empty_setting)</visible>
+                          <property name="setting_label">Open External Scraper Settings</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Open the External Scraper settings. The settings of the module chosen above will be opened</property>
+                          <onclick>back</onclick>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=open_external_scraper_settings)</onclick>
+                      </item>
+        <!-- Real Debrid -->
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Real Debrid</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.rd.token),empty_setting)</visible>
+                          <property name="setting_label">Authorize</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Authorize your Real Debrid account and use it within Fen</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=real_debrid.authenticate)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rd.token),empty_setting)</visible>
+                          <property name="setting_label">Enable</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.rd.enabled)]</property>
+                          <property name="setting_description">Enable the use of your Real Debrid account</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=rd.enabled)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rd.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.rd.enabled),true)</visible>
+                          <property name="setting_label">Revoke Authorization</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.rd.account_id)]</property>
+                          <property name="setting_description">Revoke authorization of your Real Debrid account</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=real_debrid.revoke_authentication)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rd.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.rd.enabled),true)</visible>
+                          <property name="setting_label">Add Resolved Debrid Cache to Cloud</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.store_resolved_to_cloud.real-debrid_name)]</property>
+                          <property name="setting_description">Choose which resolved media is automatically added to your Real Debrid Cloud. All media or only show packs</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=store_resolved_to_cloud.real-debrid)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rd.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.rd.enabled),true)</visible>
+                          <property name="setting_label">Search Cloud Storage</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.provider.rd_cloud)]</property>
+                          <property name="setting_description">Enable this and Fen will search your Real Debrid Cloud for media</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=provider.rd_cloud)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rd.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.rd.enabled),true)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.rd_cloud),true)</visible>
+                          <property name="setting_label">    - Filter Results by Name</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.rd_cloud.title_filter)]</property>
+                          <property name="setting_description">Enable this and Fen will perform extra name matching functions on your Real Debrid Cloud results. Will help to limit incorrect results, but may also filter some relevant results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=rd_cloud.title_filter)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rd.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.rd.enabled),true)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.rd_cloud),true)</visible>
+                          <property name="setting_label">    - Check Before Full Search</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.check.rd_cloud)]</property>
+                          <property name="setting_description">Enable this and Fen will search for results in your Real Debrid Cloud before checking other enabled scrapers</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=check.rd_cloud)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rd.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.rd.enabled),true)</visible>
+                          <property name="setting_label">Priority (Lower Number Equals Higher Priority)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.rd.priority)]</property>
+                          <property name="setting_description">Choose the order in which Real Debrid results appear in relation to any other active accounts. The lower the number, the higher the sort order</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=rd.priority)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.rd.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.rd.enabled),true)</visible>
+                          <property name="setting_label">Use alternate url</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.rd.alternate_base_url)]</property>
+                          <property name="setting_description">Enable this and Fen will use an alternate base url for RD. This may circumvent any blocks being performed</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=rd.alternate_base_url)</onclick>
+                      </item>
+        <!-- Premiumize -->
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Premiumize</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.pm.token),empty_setting)</visible>
+                          <property name="setting_label">Authorize</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Authorize your Premiumize account and use it within Fen</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=premiumize.authenticate)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.pm.token),empty_setting)</visible>
+                          <property name="setting_label">Enable</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.pm.enabled)]</property>
+                          <property name="setting_description">Enable the use of your Premiumize account</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=pm.enabled)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.pm.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.pm.enabled),true)</visible>
+                          <property name="setting_label">Revoke Authorization</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.pm.account_id)]</property>
+                          <property name="setting_description">Revoke authorization of your Premiumize account</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=premiumize.revoke_authentication)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.pm.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.pm.enabled),true)</visible>
+                          <property name="setting_label">Add Resolved Debrid Cache to Cloud</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.store_resolved_to_cloud.premiumize.me_name)]</property>
+                          <property name="setting_description">Choose which resolved media is automatically added to your Premiumize Cloud. All media or only show packs</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=store_resolved_to_cloud.premiumize.me)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.pm.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.pm.enabled),true)</visible>
+                          <property name="setting_label">Search Cloud Storage</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.provider.pm_cloud)]</property>
+                          <property name="setting_description">Enable this and Fen will search your Premiumize Cloud for media</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=provider.pm_cloud)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.pm.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.pm.enabled),true)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.pm_cloud),true)</visible>
+                          <property name="setting_label">    - Filter Results by Name</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.pm_cloud.title_filter)]</property>
+                          <property name="setting_description">Enable this and Fen will perform extra name matching functions on your Premiumize Cloud results. Will help to limit incorrect results, but may also filter some relevant results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=pm_cloud.title_filter)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.pm.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.pm.enabled),true)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.pm_cloud),true)</visible>
+                          <property name="setting_label">    - Check Before Full Search</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.check.pm_cloud)]</property>
+                          <property name="setting_description">Enable this and Fen will search for results in your Premiumize Cloud before checking other enabled scrapers</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=check.pm_cloud)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.pm.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.pm.enabled),true)</visible>
+                         <property name="setting_label">Priority (Lower Number Equals Higher Priority)</property>
+                         <property name="setting_type">numeric</property>
+                         <property name="setting_value">$INFO[Window(10000).Property(fen.pm.priority)]</property>
+                         <property name="setting_description">Choose the order in which Premiumize results appear in relation to any other active accounts. The lower the number, the higher the sort order</property>
+                         <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=pm.priority)</onclick>
+                     </item>
+        <!-- Off Cloud -->
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Off Cloud</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.oc.token),empty_setting)</visible>
+                          <property name="setting_label">Authorize</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Authorize your Off Cloud account and use it within Fen Light</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=offcloud.authenticate)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.oc.token),empty_setting)</visible>
+                          <property name="setting_label">Enable</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.oc.enabled)]</property>
+                          <property name="setting_description">Enable the use of your Off Cloud account</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=oc.enabled)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.oc.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.oc.enabled),true)</visible>
+                          <property name="setting_label">Revoke Authorization</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.oc.account_id)]</property>
+                          <property name="setting_description">Revoke authorization of your Off Cloud account</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=offcloud.revoke_authentication)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.oc.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.oc.enabled),true)</visible>
+                          <property name="setting_label">Add Resolved Debrid Cache to Cloud</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.store_resolved_to_cloud.offcloud_name)]</property>
+                          <property name="setting_description">Choose which resolved media is automatically added to your Off Cloud Cloud. All media or only show packs</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=store_resolved_to_cloud.offcloud)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.oc.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.oc.enabled),true)</visible>
+                          <property name="setting_label">Search Cloud Storage</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.provider.oc_cloud)]</property>
+                          <property name="setting_description">Enable this and Fen Light will search your Off Cloud Cloud for media</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=provider.oc_cloud)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.oc.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.oc.enabled),true)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.oc_cloud),true)</visible>
+                          <property name="setting_label">    - Filter Results by Name</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.oc_cloud.title_filter)]</property>
+                          <property name="setting_description">Enable this and Fen Light will perform extra name matching functions on your Off Cloud Cloud results. Will help to limit incorrect results, but may also filter some relevant results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=oc_cloud.title_filter)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.oc.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.oc.enabled),true)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.oc_cloud),true)</visible>
+                          <property name="setting_label">    - Check Before Full Search</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.check.oc_cloud)]</property>
+                          <property name="setting_description">Enable this and Fen Light will search for results in your Off Cloud Cloud before checking other enabled scrapers</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=check.oc_cloud)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.oc.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.oc.enabled),true)</visible>
+                          <property name="setting_label">Priority (Lower Number Equals Higher Priority)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.oc.priority)]</property>
+                          <property name="setting_description">Choose the order in which Off Cloud results appear in relation to any other active accounts. The lower the number, the higher the sort order</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=oc.priority)</onclick>
+                      </item>
+        <!-- TorBox -->
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">TorBox</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.tb.token),empty_setting)</visible>
+                          <property name="setting_label">Authorize</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Authorize your TorBox account and use it within Fen</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=torbox.authenticate)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.tb.token),empty_setting)</visible>
+                          <property name="setting_label">Enable</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.tb.enabled)]</property>
+                          <property name="setting_description">Enable the use of your TorBox account</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=tb.enabled)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.tb.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.tb.enabled),true)</visible>
+                          <property name="setting_label">Revoke Authorization</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.tb.token)]</property>
+                          <property name="setting_description">Revoke authorization of your TorBox account</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=torbox.revoke_authentication)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.tb.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.tb.enabled),true)</visible>
+                          <property name="setting_label">Add Resolved Debrid Cache to Cloud</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.store_resolved_to_cloud.torbox_name)]</property>
+                          <property name="setting_description">Choose which resolved media is automatically added to your TorBox Cloud. All media or only show packs</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=store_resolved_to_cloud.torbox)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.tb.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.tb.enabled),true)</visible>
+                          <property name="setting_label">Search Cloud Storage</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.provider.tb_cloud)]</property>
+                          <property name="setting_description">Enable this and Fen will search your TorBox Cloud for media</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=provider.tb_cloud)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.tb.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.tb.enabled),true)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.tb_cloud),true)</visible>
+                          <property name="setting_label">    - Filter Results by Name</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.tb_cloud.title_filter)]</property>
+                          <property name="setting_description">Enable this and Fen will perform extra name matching functions on your TorBox Cloud results. Will help to limit incorrect results, but may also filter some relevant results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=tb_cloud.title_filter)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.tb.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.tb.enabled),true)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.tb_cloud),true)</visible>
+                          <property name="setting_label">    - Check Before Full Search</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.check.tb_cloud)]</property>
+                          <property name="setting_description">Enable this and Fen will search for results in your TorBox Cloud before checking other enabled scrapers</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=check.tb_cloud)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.tb.token),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.tb.enabled),true)</visible>
+                          <property name="setting_label">Priority (Lower Number Equals Higher Priority)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.tb.priority)]</property>
+                          <property name="setting_description">Choose the order in which TorBox results appear in relation to any other active accounts. The lower the number, the higher the sort order</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=tb.priority)</onclick>
+                      </item>
+        <!-- Easynews -->
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Easynews</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Enable</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.provider.easynews)]</property>
+                          <property name="setting_description">Enable the use of your Easynews account</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=provider.easynews)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.easynews),true)</visible>
+                          <property name="setting_label">Login</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.easynews_user)]</property>
+                          <property name="setting_description">Enter the Login of your Easynews account</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_string&amp;setting_id=easynews_user)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.easynews),true)</visible>
+                          <property name="setting_label">Password</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.easynews_password)]</property>
+                          <property name="setting_description">Enter the Password of your Easynews account</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_string&amp;setting_id=easynews_password)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.easynews),true)</visible>
+                          <visible>![String.IsEmpty(Window(10000).Property(fen.easynews_user)) + String.IsEmpty(Window(10000).Property(fen.easynews_password))]</visible>
+                          <property name="setting_label">Filter Results by Name</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.easynews.title_filter)]</property>
+                          <property name="setting_description">Enable this and Fen will perform extra name matching functions on your Easynews results. Will help to limit incorrect results, but may also filter some relevant results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=easynews.title_filter)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.easynews),true)</visible>
+                          <visible>![String.IsEmpty(Window(10000).Property(fen.easynews_user)) + String.IsEmpty(Window(10000).Property(fen.easynews_password))]</visible>
+                          <property name="setting_label">Filter Languages</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.easynews.filter_lang)]</property>
+                          <property name="setting_description">Enable this and Fen will perform extra language filtering on your Easynews results. Will help to limit incorrect results, but may also filter some relevant results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=easynews.filter_lang)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.easynews),true)</visible>
+                          <visible>![String.IsEmpty(Window(10000).Property(fen.easynews_user)) + String.IsEmpty(Window(10000).Property(fen.easynews_password))]</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.easynews.filter_lang),true)</visible>
+                          <property name="setting_label">    - Choose Languages To Include</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.easynews.lang_filters)]</property>
+                          <property name="setting_description">Choose which languages you wish to include in Easynews results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=set_language_filter_choice&amp;filter_setting_id=easynews.lang_filters&amp;multi_choice=true)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.easynews),true)</visible>
+                          <visible>![String.IsEmpty(Window(10000).Property(fen.easynews_user)) + String.IsEmpty(Window(10000).Property(fen.easynews_password))]</visible>
+                          <property name="setting_label">Check Before Full Search</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.check.easynews)]</property>
+                          <property name="setting_description">Enable this and Fen will search for results from your Easynews service before checking other enabled scrapers</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=check.easynews)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.easynews),true)</visible>
+                          <visible>![String.IsEmpty(Window(10000).Property(fen.easynews_user)) + String.IsEmpty(Window(10000).Property(fen.easynews_password))]</visible>
+                          <property name="setting_label">Priority (Lower Number Equals Higher Priority)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.en.priority)]</property>
+                          <property name="setting_description">Choose the order in which Easynews results appear in relation to any other active accounts. The lower the number, the higher the sort order</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=en.priority)</onclick>
+                      </item>
+        <!-- Local Media Folders -->
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Local Media Folders</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Enable</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.provider.folders)]</property>
+                          <property name="setting_description">Enable the use of any local media folder locations i.e. NAS drives, HDDs etc</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=provider.folders)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.folders),true)</visible>
+                          <property name="setting_label">Set Folder Scrapers</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">empty_setting</property>
+                          <property name="setting_description">Choose this to activate a settings window allowing you to set the location of up to 5 devices containing local media</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=sources_folders_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.folders),true)</visible>
+                          <property name="setting_label">Filter Results by Name</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.folders.title_filter)]</property>
+                          <property name="setting_description">Enable this and Fen will perform extra name matching functions on your local media folders results. Will help to limit incorrect results, but may also filter some relevant results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=folders.title_filter)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.folders),true)</visible>
+                          <property name="setting_label">Check Before Full Search</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.check.folders)]</property>
+                          <property name="setting_description">Enable this and Fen will search for results from your local media folders before checking other enabled scrapers</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=check.folders)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.folders),true)</visible>
+                          <property name="setting_label">Ignore Quality and Size Filters</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.results.folders_ignore_filters)]</property>
+                          <property name="setting_description">Enable this and Fen will ignore any Quality or Size filters when processing local media folders results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=results.folders_ignore_filters)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.provider.folders),true)</visible>
+                          <property name="setting_label">Priority (Lower Number Equals Higher Priority)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.folders.priority)]</property>
+                          <property name="setting_description">Choose the order in which Media Folders results appear in relation to any other active accounts. The lower the number, the higher the sort order</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=folders.priority)</onclick>
+                      </item>
+<!-- RESULTS 60 -->
+        <!-- Display -->
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <property name="setting_label">Display</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <property name="setting_label">Scraper Timeout</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.results.timeout)]</property>
+                          <property name="setting_description">Choose the amount of time Fen will allow all scrapers to search for results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=results.timeout)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <property name="setting_label">Results Sorting</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.results.sort_order_name)]</property>
+                          <property name="setting_description">Choose the priority ordering performed by Fen before displaying source results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=results.sort_order)</onclick>
+                      </item>
+        <!-- Filtering -->
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <property name="setting_label">Filtering</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <property name="setting_label">Retry with Filters Ignored When No Results</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.results.ignore_filter_name)]</property>
+                          <property name="setting_description">Choose whether to rescrape ignoring filters when there are no results. Choices are Off, Auto or Prompt</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=results.ignore_filter)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <property name="setting_label">Filter Results by Line Speed</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.results.filter_size)]</property>
+                          <property name="setting_description">Choose the method used to filter results by their size using entered internet speed</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=results.filter_size)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.results.filter_size),true)</visible>
+                          <property name="setting_label">    - Internet Speed (Mbit/s)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.results.line_speed)]</property>
+                          <property name="setting_description">Enter here your internet line speed. It is a good idea to choose a value slightly below your true internet speed, although Fen will still reduce this value by 10% before filtering results by size</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=results.line_speed)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <property name="setting_label">Assign Playback Filters</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Choose filter settings. They can be INCLUDED or EXCLUDED</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=playback_filters_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <property name="setting_label">Custom Sort To Top</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.filter.sort_to_top_name)]</property>
+                          <property name="setting_description">Choose when to Sort results to the top. The options are NONE, SOURCE SELECT, AUTOPLAY or BOTH</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=filter.sort_to_top)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(fen.filter.sort_to_top),0)</visible>
+                          <property name="setting_label">    - Set Filters for Sort to Top</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.filter.preferred_filters)]</property>
+                          <property name="setting_description">Choose video and audio properties that will be sorted to the top of the sources list. Choose up to 5 different parameters to be used, in order of importance. "Sort to Top" settings involving Debrid Cache and Folder Scraper results will take priority over these 5 params</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=preferred_filters_choice)</onclick>
+                      </item>
+        <!-- Results Color Highlights -->
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <property name="setting_label">Results Color Highlights</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <property name="setting_label">Highlight Results Based On</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.highlight.type_name)]</property>
+                          <property name="setting_description">Choose the method used to provide highlight colors to source results. The options are PROVIDER, QUALITY, or the use of a SINGLE COLOR</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=highlight.type)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),0)</visible>
+                          <property name="setting_label">    - Real Debrid Color</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.provider.rd_highlight)]]$INFO[Window(10000).Property(fen.provider.rd_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose Real Debrid color</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=provider.rd_highlight)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),0)</visible>
+                          <property name="setting_label">    - Premiumize Color</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.provider.pm_highlight)]]$INFO[Window(10000).Property(fen.provider.pm_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose Premiumize color</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=provider.pm_highlight)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),0)</visible>
+                          <property name="setting_label">    - Off Cloud Color</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.provider.oc_highlight)]]$INFO[Window(10000).Property(fen.provider.oc_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose Off Cloud color</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=provider.oc_highlight)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),0)</visible>
+                          <property name="setting_label">    - TorBox Color</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.provider.tb_highlight)]]$INFO[Window(10000).Property(fen.provider.tb_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose TorBox color</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=provider.tb_highlight)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),0)</visible>
+                          <property name="setting_label">    - Easynews Color</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.provider.easynews_highlight)]]$INFO[Window(10000).Property(fen.provider.easynews_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose Easynews color</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=provider.easynews_highlight)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),0)</visible>
+                          <property name="setting_label">    - Debrid Cloud Color</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.provider.debrid_cloud_highlight)]]$INFO[Window(10000).Property(fen.provider.debrid_cloud_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose Debrid Cloud color</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=provider.debrid_cloud_highlight)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),0)</visible>
+                          <property name="setting_label">    - Local Media Folders Color</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.provider.folders_highlight)]]$INFO[Window(10000).Property(fen.provider.folders_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose Local Media Folders color</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=provider.folders_highlight)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),1)</visible>
+                          <property name="setting_label">    - 4K Results Color</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.scraper_4k_highlight)]]$INFO[Window(10000).Property(fen.scraper_4k_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose 4K Quality color</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=scraper_4k_highlight)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),1)</visible>
+                          <property name="setting_label">    - 1080P Results Color</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.scraper_1080p_highlight)]]$INFO[Window(10000).Property(fen.scraper_1080p_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose 1080P Quality color</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=scraper_1080p_highlight)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),1)</visible>
+                          <property name="setting_label">    - 720P Results Color</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.scraper_720p_highlight)]]$INFO[Window(10000).Property(fen.scraper_720p_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose 720P Quality color</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=scraper_720p_highlight)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),1)</visible>
+                          <property name="setting_label">    - SD Results Color</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.scraper_SD_highlight)]]$INFO[Window(10000).Property(fen.scraper_SD_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose SD Quality color</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=scraper_SD_highlight)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(60)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.highlight.type),2)</visible>
+                          <property name="setting_label">    - Single Color For All</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">[COLOR $INFO[Window(10000).Property(fen.scraper_single_highlight)]]$INFO[Window(10000).Property(fen.scraper_single_highlight)][/COLOR]</property>
+                          <property name="setting_description">Choose Single color for all results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=scraper_color_choice&amp;setting_id=scraper_single_highlight)</onclick>
+                      </item>
+<!-- PLAYBACK 70 -->
+        <!-- Playback Movies -->
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <property name="setting_label">Movies</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <property name="setting_label">Auto Play</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.auto_play_movie)]</property>
+                          <property name="setting_description">Enable this for Movies to play automatically when selected</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=auto_play_movie)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.auto_play_movie),false)</visible>
+                          <property name="setting_label">Limit Quality</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.results_quality_movie)]</property>
+                          <property name="setting_description">Choose the Quality properties allowed for source select results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=set_quality_choice&amp;setting_id=results_quality_movie)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.auto_play_movie),true)</visible>
+                          <property name="setting_label">Limit Auto Play Quality</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.autoplay_quality_movie)]</property>
+                          <property name="setting_description">Choose the Quality properties allowed for autoplay results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=set_quality_choice&amp;setting_id=autoplay_quality_movie)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <property name="setting_label">Show Credits Stinger Alert</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.stinger_alert.show)]</property>
+                          <property name="setting_description">Enable this and Fen will show an alert towards the end of a movie if the movie contains during or after credit stingers</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=stinger_alert.show)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <property name="setting_label">Automatically Resume Playback</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.auto_resume_movie_name)]</property>
+                          <property name="setting_description">Choose when Fen Light will automatically resume playback of an in-progress Movie</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=auto_resume_movie)</onclick>
+                      </item>
+        <!-- Playback Episodes -->
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <property name="setting_label">Episodes</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <property name="setting_label">Auto Play</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.auto_play_episode)]</property>
+                          <property name="setting_description">Enable this for Episodes to play automatically when selected</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=auto_play_episode)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.auto_play_episode),false)</visible>
+                          <property name="setting_label">Limit Quality</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.results_quality_episode)]</property>
+                          <property name="setting_description">Choose the Quality properties allowed for source select results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=set_quality_choice&amp;setting_id=results_quality_episode)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.auto_play_episode),true)</visible>
+                          <property name="setting_label">Limit Auto Play Quality</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.autoplay_quality_episode)]</property>
+                          <property name="setting_description">Choose the Quality properties allowed for autoplay results</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=set_quality_choice&amp;setting_id=autoplay_quality_episode)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.auto_play_episode),true)</visible>
+                          <property name="setting_label">Autoplay Next Episode</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.autoplay_next_episode)]</property>
+                          <property name="setting_description">Enable this and Fen will automatically play the next episode of a TV Show at the end of the episode currently being watched</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=autoplay_next_episode)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <property name="setting_label">Skip Intros When Avaiable</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.skip_episode_intros_name)]</property>
+                          <property name="setting_description">Choose the Intros that Fen will skip. Choices are Off, Skip Intro, Skip Recap, or Skip Both</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=skip_episode_intros)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <property name="setting_label">Automatically Resume Playback</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.auto_resume_episode_name)]</property>
+                          <property name="setting_description">Choose when Fen Light will automatically resume playback of an in-progress Episode</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_from_list&amp;setting_id=auto_resume_episode)</onclick>
+                      </item>
+        <!-- Playback Utilities -->
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <property name="setting_label">Playback Utilities</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <property name="setting_label">Limit Resolve Attempts to Selected Result</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.playback.limit_resolve)]</property>
+                          <property name="setting_description">Enable this and Fen will limit the playback attempts to only the source result chosen. If disabled, Fen will potentially try 15 results of similar properties to your chosen source result until it is able to successfully resolve and playback</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=playback.limit_resolve)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <property name="setting_label">Check Volume Before Start of Playback</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.playback.volumecheck_enabled)]</property>
+                          <property name="setting_description">Enable this and Fen will attempt to check the current level of volume within Kodi, and adjust it downwards if it is exceeding a set level</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_boolean&amp;setting_id=playback.volumecheck_enabled)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(70)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(fen.playback.volumecheck_enabled),true)</visible>
+                          <property name="setting_label">    - Set Max. Percent Starting Volume (0-100)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(fen.playback.volumecheck_percent)]</property>
+                          <property name="setting_description">Choose the maximum allowed volume level</property>
+                          <onclick>RunPlugin(plugin://plugin.video.fen/?mode=settings_manager.set_numeric&amp;setting_id=playback.volumecheck_percent)</onclick>
+                      </item>
+                </content>
+            </control>
+            <control type="group">
+                <top>930</top>
+                <left>15</left>
+                <control type="label">
+                    <top>30</top>
+                    <left>30</left>
+                    <width>200</width>
+                    <height>20</height>
+                    <font>font12</font> <!-- FEN_26 -->
+                    <textcolor>FFCCCCCC</textcolor>
+                    <label>[UPPERCASE][B]INFO: [/B][/UPPERCASE]</label>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                </control>
+                <control type="group">
+                    <top>4</top>
+                    <left>115</left>
+                    <width>1530</width>
+                    <height>70</height>
+                    <control type="textbox">
+                        <font>font12</font> <!-- FEN_26 -->
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <textcolor>FFCCCCCC</textcolor>
+                        <label>$INFO[Container(2100).ListItem.Property(setting_description)]</label>
+                        <autoscroll time="7000" delay="15000" repeat="7000">true</autoscroll>
+                        <visible>Control.HasFocus(2100)</visible>
+                    </control>
+                    <control type="textbox">
+                        <font>font12</font> <!-- FEN_26 -->
+                        <align>left</align>
+                        <aligny>center</aligny>
+                        <textcolor>FFCCCCCC</textcolor>
+                        <label>$INFO[Container(2000).ListItem.Property(setting_label),All settings related to [UPPERCASE][B],[/B][/UPPERCASE] settings]</label>
+                        <autoscroll time="7000" delay="15000" repeat="7000">true</autoscroll>
+                        <visible>Control.HasFocus(2000)</visible>
+                    </control>
+                </control>
+            </control>
+            <control type="scrollbar" id="10025">
+                <top>100</top>
+                <left>1700</left>
+                <width>10</width>
+                <height>760</height>
+                <texturesliderbackground colordiffuse="FF302F2F">fen_common/white.png</texturesliderbackground>
+                <texturesliderbar colordiffuse="FF555556">fen_common/white.png</texturesliderbar>
+                <texturesliderbarfocus colordiffuse="FFCCCCCC">fen_common/white.png</texturesliderbarfocus>
+                <onleft>2100</onleft>
+                <onright>2000</onright>
+                <showonepage>false</showonepage>
+                <orientation>vertical</orientation>
+            </control>
+        </control>
+    </controls>
+</window>
