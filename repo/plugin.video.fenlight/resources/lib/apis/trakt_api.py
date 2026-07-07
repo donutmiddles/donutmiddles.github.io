@@ -25,37 +25,20 @@ def get_trakt_all_pages(params, limit=250):
 	# Trakt now enforces pagination on /users/{id}/watched/{type} and /sync/watched/{type}
 	# (and returns only the first 100 items if no page/limit is sent). This loops every
 	# page until an empty result comes back so callers still get the full watched history.
-	# This also loops every page and preserves sort headers when callers user method='sort_by_headers'.
 	page_no = 1
 	all_results = []
 	extra_params = dict(params.get('params', {}))
-	extra_params['limit'] = min(int(extra_params.get('limit', limit)), 250)
+	extra_params['limit'] = limit
 	while True:
 		result, page_count = call_trakt(params['path'] % params.get('path_insert', ''), params=dict(extra_params), data=params.get('data'),
 										is_delete=params.get('is_delete', False), with_auth=params.get('with_auth', False), method=params.get('method'),
 										pagination=True, page_no=page_no)
 		if not result: break
-		if isinstance(result, dict) and 'data' in result:
-			sort_by = result.get('sort_by', sort_by)
-			sort_how = result.get('sort_how', sort_how)
-			page_results = resut.get('data') or []
-		else:
-			page_results = result
-		if not page_results: break
-
-		all_results.extend(page_results)
-
+		all_results.extend(result)
 		try: page_count = int(page_count)
 		except: page_count = page_no
 		if page_no >= page_count: break
 		page_no += 1
-
-		if params.get('method') == 'sort_by_headers':
-			return {
-		'sort_by': sort_by or 'title',
-		'sort_how': sort_how or 'asc',
-		'data': all_results
-		}
 	return all_results
 
 def call_trakt(path, params={}, data=None, is_delete=False, with_auth=True, method=None, pagination=False, page_no=1):
@@ -340,7 +323,7 @@ def trakt_get_hidden_items(list_type):
 	results = []
 	results_append = results.append
 	string = 'trakt_hidden_items_%s' % list_type
-	params = {'path': 'users/hidden/%s', 'path_insert': list_type, 'params': {'limit': 999, 'type': 'show'}, 'with_auth': True, 'pagination':False}
+	params = {'path': 'users/hidden/%s', 'path_insert': list_type, 'params': {'limit': 999, 'type': 'show'}, 'with_auth': True, 'pagination': False}
 	return trakt_cache.cache_trakt_object(_process, string, params)
 
 def trakt_watched_status_mark(action, media, media_id, tvdb_id=0, season=None, episode=None, key='tmdb'):
@@ -407,7 +390,7 @@ def trakt_watchlist(media_type, dummy_arg):
 
 def trakt_fetch_collection_watchlist(list_type, media_type):
 	def _process(params):
-		data = get_trakt_all_pages(params)
+		data = get_trakt(params)
 		if list_type == 'watchlist': data = [i for i in data if i['type'] == key]
 		return [{'media_ids': {'tmdb': i[key]['ids'].get('tmdb', ''), 'imdb': i[key]['ids'].get('imdb', ''), 'tvdb': i[key]['ids'].get('tvdb', '')},
 		'title': i[key]['title'], 'collected_at': i.get(collected_at), 'released': i[key].get(r_key) if i[key].get(r_key) else
@@ -418,7 +401,7 @@ def trakt_fetch_collection_watchlist(list_type, media_type):
 	collected_at = 'listed_at' if list_type == 'watchlist' else 'collected_at' if media_type == 'movie' else 'last_collected_at'
 	string = 'trakt_%s_%s' % (list_type, string_insert)
 	path = 'sync/%s/%s?extended=full'
-	params = {'path': path, 'path_insert': (list_type, url_type), 'params': {'limit': 250}, 'with_auth': True}
+	params = {'path': path, 'path_insert': (list_type, url_type), 'params': {'limit': 999}, 'with_auth': True, 'pagination': False}
 	return trakt_cache.cache_trakt_object(_process, string, params)
 
 def add_to_list(user, slug, data):
@@ -491,12 +474,12 @@ def trakt_favorites(media_type, dummy_arg):
 					for i in data]
 	media_type = 'movies' if media_type in ('movie', 'movies') else 'shows'
 	string = 'trakt_favorites_%s' % media_type
-	params = {'path': 'users/me/favorites/%s/%s', 'path_insert': (media_type, 'title'), 'params': {'limit': 250}, 'with_auth': True}
+	params = {'path': 'users/me/favorites/%s/%s', 'path_insert': (media_type, 'title'), 'with_auth': True, 'pagination': False}
 	return trakt_cache.cache_trakt_object(_process, string, params)
 
 def trakt_lists_with_media(media_type, imdb_id):
 	def _process(foo):
-		data = get_trakt_all_pages(params)
+		data = get_trakt(params)
 		result = [i for i in data if i['item_count'] > 0 and i['ids']['slug'] not in ('', 'None', None) and i['privacy'] == 'public']
 		return [kodi_utils.remove_keys(i, media_removals) for i in result]
 	media_removals = ('description', 'privacy', 'type', 'share_link', 'display_numbers', 'allow_comments', 'sort_by', 'sort_how', 'created_at', 'updated_at', 'comment_count')
@@ -505,7 +488,7 @@ def trakt_lists_with_media(media_type, imdb_id):
 	template = '[B]%02d. [I]%s - %s likes[/I]'
 	media_type = 'movies' if media_type in ('movie', 'movies') else 'shows'
 	string = 'trakt_lists_with_media_%s' % imdb_id
-	params = {'path': '%s/%s/lists/personal', 'path_insert': (media_type, imdb_id), 'params': {'limit': 250}, 'pagination': False}
+	params = {'path': '%s/%s/lists/personal', 'path_insert': (media_type, imdb_id), 'params': {'limit': 100}, 'pagination': False}
 	return cache_object(_process, string, 'foo', False, 168)
 
 def get_trakt_list_contents(list_type, user, slug, with_auth, list_id=None, sort_by='default', sort_how='default'):
@@ -516,15 +499,15 @@ def get_trakt_list_contents(list_type, user, slug, with_auth, list_id=None, sort
 		method = None if custom_sort else 'sort_by_headers'
 	if list_type == 'my_lists':
 		string = 'trakt_list_contents_%s_%s_%s' % (list_type, user, slug)
-		params = {'path': 'users/%s/lists/%s/items', 'path_insert': (user, slug), 'params': {'extended':'full', 'limit': 250}, 'method': method, 'with_auth': with_auth}
+		params = {'path': 'users/%s/lists/%s/items', 'path_insert': (user, slug), 'params': {'extended':'full', 'limit': 999}, 'method': method, 'with_auth': with_auth}
 	elif list_id is not None:
 		string = 'trakt_list_contents_%s_%s' % (list_type, list_id)
-		params = {'path': 'users/%s/lists/%s/items', 'path_insert': (user, list_id), 'params': {'extended':'full', 'limit': 250}, 'method': method}
+		params = {'path': 'users/%s/lists/%s/items', 'path_insert': (user, list_id), 'params': {'extended':'full', 'limit': 999}, 'method': method}
 	else:
 		string = 'trakt_list_contents_%s_%s_%s' % (list_type, user, slug)
-		if user == 'Trakt Official': params = {'path': 'lists/%s/items', 'path_insert': slug, 'params': {'extended':'full', 'limit': 250}, 'method': method}
-		else: params = {'path': 'users/%s/lists/%s/items', 'path_insert': (user, slug), 'params': {'extended':'full', 'limit': 250}, 'method': method, 'with_auth': with_auth}
-	data = trakt_cache.cache_trakt_object(get_trakt_all_pages, string, params)
+		if user == 'Trakt Official': params = {'path': 'lists/%s/items', 'path_insert': slug, 'params': {'extended':'full', 'limit': 999}, 'method': method}
+		else: params = {'path': 'users/%s/lists/%s/items', 'path_insert': (user, slug), 'params': {'extended':'full', 'limit': 999}, 'method': method, 'with_auth': with_auth}
+	data = trakt_cache.cache_trakt_object(get_trakt, string, params)
 	if not skip_sort:
 		if not custom_sort:
 			sort_by, sort_how = data['sort_by'], data['sort_how']
@@ -559,7 +542,7 @@ def trakt_get_lists(list_type, page_no='1'):
 	else:
 		if list_type == 'my_lists': string, path = 'trakt_my_lists', 'users/me/lists%s'
 		elif list_type == 'liked_lists': string, path = 'trakt_liked_lists', 'users/likes/lists%s'
-		params = {'path': path, 'params': {'limit': 250}, 'with_auth': True}
+		params = {'path': path, 'params': {'limit': 999}, 'pagination': False, 'with_auth': True}
 		return trakt_cache.cache_trakt_object(get_trakt, string, params)
 
 def get_trakt_list_selection(included_lists):
@@ -796,7 +779,7 @@ def trakt_official_status(media_type):
 
 def trakt_get_my_calendar(recently_aired, current_date):
 	def _process(dummy):
-		data = get_trakt_all_pages(params)
+		data = get_trakt(params)
 		data = [{'sort_title': '%s s%s e%s' % (i['show']['title'], str(i['episode']['season']).zfill(2), str(i['episode']['number']).zfill(2)),
 				'media_ids': i['show']['ids'], 'season': i['episode']['season'], 'episode': i['episode']['number'], 'first_aired': i['first_aired']} \
 									for i in data if i['episode']['season'] > 0]
@@ -804,7 +787,7 @@ def trakt_get_my_calendar(recently_aired, current_date):
 		return data
 	start, finish = trakt_calendar_days(recently_aired, current_date)
 	string = 'trakt_get_my_calendar_%s_%s' % (start, finish)
-	params = {'path': 'calendars/my/shows/%s/%s', 'path_insert': (start, finish), 'params': {'limit': 250}, 'with_auth': True}
+	params = {'path': 'calendars/my/shows/%s/%s', 'path_insert': (start, finish), 'params': {'limit': 999}, 'with_auth': True, 'pagination': False}
 	return trakt_cache.cache_trakt_object(_process, string, params)
 
 def trakt_calendar_days(recently_aired, current_date):

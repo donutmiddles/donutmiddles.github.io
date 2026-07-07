@@ -1,15 +1,3 @@
-[COLOR orange][B]Version 2.2.09[/B][/COLOR]
-- Fixed Trakt's Drop function from a broken state following intrudictions in 2.2.06
-
-[COLOR orange][B]Version 2.2.08[/B][/COLOR]
-- Fixed some Trakt syntax bugs.
-
-[COLOR orange][B]Version 2.2.07[/B][/COLOR]
-- Corrected changelog color.
-
-[COLOR orange][B]Version 2.2.06[/B][/COLOR]
-- Added some additional Trakt endpoint fixes to be compatible with their June/July 2026 API updates and limitations.
-
 [COLOR orange][B]Version 2.2.05[/B][/COLOR]
 - Fixed Trakt list contents not appearing from Next Episodes and Watched [incorporated ReaLx3m's trakt_api.py fix]. Clear Trakt cache if you experienced this issue. Updated addon provider as I will handle changes from now on should there need to be any. As-is, this is working quite well now.
 
