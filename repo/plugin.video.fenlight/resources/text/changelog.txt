@@ -1,3 +1,6 @@
+[COLOR orange][B]Version 2.2.09[/B][/COLOR]
+- Fixed Trakt's Drop function from a broken state following intrudictions in 2.2.06
+
 [COLOR orange][B]Version 2.2.08[/B][/COLOR]
 - Fixed some Trakt syntax bugs.
 

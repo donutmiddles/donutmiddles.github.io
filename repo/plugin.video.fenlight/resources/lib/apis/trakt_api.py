@@ -333,14 +333,14 @@ def trakt_get_hidden_items(list_type):
 	def _get_trakt_ids(item):
 		results_append(get_trakt_tvshow_id(item['show']['ids']))
 	def _process(params):
-		data = get_trakt_all_pages(params)
+		data = get_trakt(params)
 		threads = TaskPool().tasks(_get_trakt_ids, data, min(len(data), settings.max_threads()))
 		[i.join() for i in threads]
 		return results
 	results = []
 	results_append = results.append
 	string = 'trakt_hidden_items_%s' % list_type
-	params = {'path': 'users/hidden/%s', 'path_insert': list_type, 'params': {'limit': 250, 'type': 'show'}, 'with_auth': True}
+	params = {'path': 'users/hidden/%s', 'path_insert': list_type, 'params': {'limit': 999, 'type': 'show'}, 'with_auth': True, 'pagination':False}
 	return trakt_cache.cache_trakt_object(_process, string, params)
 
 def trakt_watched_status_mark(action, media, media_id, tvdb_id=0, season=None, episode=None, key='tmdb'):
