@@ -33,11 +33,15 @@ def log(message, level=xbmc.LOGINFO):
     xbmc.log("[%s] %s" % (ADDON_ID, message), level)
 
 
+def show_ok(message):
+    xbmcgui.Dialog().ok(ADDON_NAME, message)
+
+
 def install_advancedsettings():
     if not xbmcvfs.exists(SOURCE_FILE):
         msg = "Bundled advancedsettings.xml was not found."
         log(msg, xbmc.LOGERROR)
-        xbmcgui.Dialog().ok(ADDON_NAME, msg)
+        show_ok(msg)
         return
 
     if xbmcvfs.exists(DEST_FILE):
@@ -46,33 +50,31 @@ def install_advancedsettings():
         if not xbmcvfs.copy(DEST_FILE, backup_file):
             msg = "Could not back up the existing advancedsettings.xml file."
             log(msg, xbmc.LOGERROR)
-            xbmcgui.Dialog().ok(ADDON_NAME, msg)
+            show_ok(msg)
             return
 
         overwrite = xbmcgui.Dialog().yesno(
             ADDON_NAME,
-            "An existing advancedsettings.xml file was found.",
-            "A backup has been created.",
-            "Do you want to overwrite it with the bundled file?"
+            "Existing advancedsettings.xml found.\n\nA backup was created.\n\nOverwrite it now?",
+            "Cancel",
+            "Install"
         )
 
         if not overwrite:
-            notify("Install cancelled. Existing file was left unchanged.")
+            notify("Install cancelled.")
             log("Install cancelled by user.")
             return
 
     if not xbmcvfs.copy(SOURCE_FILE, DEST_FILE):
         msg = "Could not copy advancedsettings.xml to the Kodi profile folder."
         log(msg, xbmc.LOGERROR)
-        xbmcgui.Dialog().ok(ADDON_NAME, msg)
+        show_ok(msg)
         return
 
     log("advancedsettings.xml installed to %s" % DEST_FILE)
 
-    xbmcgui.Dialog().ok(
-        ADDON_NAME,
-        "advancedsettings.xml has been installed.",
-        "Restart Kodi for the changes to take effect."
+    show_ok(
+        "advancedsettings.xml installed.\n\nRestart Kodi for changes to take effect."
     )
 
 

@@ -1,3 +1,7 @@
+v1.0.1
+- Corrected the button coding
+- Complete without erroring.
+
 v1.0.0
 - Initial release.
 - Installs bundled advancedsettings.xml to the active Kodi profile.
