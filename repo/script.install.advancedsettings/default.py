@@ -13,12 +13,27 @@ ADDON = xbmcaddon.Addon()
 ADDON_ID = ADDON.getAddonInfo("id")
 ADDON_NAME = ADDON.getAddonInfo("name")
 
-SOURCE_FILE = xbmcvfs.translatePath(
+ADDON_PATH = xbmcvfs.translatePath(ADDON.getAddonInfo("path"))
+
+DATA_DIR = xbmcvfs.translatePath(
     os.path.join(
-        ADDON.getAddonInfo("path"),
+        ADDON_PATH,
         "resources",
-        "data",
-        "advancedsettings.xml"
+        "data"
+    )
+)
+
+SOURCE_UNIVERSAL = xbmcvfs.translatePath(
+    os.path.join(
+        DATA_DIR,
+        "advancedsettings.xml.universal"
+    )
+)
+
+SOURCE_SHIELD = xbmcvfs.translatePath(
+    os.path.join(
+        DATA_DIR,
+        "advancedsettings.xml.shield"
     )
 )
 
@@ -37,44 +52,79 @@ def show_ok(message):
     xbmcgui.Dialog().ok(ADDON_NAME, message)
 
 
+def choose_source_file():
+    choice = xbmcgui.Dialog().select(
+        ADDON_NAME,
+        [
+            "NVIDIA Shield",
+            "Universal",
+            "Cancel"
+        ]
+    )
+
+    if choice == -1 or choice == 2:
+        return None, None
+
+    if choice == 0:
+        return SOURCE_SHIELD, "NVIDIA Shield"
+
+    return SOURCE_UNIVERSAL, "Universal"
+
+
+def backup_existing_file():
+    if not xbmcvfs.exists(DEST_FILE):
+        return True
+
+    backup_file = DEST_FILE + ".bak-" + time.strftime("%Y%m%d-%H%M%S")
+
+    if not xbmcvfs.copy(DEST_FILE, backup_file):
+        msg = "Could not back up the existing advancedsettings.xml file."
+        log(msg, xbmc.LOGERROR)
+        show_ok(msg)
+        return False
+
+    overwrite = xbmcgui.Dialog().yesno(
+        ADDON_NAME,
+        "Backup created.\n\nOverwrite existing advancedsettings.xml?",
+        "Cancel",
+        "Install"
+    )
+
+    if not overwrite:
+        notify("Install cancelled.")
+        log("Install cancelled by user.")
+        return False
+
+    return True
+
+
 def install_advancedsettings():
-    if not xbmcvfs.exists(SOURCE_FILE):
-        msg = "Bundled advancedsettings.xml was not found."
+    source_file, profile_name = choose_source_file()
+
+    if not source_file:
+        notify("Install cancelled.")
+        log("Install cancelled before profile selection.")
+        return
+
+    if not xbmcvfs.exists(source_file):
+        msg = "%s advancedsettings file was not found." % profile_name
         log(msg, xbmc.LOGERROR)
         show_ok(msg)
         return
 
-    if xbmcvfs.exists(DEST_FILE):
-        backup_file = DEST_FILE + ".bak-" + time.strftime("%Y%m%d-%H%M%S")
+    if not backup_existing_file():
+        return
 
-        if not xbmcvfs.copy(DEST_FILE, backup_file):
-            msg = "Could not back up the existing advancedsettings.xml file."
-            log(msg, xbmc.LOGERROR)
-            show_ok(msg)
-            return
-
-        overwrite = xbmcgui.Dialog().yesno(
-            ADDON_NAME,
-            "Existing advancedsettings.xml found.\n\nA backup was created.\n\nOverwrite it now?",
-            "Cancel",
-            "Install"
-        )
-
-        if not overwrite:
-            notify("Install cancelled.")
-            log("Install cancelled by user.")
-            return
-
-    if not xbmcvfs.copy(SOURCE_FILE, DEST_FILE):
+    if not xbmcvfs.copy(source_file, DEST_FILE):
         msg = "Could not copy advancedsettings.xml to the Kodi profile folder."
         log(msg, xbmc.LOGERROR)
         show_ok(msg)
         return
 
-    log("advancedsettings.xml installed to %s" % DEST_FILE)
+    log("%s advancedsettings.xml installed to %s" % (profile_name, DEST_FILE))
 
     show_ok(
-        "advancedsettings.xml installed.\n\nRestart Kodi for changes to take effect."
+        "%s advancedsettings.xml installed.\n\nRestart Kodi for changes to take effect." % profile_name
     )
 
 

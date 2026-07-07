@@ -1,0 +1,131 @@
+<advancedsettings version="1.0">
+
+    <!-- Startup -->
+    <splash>false</splash>
+    <!-- Disable Kodi splash screen for slightly faster startup -->
+
+    <!--
+        Kodi Omega / v21+ cache settings
+
+        These advancedsettings.xml cache tags are deprecated/ignored in Kodi Omega.
+        Configure cache at:
+
+        Settings > Services > Caching
+
+        Universal high-bitrate playback baseline:
+        - Buffer mode: Buffer all network filesystems
+        - Memory size: device-dependent
+            * Low-memory devices: 64-128 MB
+              Examples: older Android TV boxes, older Fire TV sticks,
+              1-2 GB RAM streaming sticks, low-end tablets.
+
+            * Midrange devices: 128-256 MB
+              Examples: newer 2 GB RAM streaming sticks, many Google TV /
+              Android TV boxes, Raspberry Pi-class clients, lightweight mini PCs.
+
+            * Strong clients: 256-512 MB
+              Examples: Nvidia Shield TV Pro, high-end streaming boxes,
+              modern mini PCs / HTPCs, Raspberry Pi 5 with ample RAM.
+
+            * Avoid oversized cache values just because RAM exists.
+              Leave enough memory for Kodi, the skin, add-ons, subtitles,
+              artwork, OS background services, and decoder overhead.
+
+        - Read factor: Adaptive if available, otherwise 4x-5x
+        - Chunk size: 256 KB first; test 512 KB only if needed
+
+        Historical cache block retained for reference only:
+
+        <cache>
+            <memorysize>536870912</memorysize>
+            <buffermode>1</buffermode>
+            <readfactor>5</readfactor>
+        </cache>
+    -->
+
+    <!-- Network / HTTP / NFS behavior -->
+    <network>
+        <curlclienttimeout>20</curlclienttimeout>
+        <!-- Seconds before Kodi gives up on an unresponsive HTTP/HTTPS request -->
+
+        <curllowspeedtime>20</curllowspeedtime>
+        <!-- Seconds a transfer may remain below Kodi's low-speed threshold before being treated as failed -->
+
+        <curlretries>2</curlretries>
+        <!-- Retry failed curl transfers twice before giving up -->
+
+        <curlkeepaliveinterval>30</curlkeepaliveinterval>
+        <!-- Enable TCP keepalive probes for curl-supported connections -->
+
+        <!--
+            IPv6 troubleshooting
+
+            Leave this omitted by default.
+            Enable only if a specific device, operating system, router,
+            DNS path, or ISP has broken IPv6 behavior.
+
+            <disableipv6>true</disableipv6>
+        -->
+
+        <!--
+            HTTP/2 troubleshooting
+
+            Leave this omitted by default.
+            Enable only if Kodi playback is unstable with a specific HTTP/2 server,
+            reverse proxy, add-on, or CDN path.
+
+            <disablehttp2>true</disablehttp2>
+        -->
+
+        <nfstimeout>10</nfstimeout>
+        <!-- NFS timeout in seconds. Applies to Kodi's internal NFS client. -->
+
+        <nfsretries>2</nfsretries>
+        <!-- Number of NFS retries before giving up. Applies to Kodi's internal NFS client. -->
+    </network>
+
+    <!-- Artwork / texture cache quality -->
+    <fanartres>1080</fanartres>
+    <!-- 2160 is appropriate for 4K fanart on strong clients. Kodi default is 1080. -->
+
+    <imageres>1080</imageres>
+    <!-- 1080 is a safer universal value for posters/thumbs across weaker and stronger devices. -->
+
+    <imagequalityjpeg>4</imagequalityjpeg>
+    <!-- Kodi default compromise between image quality and thumbnail/cache size. Use 0-3 for higher quality/larger cache. -->
+
+    <!-- Samba / SMB behavior -->
+    <samba>
+        <clienttimeout>30</clienttimeout>
+        <!-- SMB client timeout in seconds -->
+
+        <statfiles>true</statfiles>
+        <!--
+            true allows Kodi to stat files normally.
+            If browsing very large SMB directories is slow, testing false may improve listing speed.
+            For HTTP-based playback, this usually has little impact.
+        -->
+    </samba>
+
+    <!--
+        Android audio workaround
+
+        Enable only on Android devices that actually show passthrough drift,
+        delayed audio start, or audio sink weirdness.
+
+        <audio>
+            <superviseaudiodelay>true</superviseaudiodelay>
+            <maxpassthroughoffsyncduration>25</maxpassthroughoffsyncduration>
+        </audio>
+    -->
+
+    <!-- Playback controls / watched status -->
+    <video>
+        <playcountminimumpercent>95</playcountminimumpercent>
+        <!-- Mark video watched after 95% completion -->
+
+        <subsdelayrange>240</subsdelayrange>
+        <!-- Allows subtitle delay adjustment up to +/- 240 seconds -->
+    </video>
+
+</advancedsettings>

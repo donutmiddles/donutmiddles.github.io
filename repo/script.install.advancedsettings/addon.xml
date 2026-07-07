@@ -2,7 +2,7 @@
 <addon id="script.install.advancedsettings"
        name="AdvancedSettings Installer"
        provider-name="donutmiddles"
-       version="1.0.1">
+       version="1.0.2">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
     </requires>
