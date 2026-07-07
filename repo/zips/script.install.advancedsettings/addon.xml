@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.install.advancedsettings"
+       name="AdvancedSettings Installer"
+       provider-name="donutmiddles"
+       version="1.0.0">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+    </requires>
+
+    <extension point="xbmc.python.script" library="default.py">
+        <provides>executable</provides>
+    </extension>
+
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Installs a preconfigured advancedsettings.xml file to the active Kodi profile.</summary>
+        <description lang="en_GB">This add-on backs up any existing advancedsettings.xml file, copies the bundled advancedsettings.xml file into the active Kodi profile directory, and reminds the user to restart Kodi. For Kodi Omega and newer, cache size and read factor should be configured in Settings &gt; Services &gt; Caching.</description>
+        <platform>all</platform>
+        <license>MIT</license>
+        <assets>
+            <icon>resources/media/advancedsettings_icon_01.png</icon>
+            <fanart>resources/media/advancedsettings_fanart_01.jpg</fanart>
+        </assets>
+    </extension>
+</addon>

@@ -1,0 +1,5 @@
+v1.0.0
+- Initial release.
+- Installs bundled advancedsettings.xml to the active Kodi profile.
+- Creates a timestamped backup of any existing advancedsettings.xml file.
+- Prompts before overwriting an existing advancedsettings.xml file.

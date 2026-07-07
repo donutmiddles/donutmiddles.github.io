@@ -1,0 +1,145 @@
+<advancedsettings version="1.0">
+
+    <!-- Startup -->
+    <splash>false</splash> <!-- Disable Kodi splash screen for slightly faster startup -->
+
+    <!-- Playback progress / watched status -->
+    <playcountminimumpercent>95</playcountminimumpercent> <!-- Mark video watched after 95% completion -->
+
+    <!-- Video decoding -->
+    <skiploopfilter>0</skiploopfilter>
+    <!--
+        H.264 loop filter behavior.
+        0 is Kodi's default and is safe for best compatibility.
+        Higher values may reduce CPU load but can reduce image quality.
+        For Shield TV Pro / hardware decoding, 0 is the correct conservative choice.
+    -->
+
+    <!--
+        Kodi Omega / v21+ cache settings
+
+        These advancedsettings.xml cache tags are deprecated/ignored in Kodi Omega.
+        Keep this block only as documentation of intended values.
+
+        Configure instead at:
+        Settings > Services > Caching
+
+        Suggested Shield TV Pro baseline:
+        - Buffer mode: network/internet filesystems as appropriate
+        - Memory size: 536870912 bytes / 512 MB
+        - Read factor: Adaptive or 4x-5x
+        - Chunk size: 256 KB or 512 KB for high-bitrate UHD testing
+
+        Historical cache block retained for reference only:
+
+        <cache>
+            <memorysize>536870912</memorysize>
+            <buffermode>1</buffermode>
+            <readfactor>5</readfactor>
+        </cache>
+    -->
+
+    <!-- Network / HTTP / NFS behavior -->
+    <network>
+        <curlclienttimeout>20</curlclienttimeout>
+        <!-- Seconds before Kodi gives up on an unresponsive HTTP/HTTPS request -->
+
+        <curllowspeedtime>20</curllowspeedtime>
+        <!-- Seconds a transfer may remain below Kodi's low-speed threshold before being treated as failed -->
+
+        <curlretries>2</curlretries>
+        <!-- Retry failed curl transfers twice before giving up -->
+
+        <curlkeepaliveinterval>30</curlkeepaliveinterval>
+        <!-- Keep HTTP connections alive during longer sessions where supported -->
+
+        <disableipv6>false</disableipv6>
+        <!-- Keep IPv6 enabled. Only set true if your network has broken IPv6 behavior. -->
+
+        <disablehttp2>true</disablehttp2>
+        <!--
+            Force Kodi/curl to avoid HTTP/2.
+            Useful if Kodi + Jellyfin/nginx playback has shown HTTP/2-related instability.
+            Your nginx can still use HTTP/2 for other clients.
+        -->
+
+        <nfstimeout>10</nfstimeout>
+        <!-- NFS timeout in seconds. Applies to Kodi's internal NFS client. -->
+
+        <nfsretries>2</nfsretries>
+        <!-- Number of NFS retries before giving up. Applies to Kodi's internal NFS client. -->
+    </network>
+
+    <!-- JSON-RPC -->
+    <jsonrpc>
+        <compactoutput>true</compactoutput>
+        <!-- true is more efficient; false is only useful when manually reading/debugging JSON-RPC output -->
+
+        <tcpport>9999</tcpport>
+        <!-- Custom JSON-RPC TCP port. Kodi default is usually 9090. -->
+    </jsonrpc>
+
+    <!--
+        Video library settings intentionally omitted/commented out.
+
+        With Jellyfin for Kodi / Jellyfin add-on workflows, Kodi's native scanner,
+        clean-on-update behavior, imported watched state, and resume-point handling
+        can conflict with Jellyfin-managed library state.
+    -->
+
+    <!-- Artwork / texture cache quality -->
+    <fanartres>2160</fanartres>
+    <!-- Maximum fanart resolution. 2160 is appropriate for a 4K UI, but uses more texture cache storage. -->
+
+    <imageres>2160</imageres>
+    <!-- Maximum resolution for posters/thumbs/other images. Lower to 1080 if Shield UI becomes sluggish. -->
+
+    <imagequalityjpeg>3</imagequalityjpeg>
+    <!--
+        JPEG texture quality:
+        0 = lowest, 3 = highest.
+        3 favors visual quality over storage/cache size.
+    -->
+
+    <!-- GUI behavior -->
+    <gui>
+        <autoscroll>true</autoscroll>
+        <!-- Enable autoscroll for long titles, descriptions, and list text -->
+    </gui>
+
+    <!-- Samba / SMB behavior -->
+    <samba>
+        <clienttimeout>30</clienttimeout>
+        <!-- SMB client timeout in seconds -->
+
+        <statfiles>true</statfiles>
+        <!--
+            true allows Kodi to stat files normally.
+            If browsing very large SMB directories is slow, testing false may improve listing speed.
+            For Jellyfin HTTP playback, this usually has little impact.
+        -->
+    </samba>
+
+    <!-- Android audio workaround -->
+    <audio>
+        <superviseaudiodelay>true</superviseaudiodelay>
+        <!--
+            Android-specific audio sink supervision.
+            Keep only if it improves Shield audio sync/dropout behavior.
+            Remove if audio is already perfectly stable.
+        -->
+
+        <maxpassthroughoffsyncduration>25</maxpassthroughoffsyncduration>
+        <!--
+            Conservative passthrough sync tolerance.
+            Useful only if using passthrough and occasionally seeing sync drift.
+        -->
+    </audio>
+
+    <!-- Playback controls -->
+    <video>
+        <subsdelayrange>240</subsdelayrange>
+        <!-- Allows subtitle delay adjustment up to +/- 240 seconds -->
+    </video>
+
+</advancedsettings>
