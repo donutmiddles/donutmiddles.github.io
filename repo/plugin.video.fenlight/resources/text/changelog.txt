@@ -1,5 +1,5 @@
-[COLOR dodgerblue][B]Version 2.2.04[/B][/COLOR]
-- Fixed Trakt list contents not appearing from Next Episodes and Watched [incorporated ReaLx3m's trakt_api.py fix]. Clear Trakt cache if you experienced this issue.
+[COLOR rockiespurple][B]Version 2.2.05[/B][/COLOR]
+- Fixed Trakt list contents not appearing from Next Episodes and Watched [incorporated ReaLx3m's trakt_api.py fix]. Clear Trakt cache if you experienced this issue. Updated addon provider as I will handle changes from now on should there need to be any. As-is, this is working quite well now.
 
 [COLOR dodgerblue][B]Version 2.2.04[/B][/COLOR]
 - Fixed Trakt list contents not appearing from Trakt list search. Clear Trakt cache if you experienced this issue.
