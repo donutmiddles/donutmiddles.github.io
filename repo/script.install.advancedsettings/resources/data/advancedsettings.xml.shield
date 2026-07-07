@@ -1,4 +1,5 @@
 <advancedsettings version="1.0">
+    <!-- Crafted by donutmiddles with assistance from GPT-5.5 High intelligence model 7.7.26 -->
 
     <!-- Startup -->
     <splash>false</splash>
@@ -14,18 +15,23 @@
 
         Shield TV Pro / Jellyfin / NGINX high-bitrate playback baseline:
         - Buffer mode: Buffer all network filesystems
+
           For Jellyfin through NGINX, playback is typically HTTP/HTTPS.
           This mode also covers SMB/NFS if Kodi is ever used directly with network shares.
 
         - Memory size: 256-512 MB
+
           512 MB is reasonable on Shield TV Pro if Kodi has healthy free memory.
           Use 256 MB if running a heavy skin, many add-ons, or if Android shows memory pressure.
 
         - Read factor: Adaptive if available, otherwise 4x-5x
 
-        - Chunk size: 256 KB first
-          Test 512 KB only if very high-bitrate UHD remux playback still shows cache starvation,
+        - Chunk size: 512 KB first
+
+          Test 1 MB only if very high-bitrate UHD remux playback still shows cache starvation,
           slow refill, or buffering despite a stable wired network.
+
+          Use 256 KB only if 512 KB causes instability, stalls, or excessive burstiness.
 
         Historical cache block retained for reference only:
 
@@ -36,19 +42,52 @@
         </cache>
     -->
 
+    <!-- Samba / SMB behavior -->
+    <samba>
+        <clienttimeout>30</clienttimeout>
+        <!-- SMB client timeout in seconds -->
+
+        <statfiles>true</statfiles>
+        <!--
+            true allows Kodi to stat files normally.
+            If browsing very large SMB directories is slow, testing false may improve listing speed.
+            For Jellyfin-over-HTTP playback, this usually has little impact.
+        -->
+    </samba>
+
     <!-- Network / HTTP / NFS behavior -->
     <network>
-        <curlclienttimeout>20</curlclienttimeout>
-        <!-- Seconds before Kodi gives up on an unresponsive HTTP/HTTPS request -->
+        <curlclienttimeout>30</curlclienttimeout>
+        <!--
+            Seconds before Kodi gives up on an unresponsive HTTP/HTTPS request.
+
+            30 seconds gives Jellyfin, NGINX, remote storage, or a temporarily busy server
+            more tolerance before Kodi considers the request failed.
+        -->
 
         <curllowspeedtime>20</curllowspeedtime>
-        <!-- Seconds a transfer may remain below Kodi's low-speed threshold before being treated as failed -->
+        <!--
+            Seconds a transfer may remain below Kodi's low-speed threshold before being
+            treated as failed.
+
+            This helps Kodi fail stalled HTTP/HTTPS transfers instead of waiting indefinitely.
+        -->
 
         <curlretries>2</curlretries>
-        <!-- Retry failed curl transfers twice before giving up -->
+        <!--
+            Retry failed curl transfers twice before giving up.
+
+            Useful for occasional transient HTTP/HTTPS failures through Jellyfin, NGINX,
+            reverse proxies, or remote network paths.
+        -->
 
         <curlkeepaliveinterval>30</curlkeepaliveinterval>
-        <!-- Enable TCP keepalive probes for curl-supported connections -->
+        <!--
+            Enable TCP keepalive probes for curl-supported connections.
+
+            Helps long-running HTTP/HTTPS streams stay alive across network devices,
+            proxies, NAT, and reverse-proxy paths.
+        -->
 
         <!--
             IPv6 troubleshooting
@@ -65,58 +104,106 @@
 
             This is intentionally enabled for Shield + Jellyfin + NGINX reverse proxy use
             when HTTP/1.1 has proven more stable than HTTP/2 for playback.
+
             Remove or comment out if your Jellyfin/NGINX/Kodi path is stable over HTTP/2.
         -->
 
-        <nfstimeout>10</nfstimeout>
-        <!-- NFS timeout in seconds. Applies only to Kodi's internal NFS client. -->
+        <nfstimeout>30</nfstimeout>
+        <!--
+            NFS access timeout in seconds.
 
-        <nfsretries>2</nfsretries>
-        <!-- Number of NFS retries before giving up. Applies only to Kodi's internal NFS client. -->
+            30 seconds gives a NAS, Jellyfin media path, or busy storage backend more
+            tolerance during wake-up, disk spin-up, temporary I/O delay, or heavy scan/import load.
+
+            Applies only to Kodi's internal NFS client.
+        -->
+
+        <nfsretries>0</nfsretries>
+        <!--
+            Disable extra Kodi-level NFS retries after the timeout is reached.
+
+            Kodi treats 0 as disabled and -1 as unlimited retries.
+
+            For high-bitrate playback, this avoids long repeated retry loops if the NFS server,
+            NAS, disk, or network path becomes genuinely unresponsive.
+
+            The intent is: wait long enough once, then fail cleanly rather than hanging through
+            repeated retries.
+
+            Applies only to Kodi's internal NFS client.
+        -->
     </network>
 
     <!-- Artwork / texture cache quality -->
-    <fanartres>2160</fanartres>
-    <!-- 2160 is appropriate for 4K fanart on Shield TV Pro / strong clients. Kodi default is 1080. -->
-
-    <imageres>2160</imageres>
-    <!-- 2160 favors high-quality posters/thumbs on Shield TV Pro. Use 1080 if the UI becomes sluggish. -->
-
-    <imagequalityjpeg>0</imagequalityjpeg>
-    <!-- Maximum JPEG artwork quality. Larger texture cache; best visual quality. Kodi default is 4. -->
-
-    <!-- Samba / SMB behavior -->
-    <samba>
-        <clienttimeout>30</clienttimeout>
-        <!-- SMB client timeout in seconds -->
-
-        <statfiles>true</statfiles>
-        <!--
-            true allows Kodi to stat files normally.
-            If browsing very large SMB directories is slow, testing false may improve listing speed.
-            For Jellyfin-over-HTTP playback, this usually has little impact.
-        -->
-    </samba>
-
+    <fanartres>1080</fanartres>
     <!--
-        Android / Shield audio workaround
+        1080 is the safest Shield / Android TV value.
 
-        Enable only if the Shield shows passthrough drift, delayed audio start,
-        audio sink weirdness, or recurring A/V sync correction behavior.
-
-        <audio>
-            <superviseaudiodelay>true</superviseaudiodelay>
-            <maxpassthroughoffsyncduration>25</maxpassthroughoffsyncduration>
-        </audio>
+        Use 2160 only if you confirm Android TV is actually caching artwork above 1080
+        and the Kodi UI remains smooth.
     -->
+
+    <imageres>1080</imageres>
+    <!--
+        1080 improves poster/thumb quality over Kodi's lower default without pushing as hard as 2160.
+
+        Use 720 if the UI becomes sluggish or storage pressure becomes an issue.
+    -->
+
+    <imagequalityjpeg>2</imagequalityjpeg>
+    <!--
+        Higher artwork quality than Kodi default 4, but less extreme than 0.
+
+        Use 0 only if maximum artwork quality matters more than texture cache size,
+        storage usage, and UI responsiveness.
+    -->
+
+    <!-- Android / passthrough stability -->
+    <audio>
+        <maxpassthroughoffsyncduration>80</maxpassthroughoffsyncduration>
+        <!--
+            Android passthrough resync tolerance.
+
+            Helps Kodi tolerate small passthrough clock drift before forcing a resync.
+            Too small a value can contribute to rare video stutter with passthrough audio.
+
+            80 ms is a conservative Shield-friendly value.
+            100 ms is the maximum useful value.
+        -->
+    </audio>
 
     <!-- Playback controls / watched status -->
     <video>
+        <fpsdetect>1</fpsdetect>
+        <!--
+            FPS detection method for video playback.
+
+            0 = trust the FPS reported by the codec/container.
+            1 = recalculate FPS from video timestamps when frame timing appears uniform.
+            2 = always recalculate FPS from video timestamps.
+
+            Keep at 1 for Shield/high-bitrate playback. It gives Kodi a chance to correct
+            inaccurate container-reported FPS while avoiding the more aggressive
+            always-recalculate behavior of 2.
+
+            This can help Kodi choose correct playback timing and display refresh behavior,
+            especially when "Adjust display refresh rate" is enabled.
+        -->
+
         <playcountminimumpercent>95</playcountminimumpercent>
         <!-- Mark video watched after 95% completion -->
 
+        <ignoresecondsatstart>180</ignoresecondsatstart>
+        <!-- Time to ignore at the start of a video before making a resume point -->
+
+        <ignorepercentatend>8</ignorepercentatend>
+        <!-- Percent at the end of a video to ignore to prevent making a resume point -->
+
         <subsdelayrange>240</subsdelayrange>
         <!-- Allows subtitle delay adjustment up to +/- 240 seconds -->
+
+        <subtitleverticalmargin>120</subtitleverticalmargin>
+        <!-- Optional quality-of-life subtitle positioning for large TV playback -->
     </video>
 
 </advancedsettings>
