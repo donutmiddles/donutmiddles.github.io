@@ -1,5 +1,5 @@
-[COLOR darkgoldenrod]GOD BLESS HIM AND KEEP HIM SAFE.[/COLOR]
-
+[COLOR dodgerblue][B]Version 2.2.04[/B][/COLOR]
+- Fixed Trakt list contents not appearing from Next Episodes and Watched [incorporated ReaLx3m's trakt_api.py fix]. Clear Trakt cache if you experienced this issue.
 
 [COLOR dodgerblue][B]Version 2.2.04[/B][/COLOR]
 - Fixed Trakt list contents not appearing from Trakt list search. Clear Trakt cache if you experienced this issue.
