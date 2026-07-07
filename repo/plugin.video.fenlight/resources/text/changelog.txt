@@ -1,4 +1,7 @@
 [COLOR orange][B]Version 2.2.06[/B][/COLOR]
+- Corrected changelog color.
+
+[COLOR orange][B]Version 2.2.06[/B][/COLOR]
 - Added some additional Trakt endpoint fixes to be compatible with their June/July 2026 API updates and limitations.
 
 [COLOR orange][B]Version 2.2.05[/B][/COLOR]
