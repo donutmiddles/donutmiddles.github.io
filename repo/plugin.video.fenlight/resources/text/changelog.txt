@@ -1,4 +1,7 @@
-[COLOR orange][B]Version 2.2.06[/B][/COLOR]
+[COLOR orange][B]Version 2.2.08[/B][/COLOR]
+- Fixed some Trakt syntax bugs.
+
+[COLOR orange][B]Version 2.2.07[/B][/COLOR]
 - Corrected changelog color.
 
 [COLOR orange][B]Version 2.2.06[/B][/COLOR]
