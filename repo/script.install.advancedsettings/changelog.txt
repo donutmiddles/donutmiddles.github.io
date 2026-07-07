@@ -1,8 +1,12 @@
+v1.0.3
+- Refined both the XML files with additional tweaks/formatting enhancements.
+- Updated addon README.md to reflect its newer state.
+
 v1.0.2
 - Updated this to allow selection between different versions of the file depending on device.
 
 v1.0.1
-- Corrected the button coding
+- Corrected the button coding.
 - Complete without erroring.
 
 v1.0.0

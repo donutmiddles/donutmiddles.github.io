@@ -667,7 +667,7 @@
         <description lang="en_NZ">FENtastic Helper for the FENtastic Skin.</description>
         <description lang="en_US">FENtastic Helper for the FENtastic Skin.</description>
     </extension>
-</addon><addon id="script.install.advancedsettings" name="AdvancedSettings Installer" provider-name="donutmiddles" version="1.0.2">
+</addon><addon id="script.install.advancedsettings" name="AdvancedSettings Installer" provider-name="donutmiddles" version="1.0.3">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
     </requires>
@@ -677,8 +677,8 @@
     </extension>
 
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Installs a preconfigured advancedsettings.xml file to the active Kodi profile.</summary>
-        <description lang="en_GB">This add-on backs up any existing advancedsettings.xml file, copies the bundled advancedsettings.xml file into the active Kodi profile directory, and reminds the user to restart Kodi. For Kodi Omega and newer, cache size and read factor should be configured in Settings &gt; Services &gt; Caching.</description>
+        <summary lang="en_GB">Installs Universal or NVIDIA Shield advancedsettings.xml profiles.</summary>
+        <description lang="en_GB">Choose a Universal or NVIDIA Shield profile, back up any existing advancedsettings.xml file, and install the selected profile to the active Kodi profile directory. Restart Kodi after installation. For Kodi Omega and newer, configure cache behavior in Settings &gt; Services &gt; Caching.</description>
         <platform>all</platform>
         <license>MIT</license>
         <assets>
