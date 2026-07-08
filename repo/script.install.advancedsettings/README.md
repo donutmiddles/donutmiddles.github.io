@@ -2,32 +2,44 @@
 
 This Kodi script add-on installs a bundled `advancedsettings.xml` file into the active Kodi profile directory.
 
-It includes two bundled profiles:
+It includes four bundled profiles:
 
-* `advancedsettings.xml.universal`
-* `advancedsettings.xml.shield`
+* `advancedsettings.xml.universal.low`
+* `advancedsettings.xml.universal.midrange`
+* `advancedsettings.xml.universal.high`
+* `advancedsettings.xml.shield.internal`
 
-When run, the add-on prompts the user to choose whether they are installing for an NVIDIA Shield device or a universal/non-Shield Kodi device.
+When run, the add-on allows the user to install an optimized profile, view the current `advancedsettings.xml` file if one exists, or cancel.
 
 ## What it does
 
-* Prompts the user to choose the **NVIDIA Shield** or **Universal** profile
+* Prompts the user to install a selected `advancedsettings.xml` profile
+* Provides Universal Low, Universal Midrange, Universal High, and Shield Internal LAN options
 * Copies the selected bundled file to `special://profile/advancedsettings.xml`
 * Creates a timestamped backup if an existing `advancedsettings.xml` file is found
 * Prompts before overwriting an existing file
+* Allows the user to view the current `advancedsettings.xml` file if one exists
 * Reminds the user to restart Kodi after installation
 
 ## Bundled profiles
 
-### Universal
+### Universal Low
 
-The Universal profile is intended for general Kodi clients and conservative compatibility across supported platforms.
+The Universal Low profile is intended for lower-powered Kodi clients such as Fire TV devices, budget Onn boxes, older Android TV devices, low-memory streamers, and similar entry-level hardware.
 
-### NVIDIA Shield
+### Universal Midrange
 
-The Shield profile is intended for NVIDIA Shield TV / Shield TV Pro devices, especially when used with Jellyfin through an NGINX reverse proxy and high-bitrate playback, including UHD 4K Blu-ray remux content.
+The Universal Midrange profile is intended for common modern Kodi clients such as Google TV devices, Raspberry Pi-class clients, lightweight mini PCs, and other balanced devices.
 
-The Shield profile includes conservative network, SMB, NFS, artwork, Android passthrough, and playback/resume behavior settings.
+### Universal High
+
+The Universal High profile is intended for stronger Kodi clients such as HTPCs, NUC-style systems, powerful mini PCs, and devices with more capable CPU, GPU, memory, storage, and network resources.
+
+### Shield Internal LAN
+
+The Shield Internal LAN profile is intended for NVIDIA Shield TV / Shield TV Pro devices used on an internal local network with a local server or NAS.
+
+This profile is especially suited for Shield-based local playback environments using Jellyfin, NFS/SMB, wired LAN, and high-bitrate content, including UHD 4K Blu-ray remux files.
 
 ## Installation from ZIP
 
@@ -36,9 +48,10 @@ The Shield profile includes conservative network, SMB, NFS, artwork, Android pas
 3. Select the ZIP file.
 4. After installation, go to **Add-ons > Program add-ons**.
 5. Run **AdvancedSettings Installer**.
-6. Choose either **NVIDIA Shield** or **Universal**.
-7. Confirm the overwrite prompt if an existing `advancedsettings.xml` file is found.
-8. Restart Kodi.
+6. Choose **Install advancedsettings.xml**.
+7. Choose the profile that best matches your device.
+8. Confirm the overwrite prompt if an existing `advancedsettings.xml` file is found.
+9. Restart Kodi.
 
 ## Installation from repository
 
@@ -49,16 +62,30 @@ If this add-on is included in an installed Kodi repository:
 3. Go to **Program add-ons**.
 4. Install **AdvancedSettings Installer**.
 5. Run **AdvancedSettings Installer**.
-6. Choose either **NVIDIA Shield** or **Universal**.
-7. Restart Kodi.
+6. Choose **Install advancedsettings.xml**.
+7. Choose the profile that best matches your device.
+8. Restart Kodi.
+
+## Viewing the current file
+
+If an `advancedsettings.xml` file already exists, the add-on can display its contents from within Kodi.
+
+To view it:
+
+1. Run **AdvancedSettings Installer**.
+2. Choose **View current advancedsettings.xml**.
+
+If no current file exists, the add-on will show the expected location.
 
 ## File locations
 
 Bundled source files:
 
 ```text
-resources/data/advancedsettings.xml.universal
-resources/data/advancedsettings.xml.shield
+resources/data/advancedsettings.xml.universal.low
+resources/data/advancedsettings.xml.universal.midrange
+resources/data/advancedsettings.xml.universal.high
+resources/data/advancedsettings.xml.shield.internal
 ```
 
 Installed destination:
@@ -73,7 +100,7 @@ Kodi resolves `special://profile/` to the active Kodi profile directory.
 
 Kodi only reads `advancedsettings.xml` at startup, so Kodi must be restarted after installation.
 
-For Kodi Omega and newer, video cache size, read factor, and related cache behavior should be configured in:
+For Kodi Omega and newer, video cache size, read factor, chunk size, and related cache behavior should be configured in:
 
 ```text
 Settings > Services > Caching

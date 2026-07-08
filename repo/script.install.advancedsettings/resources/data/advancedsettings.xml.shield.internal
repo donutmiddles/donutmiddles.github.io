@@ -1,6 +1,6 @@
 <advancedsettings version="1.0">
     <!-- Crafted by donutmiddles with assistance from GPT-5.5 Thinking, 2026-07-07 -->
-    <!-- Profile: Nvidia Shield / Shield TV Pro optimized -->
+    <!-- Profile: Nvidia Shield / Shield TV Pro internal Jellyfin-NGINX optimized -->
 
     <!-- Startup -->
     <splash>false</splash>
@@ -16,34 +16,42 @@
         The advancedsettings.xml cache tags shown below are deprecated/ignored
         in Kodi Omega / v21+ and are included only as documentation of intended values.
 
-        Shield / Shield TV Pro high-bitrate playback baseline:
-        - Buffer mode: Buffer all network filesystems
+        Shield internal / strong-client playback baseline:
+        - Buffer mode: Broadest appropriate network/internet buffer mode
 
-          Recommended broad starting point for Shield playback, including
-          HTTP/HTTPS add-ons or servers, Jellyfin/Plex-style server playback,
-          SMB/NFS shares, FTP/WebDAV paths, and reverse-proxy setups.
+          Recommended broad starting point for network-backed playback. In Kodi's
+          GUI, choose the broadest buffer mode that fits the playback path, such as
+          HTTP/HTTPS add-ons or servers, FTP/WebDAV paths, SMB/NFS shares, or
+          reverse-proxy setups. Use a narrower buffer mode only if you know the
+          playback path and the device behaves better with less buffering.
 
         - Memory size: 256-512 MB
 
-          Use 512 MB on Shield TV Pro if Kodi has healthy free memory.
-          Use 256 MB if running a heavy skin, many add-ons, or if Android shows
-          memory pressure, app reloads, or sluggish UI behavior.
+          Use 256 MB as a safe high-end starting point.
+
+          Use 512 MB on strong clients if Kodi has healthy free memory and the device
+          is not showing memory pressure, app reloads, UI lag, or background-service
+          pressure.
+
+          Avoid oversized cache values just because RAM exists.
+          Leave enough memory for Kodi, the skin, add-ons, subtitles, artwork,
+          OS background services, and decoder overhead.
 
         - Read factor: Adaptive if available, otherwise 5x
 
           Adaptive is preferred because it can read more aggressively when the cache
           is empty/low, then throttle back once the cache is healthy. If Adaptive is
-          unavailable, 5x is a reasonable Shield/high-bitrate test value on a stable
-          wired or high-quality Wi-Fi network.
+          unavailable, 5x is a reasonable high-bitrate value on stable networks.
 
         - Chunk size:
+            * Default: 128 KB
             * Start at 256 KB
             * Test 512 KB only if needed
 
             "If needed" means playback still pauses, buffers, stutters, or takes too
             long to refill during high-bitrate scenes after the basics are already
-            healthy: Direct Play is working, the server/storage can keep up, the Shield
-            is not struggling, and the network is stable.
+            healthy: direct/native playback is working, the server/storage can keep up,
+            the Shield is not struggling, and the network is stable.
 
             Do not increase chunk size just because a larger value exists.
             If playback is already smooth, leave it alone.
@@ -64,12 +72,16 @@
 
     <!-- Network / HTTP / NFS behavior -->
     <network>
-        <curlclienttimeout>30</curlclienttimeout>
+        <curlclienttimeout>20</curlclienttimeout>
         <!--
             Seconds before Kodi gives up on an unresponsive HTTP/HTTPS request.
 
-            30 seconds gives remote servers, reverse proxies, NAS-backed media paths,
-            or temporarily busy sources more tolerance before Kodi considers the request failed.
+            20 seconds gives Kodi a more responsive failure point when a remote server,
+            reverse proxy, NAS-backed media path, add-on, CDN, or temporarily busy source
+            does not respond quickly enough.
+
+            Use 30 seconds instead if your media source is known to be slow to wake,
+            remote, overloaded, or more stable with extra connection time.
         -->
 
         <curllowspeedtime>20</curllowspeedtime>
@@ -151,20 +163,20 @@
         <!--
             true allows Kodi to stat files normally.
             If browsing very large SMB directories is slow, testing false may improve listing speed.
-            For Jellyfin/Plex/HTTP-based playback, this usually has little impact.
+            For HTTP-based playback, this usually has little impact.
         -->
     </samba>
 
     <!-- Artwork / texture cache quality -->
     <fanartres>2160</fanartres>
     <!--
-        2160 is appropriate for 4K fanart on Shield TV Pro / strong clients.
+        2160 is appropriate for 4K fanart on high-end / strong-client devices.
         Use 1080 if the UI becomes sluggish or texture cache size becomes an issue.
     -->
 
     <imageres>2160</imageres>
     <!--
-        2160 favors high-quality posters/thumbs on Shield TV Pro.
+        2160 favors high-quality posters/thumbs on strong clients.
 
         Use 1080 if the UI becomes sluggish, texture cache grows too large,
         or storage pressure becomes an issue.
@@ -179,12 +191,12 @@
     -->
 
     <!--
-        Android / Shield passthrough stability
+        Android / passthrough stability
 
         Leave commented by default.
-        Enable only if the Shield actually shows passthrough drift,
-        delayed audio start, occasional video stutter during passthrough,
-        or audio/video sync weirdness.
+        Enable only on Android-based devices that actually show passthrough drift,
+        delayed audio start, occasional video stutter during passthrough, or audio/video
+        sync weirdness.
 
         Start conservatively. Kodi default is 10 ms; 25 ms is a reasonable first
         troubleshooting value. Higher values should only be tested if clearly needed.
@@ -204,7 +216,7 @@
             1 = recalculate FPS from video timestamps when frame timing appears uniform.
             2 = always recalculate FPS from video timestamps.
 
-            Keep at 1 for universal/high-bitrate playback. It gives Kodi a chance to correct
+            Keep at 1 for broad compatibility. It gives Kodi a chance to correct
             inaccurate container-reported FPS while avoiding the more aggressive
             always-recalculate behavior of 2.
 
@@ -227,8 +239,8 @@
         <!--
             Optional subtitle positioning for large TV playback.
 
-            Leave commented for the Universal profile because preferred subtitle placement
-            varies by screen size, skin, device, display overscan, and seating distance.
+            Leave commented by default because preferred subtitle placement varies by
+            screen size, skin, device, display overscan, and seating distance.
 
             <subtitleverticalmargin>120</subtitleverticalmargin>
         -->

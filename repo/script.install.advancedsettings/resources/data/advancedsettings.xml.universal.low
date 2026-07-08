@@ -1,6 +1,6 @@
 <advancedsettings version="1.0">
     <!-- Crafted by donutmiddles with assistance from GPT-5.5 Thinking, 2026-07-07 -->
-    <!-- Profile: Universal midrange / recommended default -->
+    <!-- Profile: Universal low-end / lightweight devices -->
 
     <!-- Startup -->
     <splash>false</splash>
@@ -16,7 +16,7 @@
         The advancedsettings.xml cache tags shown below are deprecated/ignored
         in Kodi Omega / v21+ and are included only as documentation of intended values.
 
-        Universal midrange / recommended playback baseline:
+        Universal low-end / lightweight playback baseline:
         - Buffer mode: Broadest appropriate network/internet buffer mode
 
           Recommended broad starting point for network-backed playback. In Kodi's
@@ -25,29 +25,28 @@
           reverse-proxy setups. Use a narrower buffer mode only if you know the
           playback path and the device behaves better with less buffering.
 
-        - Memory size: 128-256 MB
+        - Memory size: 64-128 MB
 
-          Start with 128 MB on mainstream devices with around 2 GB RAM, moderate
-          CPU/storage performance, or heavier OS background activity.
+          Start with 64 MB on older, entry-level, or 1 GB RAM devices.
 
-          Use 256 MB on stronger midrange / 3-4 GB-class devices only if Kodi remains
+          Use 128 MB on stronger low-end / 2 GB-class devices only if Kodi remains
           responsive and the OS is not showing memory pressure, app reloads, or UI lag.
 
-          Avoid 512 MB+ on midrange profiles unless testing proves it helps.
+          Avoid 256 MB+ on low-end profiles unless testing proves it helps.
           Leave enough memory for Kodi, the skin, add-ons, subtitles, artwork,
           OS background services, and decoder overhead.
 
-        - Read factor: Adaptive if available, otherwise 4x-5x
+        - Read factor: Adaptive if available, otherwise 4x
 
           Adaptive is preferred because it can read more aggressively when the cache
           is empty/low, then throttle back once the cache is healthy. If Adaptive is
-          unavailable, 4x is Kodi's default baseline and 5x is a reasonable high-bitrate
-          test value on stable networks.
+          unavailable, 4x is Kodi's default baseline and is safer than aggressive read
+          factors on weaker hardware.
 
         - Chunk size:
             * Default: 128 KB
-            * Start at 256 KB
-            * Test 512 KB only if needed
+            * Start at 128 KB
+            * Test 256 KB only if needed
 
             "If needed" means playback still pauses, buffers, stutters, or takes too
             long to refill during high-bitrate scenes after the basics are already
@@ -57,17 +56,15 @@
             Do not increase chunk size just because a larger value exists.
             If playback is already smooth, leave it alone.
 
-            * Test 1 MB only as a last-resort troubleshooting step if very high-bitrate
-              UHD remux playback still buffers or refills too slowly despite an otherwise
-              healthy playback path and a stable wired LAN, stable high-quality Wi-Fi,
-              or similarly reliable network connection.
+            * Avoid 512 KB or 1 MB on low-end profiles unless 256 KB has already been
+              tested and playback still pauses, buffers, or refills too slowly.
 
         Example historical cache block included for reference only:
 
         <cache>
-            <memorysize>268435456</memorysize>
+            <memorysize>134217728</memorysize>
             <buffermode>1</buffermode>
-            <readfactor>5</readfactor>
+            <readfactor>4</readfactor>
         </cache>
     -->
 
@@ -169,26 +166,25 @@
     </samba>
 
     <!-- Artwork / texture cache quality -->
-    <fanartres>2160</fanartres>
+    <fanartres>1080</fanartres>
     <!--
-        2160 is reasonable for 4K fanart on many midrange devices.
-        Use 1080 if the UI becomes sluggish or texture cache size becomes an issue.
+        1080 is safer for low-end / lightweight devices.
+        Use 720 only if the UI remains sluggish or texture cache size becomes an issue.
     -->
 
-    <imageres>1080</imageres>
+    <imageres>720</imageres>
     <!--
-        1080 improves poster/thumb quality over Kodi's lower default without being as
-        aggressive as 2160.
+        720 keeps posters/thumbs lighter for low-memory or weaker devices.
 
-        Use 720 if the UI becomes sluggish or storage pressure becomes an issue.
+        Use 1080 only if the UI remains smooth and storage pressure is not an issue.
     -->
 
     <imagequalityjpeg>4</imagequalityjpeg>
     <!--
         Kodi default compromise between artwork quality and thumbnail/cache size.
 
-        Use 0-3 only on stronger clients where maximum artwork quality matters more than
-        texture cache size, storage usage, and UI responsiveness.
+        Avoid 0-3 on low-end profiles unless the device is clearly responsive
+        and maximum artwork quality matters more than storage usage and UI speed.
     -->
 
     <!--

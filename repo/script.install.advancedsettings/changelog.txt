@@ -1,20 +1,34 @@
+v1.2.0
+
+* Simplified profile selection to four optimized profiles: Universal Low, Universal Midrange, Universal High, and Shield Internal LAN.
+* Updated bundled profile filenames to advancedsettings.xml.universal.low, advancedsettings.xml.universal.midrange, advancedsettings.xml.universal.high, and advancedsettings.xml.shield.internal.
+* Added a main menu with options to install a profile, view the current advancedsettings.xml file, or cancel.
+* Added a built-in viewer for the current active advancedsettings.xml file when one exists.
+* Refined device-selection wording with clearer real-world device examples.
+* Continued installing all selected profiles to special://profile/advancedsettings.xml for proper Kodi profile compatibility.
+
 v1.1.0
-- Updated the addon to allow for choice of multiple devices based on user's actual use-case.
-- Redesigned the XML files with additional tweaks/formatting enhancements for universal compatibility.
+
+* Updated the addon to allow for choice of multiple devices based on user's actual use-case.
+* Redesigned the XML files with additional tweaks/formatting enhancements for universal compatibility.
 
 v1.0.3
-- Refined both the XML files with additional tweaks/formatting enhancements.
-- Updated addon README.md to reflect its newer state.
+
+* Refined both the XML files with additional tweaks/formatting enhancements.
+* Updated addon README.md to reflect its newer state.
 
 v1.0.2
-- Updated this to allow selection between different versions of the file depending on device.
+
+* Updated this to allow selection between different versions of the file depending on device.
 
 v1.0.1
-- Corrected the button coding.
-- Complete without erroring.
+
+* Corrected the button coding.
+* Complete without erroring.
 
 v1.0.0
-- Initial release.
-- Installs bundled advancedsettings.xml to the active Kodi profile.
-- Creates a timestamped backup of any existing advancedsettings.xml file.
-- Prompts before overwriting an existing advancedsettings.xml file.
+
+* Initial release.
+* Installs bundled advancedsettings.xml to the active Kodi profile.
+* Creates a timestamped backup of any existing advancedsettings.xml file.
+* Prompts before overwriting an existing advancedsettings.xml file.

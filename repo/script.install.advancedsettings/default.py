@@ -28,45 +28,27 @@ DEST_FILE = xbmcvfs.translatePath("special://profile/advancedsettings.xml")
 
 PROFILE_OPTIONS = [
     {
-        "label": "NVIDIA Shield TV / Shield TV Pro",
-        "file": "advancedsettings.xml.shield"
-    },
-    {
-        "label": "Fire TV Stick / Budget Android TV",
-        "file": "advancedsettings.xml.firetv.low"
-    },
-    {
-        "label": "Google TV / Midrange Android TV",
-        "file": "advancedsettings.xml.android.midrange"
-    },
-    {
-        "label": "Raspberry Pi / LibreELEC / CoreELEC",
-        "file": "advancedsettings.xml.pi.libreelec"
-    },
-    {
-        "label": "Windows HTPC / Mini PC",
-        "file": "advancedsettings.xml.windows.htpc"
-    },
-    {
-        "label": "Linux HTPC / Mini PC",
-        "file": "advancedsettings.xml.linux.htpc"
-    },
-    {
-        "label": "macOS HTPC",
-        "file": "advancedsettings.xml.macos.htpc"
-    },
-    {
-        "label": "Universal - Low-end",
+        "label": "Universal Low (Fire TV, Onn, budget boxes)",
         "file": "advancedsettings.xml.universal.low"
     },
     {
-        "label": "Universal - Midrange",
+        "label": "Universal Midrange (Google TV, Pi, mini PCs)",
         "file": "advancedsettings.xml.universal.midrange"
     },
     {
-        "label": "Universal - High-end",
+        "label": "Universal High (HTPC, NUC, powerful clients)",
         "file": "advancedsettings.xml.universal.high"
+    },
+    {
+        "label": "Shield Internal LAN (Shield + local server/NAS)",
+        "file": "advancedsettings.xml.shield.internal"
     }
+]
+
+MAIN_MENU_OPTIONS = [
+    "Install advancedsettings.xml",
+    "View current advancedsettings.xml",
+    "Cancel"
 ]
 
 
@@ -91,12 +73,74 @@ def source_path(filename):
     )
 
 
+def choose_main_action():
+    choice = xbmcgui.Dialog().select(
+        ADDON_NAME,
+        MAIN_MENU_OPTIONS
+    )
+
+    if choice == -1 or choice == 2:
+        return "cancel"
+
+    if choice == 1:
+        return "view"
+
+    return "install"
+
+
+def read_text_file(path):
+    file_handle = None
+
+    try:
+        file_handle = xbmcvfs.File(path)
+        contents = file_handle.read()
+    except Exception as error:
+        log("Could not read file %s: %s" % (path, error), xbmc.LOGERROR)
+        return None
+    finally:
+        try:
+            if file_handle:
+                file_handle.close()
+        except Exception:
+            pass
+
+    if isinstance(contents, bytes):
+        contents = contents.decode("utf-8", "replace")
+
+    return contents
+
+
+def view_current_advancedsettings():
+    if not xbmcvfs.exists(DEST_FILE):
+        show_ok(
+            "No current advancedsettings.xml file was found.\n\n"
+            "Expected location:\n%s" % DEST_FILE
+        )
+        return
+
+    contents = read_text_file(DEST_FILE)
+
+    if contents is None:
+        show_ok("Could not open the current advancedsettings.xml file.")
+        return
+
+    if not contents.strip():
+        contents = "[advancedsettings.xml exists, but it appears to be empty.]"
+
+    xbmcgui.Dialog().textviewer(
+        "Current advancedsettings.xml",
+        contents,
+        True
+    )
+    log("Viewed current advancedsettings.xml at %s" % DEST_FILE)
+
+
 def choose_source_file():
     labels = [profile["label"] for profile in PROFILE_OPTIONS]
     labels.append("Cancel")
 
     choice = xbmcgui.Dialog().select(
-        ADDON_NAME,
+        "Choose your device",
         labels
     )
 
@@ -167,5 +211,20 @@ def install_advancedsettings():
     )
 
 
+def main():
+    action = choose_main_action()
+
+    if action == "view":
+        view_current_advancedsettings()
+        return
+
+    if action == "install":
+        install_advancedsettings()
+        return
+
+    notify("AdvancedSettings cancelled.")
+    log("Cancelled from main menu.")
+
+
 if __name__ == "__main__":
-    install_advancedsettings()
+    main()
