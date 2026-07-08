@@ -1,6 +1,6 @@
 <advancedsettings version="1.0">
     <!-- Crafted by donutmiddles with assistance from GPT-5.5 Thinking, 2026-07-07 -->
-    <!-- Profile: Nvidia Shield / Shield TV Pro optimized -->
+    <!-- Profile: Fire TV low-memory / entry-level optimized -->
 
     <!-- Startup -->
     <splash>false</splash>
@@ -16,60 +16,68 @@
         The advancedsettings.xml cache tags shown below are deprecated/ignored
         in Kodi Omega / v21+ and are included only as documentation of intended values.
 
-        Shield / Shield TV Pro high-bitrate playback baseline:
+        Fire TV low-memory / entry-level playback baseline:
         - Buffer mode: Buffer all network filesystems
 
-          Recommended broad starting point for Shield playback, including
-          HTTP/HTTPS add-ons or servers, Jellyfin/Plex-style server playback,
-          SMB/NFS shares, FTP/WebDAV paths, and reverse-proxy setups.
+          Recommended broad starting point for network-backed playback, including
+          HTTP/HTTPS add-ons or servers, SMB/NFS shares, FTP/WebDAV paths, and
+          reverse-proxy setups. On low-memory Fire TV devices, use a narrower buffer
+          mode only if you know the playback path and the device behaves better with
+          less buffering.
 
-        - Memory size: 256-512 MB
+        - Memory size: 64-128 MB
 
-          Use 512 MB on Shield TV Pro if Kodi has healthy free memory.
-          Use 256 MB if running a heavy skin, many add-ons, or if Android shows
-          memory pressure, app reloads, or sluggish UI behavior.
+          Start with 64 MB on older or entry-level Fire TV sticks, especially 1 GB
+          RAM models, older Fire OS devices, or devices that reload apps often.
 
-        - Read factor: Adaptive if available, otherwise 5x
+          Use 128 MB on stronger low-end / 2 GB-class Fire TV devices only if Kodi
+          remains responsive and Fire OS is not showing memory pressure.
+
+          Avoid 256 MB+ on low-memory Fire TV profiles unless testing proves it helps.
+          Leave enough memory for Kodi, the skin, add-ons, subtitles, artwork, Fire OS
+          background services, and decoder overhead.
+
+        - Read factor: Adaptive if available, otherwise 4x
 
           Adaptive is preferred because it can read more aggressively when the cache
           is empty/low, then throttle back once the cache is healthy. If Adaptive is
-          unavailable, 5x is a reasonable Shield/high-bitrate test value on a stable
-          wired or high-quality Wi-Fi network.
+          unavailable, 4x is Kodi's default baseline and is safer than aggressive read
+          factors on weaker Android/Fire TV hardware.
 
         - Chunk size:
-            * Start at 256 KB
-            * Test 512 KB only if needed
+            * Default: 128 KB
+            * Start at 128 KB
+            * Test 256 KB only if needed
 
             "If needed" means playback still pauses, buffers, stutters, or takes too
             long to refill during high-bitrate scenes after the basics are already
-            healthy: Direct Play is working, the server/storage can keep up, the Shield
+            healthy: Direct Play is working, the server/storage can keep up, the Fire TV
             is not struggling, and the network is stable.
 
             Do not increase chunk size just because a larger value exists.
             If playback is already smooth, leave it alone.
 
-            * Test 1 MB only as a last-resort troubleshooting step if very high-bitrate
-              UHD remux playback still buffers or refills too slowly despite an otherwise
-              healthy playback path and a stable wired LAN, stable high-quality Wi-Fi,
-              or similarly reliable network connection.
+            * Avoid 512 KB or 1 MB on low-memory Fire TV profiles unless 256 KB has
+            already been tested and playback still pauses, buffers, or refills too slowly.
 
         Example historical cache block included for reference only:
 
         <cache>
-            <memorysize>536870912</memorysize>
+            <memorysize>134217728</memorysize>
             <buffermode>1</buffermode>
-            <readfactor>5</readfactor>
+            <readfactor>4</readfactor>
         </cache>
     -->
 
     <!-- Network / HTTP / NFS behavior -->
     <network>
-        <curlclienttimeout>30</curlclienttimeout>
+        <curlclienttimeout>20</curlclienttimeout>
         <!--
             Seconds before Kodi gives up on an unresponsive HTTP/HTTPS request.
 
-            30 seconds gives remote servers, reverse proxies, NAS-backed media paths,
-            or temporarily busy sources more tolerance before Kodi considers the request failed.
+            20 seconds gives low-memory Fire TV devices a more responsive failure point
+            when a remote server, reverse proxy, NAS-backed media path, or temporarily
+            busy source does not respond quickly enough.
         -->
 
         <curllowspeedtime>20</curllowspeedtime>
@@ -106,14 +114,14 @@
             <disableipv6>true</disableipv6>
         -->
 
-        <disablehttp2>true</disablehttp2>
         <!--
-            Force Kodi/curl to avoid HTTP/2.
+            HTTP/2 troubleshooting
 
-            Intentionally enabled for Shield + Jellyfin + NGINX reverse proxy use
-            when HTTP/1.1 has proven more stable than HTTP/2 for playback.
+            Leave this omitted by default.
+            Enable only if Kodi playback is unstable with a specific HTTP/2 server,
+            reverse proxy, add-on, or CDN path.
 
-            Remove or comment out if your Jellyfin/NGINX/Kodi path is stable over HTTP/2.
+            <disablehttp2>true</disablehttp2>
         -->
 
         <nfstimeout>30</nfstimeout>
@@ -124,6 +132,9 @@
             during wake-up, disk spin-up, temporary I/O delay, or heavy scan/import load.
 
             Applies only to Kodi's internal NFS client.
+
+            For low-memory Fire TV devices, HTTP/server-based playback is often preferable to
+            heavy direct browsing of large NFS folders.
         -->
 
         <nfsretries>0</nfsretries>
@@ -150,39 +161,40 @@
         <statfiles>true</statfiles>
         <!--
             true allows Kodi to stat files normally.
-            If browsing very large SMB directories is slow, testing false may improve listing speed.
-            For Jellyfin/Plex/HTTP-based playback, this usually has little impact.
+            If browsing very large SMB directories is slow on low-memory Fire TV devices,
+            testing false may improve listing speed.
+
+            For HTTP-based playback, this usually has little impact.
         -->
     </samba>
 
     <!-- Artwork / texture cache quality -->
-    <fanartres>2160</fanartres>
+    <fanartres>1080</fanartres>
     <!--
-        2160 is appropriate for 4K fanart on Shield TV Pro / strong clients.
-        Use 1080 if the UI becomes sluggish or texture cache size becomes an issue.
+        1080 is safer for Fire TV low-memory / entry-level devices.
+        Use 720 only if the UI remains sluggish or texture cache size becomes an issue.
     -->
 
-    <imageres>2160</imageres>
+    <imageres>720</imageres>
     <!--
-        2160 favors high-quality posters/thumbs on Shield TV Pro.
+        720 keeps posters/thumbs lighter for low-memory Fire TV devices.
 
-        Use 1080 if the UI becomes sluggish, texture cache grows too large,
-        or storage pressure becomes an issue.
+        Use 1080 only if the UI remains smooth and storage pressure is not an issue.
     -->
 
-    <imagequalityjpeg>0</imagequalityjpeg>
+    <imagequalityjpeg>4</imagequalityjpeg>
     <!--
-        Maximum JPEG artwork quality. Larger texture cache; best visual quality.
+        Kodi default compromise between artwork quality and thumbnail/cache size.
 
-        Kodi default is 4. Use 3 or 4 if storage usage, texture cache size,
-        or UI responsiveness becomes a problem.
+        Avoid 0-3 on low-memory Fire TV profiles unless the device is clearly responsive
+        and maximum artwork quality matters more than storage usage and UI speed.
     -->
 
     <!--
-        Android / Shield passthrough stability
+        Android / Fire TV passthrough stability
 
         Leave commented by default.
-        Enable only if the Shield actually shows passthrough drift,
+        Enable only if the Fire TV actually shows passthrough drift,
         delayed audio start, occasional video stutter during passthrough,
         or audio/video sync weirdness.
 
@@ -227,7 +239,7 @@
         <!--
             Optional subtitle positioning for large TV playback.
 
-            Leave commented for the Universal profile because preferred subtitle placement
+            Leave commented for the Fire TV low profile because preferred subtitle placement
             varies by screen size, skin, device, display overscan, and seating distance.
 
             <subtitleverticalmargin>120</subtitleverticalmargin>

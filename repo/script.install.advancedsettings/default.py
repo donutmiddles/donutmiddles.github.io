@@ -23,21 +23,51 @@ DATA_DIR = xbmcvfs.translatePath(
     )
 )
 
-SOURCE_UNIVERSAL = xbmcvfs.translatePath(
-    os.path.join(
-        DATA_DIR,
-        "advancedsettings.xml.universal"
-    )
-)
-
-SOURCE_SHIELD = xbmcvfs.translatePath(
-    os.path.join(
-        DATA_DIR,
-        "advancedsettings.xml.shield"
-    )
-)
-
 DEST_FILE = xbmcvfs.translatePath("special://profile/advancedsettings.xml")
+
+
+PROFILE_OPTIONS = [
+    {
+        "label": "NVIDIA Shield TV / Shield TV Pro",
+        "file": "advancedsettings.xml.shield"
+    },
+    {
+        "label": "Fire TV Stick / Budget Android TV",
+        "file": "advancedsettings.xml.firetv.low"
+    },
+    {
+        "label": "Google TV / Midrange Android TV",
+        "file": "advancedsettings.xml.android.midrange"
+    },
+    {
+        "label": "Raspberry Pi / LibreELEC / CoreELEC",
+        "file": "advancedsettings.xml.pi.libreelec"
+    },
+    {
+        "label": "Windows HTPC / Mini PC",
+        "file": "advancedsettings.xml.windows.htpc"
+    },
+    {
+        "label": "Linux HTPC / Mini PC",
+        "file": "advancedsettings.xml.linux.htpc"
+    },
+    {
+        "label": "macOS HTPC",
+        "file": "advancedsettings.xml.macos.htpc"
+    },
+    {
+        "label": "Universal - Low-end",
+        "file": "advancedsettings.xml.universal.low"
+    },
+    {
+        "label": "Universal - Midrange",
+        "file": "advancedsettings.xml.universal.midrange"
+    },
+    {
+        "label": "Universal - High-end",
+        "file": "advancedsettings.xml.universal.high"
+    }
+]
 
 
 def notify(message, level=xbmcgui.NOTIFICATION_INFO, seconds=5000):
@@ -52,23 +82,30 @@ def show_ok(message):
     xbmcgui.Dialog().ok(ADDON_NAME, message)
 
 
-def choose_source_file():
-    choice = xbmcgui.Dialog().select(
-        ADDON_NAME,
-        [
-            "NVIDIA Shield",
-            "Universal",
-            "Cancel"
-        ]
+def source_path(filename):
+    return xbmcvfs.translatePath(
+        os.path.join(
+            DATA_DIR,
+            filename
+        )
     )
 
-    if choice == -1 or choice == 2:
+
+def choose_source_file():
+    labels = [profile["label"] for profile in PROFILE_OPTIONS]
+    labels.append("Cancel")
+
+    choice = xbmcgui.Dialog().select(
+        ADDON_NAME,
+        labels
+    )
+
+    if choice == -1 or choice == len(labels) - 1:
         return None, None
 
-    if choice == 0:
-        return SOURCE_SHIELD, "NVIDIA Shield"
+    profile = PROFILE_OPTIONS[choice]
 
-    return SOURCE_UNIVERSAL, "Universal"
+    return source_path(profile["file"]), profile["label"]
 
 
 def backup_existing_file():
@@ -83,6 +120,8 @@ def backup_existing_file():
         show_ok(msg)
         return False
 
+    log("Existing advancedsettings.xml backed up to %s" % backup_file)
+
     overwrite = xbmcgui.Dialog().yesno(
         ADDON_NAME,
         "Backup created.\n\nOverwrite existing advancedsettings.xml?",
@@ -92,7 +131,7 @@ def backup_existing_file():
 
     if not overwrite:
         notify("Install cancelled.")
-        log("Install cancelled by user.")
+        log("Install cancelled by user after backup.")
         return False
 
     return True

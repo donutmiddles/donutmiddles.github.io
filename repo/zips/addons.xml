@@ -667,7 +667,7 @@
         <description lang="en_NZ">FENtastic Helper for the FENtastic Skin.</description>
         <description lang="en_US">FENtastic Helper for the FENtastic Skin.</description>
     </extension>
-</addon><addon id="script.install.advancedsettings" name="AdvancedSettings Installer" provider-name="donutmiddles" version="1.0.3">
+</addon><addon id="script.install.advancedsettings" name="AdvancedSettings Installer" provider-name="donutmiddles" version="1.1.0">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
     </requires>

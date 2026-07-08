@@ -1,3 +1,7 @@
+v1.1.0
+- Updated the addon to allow for choice of multiple devices based on user's actual use-case.
+- Redesigned the XML files with additional tweaks/formatting enhancements for universal compatibility.
+
 v1.0.3
 - Refined both the XML files with additional tweaks/formatting enhancements.
 - Updated addon README.md to reflect its newer state.
