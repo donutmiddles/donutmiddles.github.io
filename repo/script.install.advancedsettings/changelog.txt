@@ -1,11 +1,10 @@
 v1.2.0
 
 * Simplified profile selection to four optimized profiles: Universal Low, Universal Midrange, Universal High, and Shield Internal LAN.
-* Updated bundled profile filenames to advancedsettings.xml.universal.low, advancedsettings.xml.universal.midrange, advancedsettings.xml.universal.high, and advancedsettings.xml.shield.internal.
-* Added a main menu with options to install a profile, view the current advancedsettings.xml file, or cancel.
+* Updated bundled profile filenames to simplify association.
+* Added a main menu, with options to install a profile, view the current advancedsettings.xml file, or cancel.
 * Added a built-in viewer for the current active advancedsettings.xml file when one exists.
 * Refined device-selection wording with clearer real-world device examples.
-* Continued installing all selected profiles to special://profile/advancedsettings.xml for proper Kodi profile compatibility.
 
 v1.1.0
 
