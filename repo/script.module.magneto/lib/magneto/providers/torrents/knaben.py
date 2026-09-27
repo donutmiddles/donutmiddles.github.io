@@ -232,4 +232,4 @@ class source:
 				elif episode_start: item.update({'episode_start': episode_start, 'episode_end': episode_end}) # for partial season packs
 				self.sources_append(item)
 			except:
-				source_utils.scraper_error('knaben')
+				source_utils.scraper_error('KNABEN')

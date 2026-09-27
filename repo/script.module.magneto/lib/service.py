@@ -1,3 +1,3 @@
-from entry import SettingsServiceMonitor
 
-if __name__ == '__main__': SettingsServiceMonitor().run()
+if __name__ == '__main__':
+	__import__('entry').SettingsServiceMonitor()()
