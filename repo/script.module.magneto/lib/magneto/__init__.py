@@ -23,6 +23,7 @@ def sources(specified_folders=None, ret_all=False):
 				if not ret_all and not enabledCheck(module_name): continue
 				try:
 					module = importlib.import_module('.%s.%s.%s' % (sourceFolder, i, module_name), package=__name__)
+					if hasattr(module.source, 'clear_all'): module.source.clear_all()
 					append((module_name, module.source))
 				except Exception as e:
 					from magneto.modules import log_utils

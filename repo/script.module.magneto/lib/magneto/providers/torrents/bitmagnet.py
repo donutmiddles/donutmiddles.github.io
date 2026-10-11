@@ -4,18 +4,19 @@
 """
 
 import xml.etree.ElementTree as ET
-import queue
+from threading import Lock
 from magneto.modules import client
 from magneto.modules import source_utils
 
 
-class source:
+class source(source_utils.SourceRegistry):
 	timeout = 10
 	priority = 1
 	pack_capable = True
 	hasMovies = True
 	hasEpisodes = True
-	_queue = queue.SimpleQueue()
+	_lock = Lock()
+	_cache = {}
 	def __init__(self):
 		self.language = ['en']
 		self.base_link = "https://bitmagnetfortheweebs.midnightignite.me"
@@ -27,6 +28,7 @@ class source:
 		sources = []
 		if not data: return sources
 		sources_append = sources.append
+		future = self.get_future(str(data))
 		try:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU').replace('/', ' ')
@@ -43,18 +45,13 @@ class source:
 				hdlr = year
 				url = '%s%s' % (self.base_link, self.movieSearch_link % imdb)
 			# log_utils.log('url = %s' % url)
-			try:
-				results = client.request(url, timeout=self.timeout)
-				files = ET.fromstring(results)
-			except:
-				files = ET.fromstring('<?xml version="1.0" ?><metadata />')
-				raise
-			finally:
-				self._queue.put_nowait(files) # if seasons
-				self._queue.put_nowait(files) # if shows
+			results = client.request(url, timeout=self.timeout)
+			files = ET.fromstring(results)
+			if not future.done(): future.set_result(files)
 			undesirables = source_utils.get_undesirables()
 			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
+			if not future.done(): future.set_result(ET.fromstring('<?xml version="1.0" ?><metadata />'))
 			source_utils.scraper_error('BITMAGNET')
 			return sources
 
@@ -108,7 +105,7 @@ class source:
 			year = data['year']
 			season = data['season']
 			url = '%s%s' % (self.base_link, self.tvSearch_link % (imdb, season, data['episode']))
-			files = self._queue.get(timeout=self.timeout + 1)
+			files = self.get_future(str(data)).result(timeout=self.timeout + 1)
 			undesirables = source_utils.get_undesirables()
 			check_foreign_audio = source_utils.check_foreign_audio()
 		except:

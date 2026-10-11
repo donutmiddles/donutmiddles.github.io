@@ -4,6 +4,7 @@
 
 import re
 from string import printable
+from concurrent.futures import Future
 from magneto.modules import cleantitle
 from magneto.modules.undesirables import Undesirables
 from magneto.modules.control import homeWindow, setting as getSetting, setSetting
@@ -81,6 +82,21 @@ unwanted_tags = ('tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.w
 			'crazy4tv-com', '(es)')
 
 home_getProperty = homeWindow.getProperty
+
+
+class SourceRegistry:
+	_lock = None # Must be overridden by subclass
+	_cache = None # Must be overridden by subclass
+
+	@classmethod
+	def clear_all(cls):
+		with cls._lock: cls._cache.clear()
+
+	def get_future(self, key):
+		with self._lock:
+			if key not in self._cache:
+				self._cache[key] = Future()
+			return self._cache[key]
 
 def get_undesirables():
 	if not getSetting('filter.undesirables') == 'true' or home_getProperty('fs_filterless_search') == 'true' : return []
