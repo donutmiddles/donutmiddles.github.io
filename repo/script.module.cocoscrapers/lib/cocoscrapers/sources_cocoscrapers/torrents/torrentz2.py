@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 2-8-2024)
+# created by Venom for Fenomscrapers
 """
-	CocoScrapers Project
+	Fenomscrapers Project
 """
 
 import re
 from urllib.parse import quote_plus, unquote_plus
 from cocoscrapers.modules import client
-from cocoscrapers.modules import source_utils, log_utils
+from cocoscrapers.modules import source_utils
 from cocoscrapers.modules import workers
 SERVER_ERROR = ('something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable')
 
@@ -38,13 +37,14 @@ class source:
 				title = data['title'].replace('&', 'and').replace('/', ' ').replace('$', 's')
 				episode_title = None
 				hdlr = year
+
 			query = '%s %s' % (re.sub(r'[^A-Za-z0-9\s\.-]+', '', title), hdlr)
+
 			url = '%s%s' % (self.base_link, self.search_link % quote_plus(query))
-			# log_utils.log('url = %s' % url)
+
 			results = client.request(url, timeout=10)
 			if not results or any(value in results for value in SERVER_ERROR): return sources
 			rows = client.parseDOM(results, 'dl')
-
 			undesirables = source_utils.get_undesirables()
 			check_foreign_audio = source_utils.check_foreign_audio()
 		except:
@@ -57,8 +57,7 @@ class source:
 
 				url = unquote_plus(columns[0]).replace('&amp;', '&')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url).replace(' ', '.') # some links on torrentz2 &tr= before &dn=
-				try: url = re.search(r'(magnet:.+?)">', url, re.I).group(1).replace(' ', '.')
-				except: continue
+				url = re.search(r'(magnet:.+?)">', url, re.I).group(1).replace(' ', '.')
 
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(url.split('&dn=')[1])
@@ -68,7 +67,7 @@ class source:
 				if source_utils.remove_lang(name_info, check_foreign_audio): continue
 				if undesirables and source_utils.remove_undesirables(name_info, undesirables): continue
 
-				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+				if not episode_title:
 					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					name_lower = name.lower()
 					if any(re.search(item, name_lower) for item in ep_strings): continue
@@ -141,13 +140,11 @@ class source:
 		for row in rows:
 			try:
 				if 'magnet:' not in row: continue
-				# columns = re.findall(r'<td.*?>(.+?)</td>', row, re.DOTALL)
 				columns = re.findall(r'<span.*?>(.+?)</span>', row, re.DOTALL)
 
 				url = unquote_plus(columns[0]).replace('&amp;', '&')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url).replace(' ', '.') # some links on torrentz2 &tr= before &dn=
-				try: url = re.search(r'(magnet:.+?)">', url, re.I).group(1).replace(' ', '.')
-				except: continue
+				url = re.search(r'(magnet:.+?)">', url, re.I).group(1).replace(' ', '.')
 
 				hash = re.search(r'btih:(.*?)&', url, re.I).group(1)
 				name = source_utils.clean_name(url.split('&dn=')[1])
