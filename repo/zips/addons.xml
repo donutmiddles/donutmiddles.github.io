@@ -686,7 +686,7 @@
             <fanart>resources/media/advancedsettings_fanart_01.jpg</fanart>
         </assets>
     </extension>
-</addon><addon id="script.module.cocoscrapers" name="CocoScrapers Module" version="1.0.43" provider-name="CocoJoe">
+</addon><addon id="script.module.cocoscrapers" name="CocoScrapers Module" version="1.0.45" provider-name="CocoJoe">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 		<import addon="script.module.requests" />
@@ -711,7 +711,7 @@
 			<fanart>fanart.png</fanart>
 			<screenshot />
 		</assets>
-		<news>Update Torlock, Knaben, Nyaa, YTS and Kickass</news>
+		<news>Avoid strptime failures during episode air-date validation that can abort provider searches.</news>
 	</extension>
 </addon><addon id="script.module.magneto" version="6.10.01" name="Magneto Module" provider-name="Magneto">
 	<requires>
